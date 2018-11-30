@@ -23,6 +23,7 @@ freely, subject to the following restrictions:
 
 #include <cassert>
 #include <iostream>
+#include <iterator>
 
 #include "misc.h"
 #include "cache.h"
@@ -108,11 +109,118 @@ bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const
 
 // Insert a new cache line by popping the least recently used line if necessary
 // and pushing the new line to the back (most recently used)
-void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state)
+void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data)
 {
    if (sets[set].size() == maxSetSize) {
       sets[set].pop_front();
    }
+   // std::cout << "Max Set Size" << maxSetSize << "\n";
 
-   sets[set].emplace_back(tag, state);
+   sets[set].emplace_back(tag, state, data);
+}
+
+void Cache::snapshot()
+{
+    int way_count;
+    // int data_count;
+
+    for (uint i=0; i<sets.size(); i++) {
+        way_count = 0;
+        std::cout << "Cache Line #" << i << " \n";
+        for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
+            // data_count = 0;
+            std::cout << "Way #" << way_count << ", Tag: " << std::hex << it->tag << ", Data: ";
+            for (int j=0; j<64; j++) {
+                std::cout << std::hex << it->data[j] << " ";
+                // data_count++;
+            }
+            way_count++;
+            std::cout << "\n\n";
+            // std::cout << "Data count: " << std::dec << data_count << "\n";
+        }
+    }
+    std::cout << "\n";
+
+}
+
+void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
+{
+    std::array<int,64> maskedData;
+
+    if (maskedBits == 1) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 7) {
+                maskedData[i] = 254;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else if (maskedBits == 2) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 7) {
+                maskedData[i] = 252;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else if (maskedBits == 4) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 7) {
+                maskedData[i] = 240;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else if (maskedBits == 8) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 7) {
+                maskedData[i] = 0;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else if (maskedBits == 16) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 6 || i % 8 == 7) {
+                maskedData[i] = 0;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else if (maskedBits == 32) {
+        for (int i=0; i<64; i++) {
+            maskedData[i] = lineData[i];
+            if (i % 8 == 4 || i % 8 == 5 || i % 8 == 6 || i % 8 == 7) {
+                maskedData[i] = 0;
+            }
+        }
+        occurence[maskedData]++;
+    }
+    else {
+        occurence[lineData]++;
+    }
+}
+
+void Cache::printSimilarity()
+{
+    int unique_data = 0;
+    std::cout << "\nSimilarity Stats\n_________________\n\n";
+    for (auto it = occurence.begin(); it != occurence.end(); ++it) {
+        unique_data++;
+    }
+    for (auto it = occurence.begin(); it != occurence.end(); ++it) {
+        double percentage = (double(it->second)/unique_data)*100;
+        if (percentage > 10.00) {
+            std::cout << "Cache Data: ";
+            for (int i=0; i<64; i++) {
+                std::cout << it->first[i] << " ";
+            }
+            std::cout << "Count: " << it->second << "\n\n";
+        }
+    }
 }

@@ -24,6 +24,7 @@ freely, subject to the following restrictions:
 #pragma once
 
 #include <vector>
+#include <array>
 #include <unordered_set>
 #include <unordered_map>
 #include <memory>
@@ -73,7 +74,7 @@ public:
    System(unsigned int line_size, unsigned int num_lines, unsigned int assoc,
           std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
           bool do_addr_trans=false);
-   virtual void memAccess(uint64_t address, AccessType type, unsigned int tid) = 0;
+   virtual void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) = 0;
    SystemStats stats;
 };
 
@@ -102,7 +103,7 @@ public:
             std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
             bool do_addr_trans=false, unsigned int num_domains=1);
 
-   void memAccess(uint64_t address, AccessType type, unsigned int tid) override;
+   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
 };
 
 // For a system containing a sinle cache
@@ -113,7 +114,10 @@ public:
                std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
                bool do_addr_trans=false);
 
-   void memAccess(uint64_t address, AccessType type, unsigned int tid) override;
+   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
+   void snapshot();
+   void checkSimilarity(std::array<int,64> lineData, int maskedBits);
+   void printSimilarity();
 private:
    std::unique_ptr<Cache> cache;
 };

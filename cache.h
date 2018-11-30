@@ -24,9 +24,32 @@ freely, subject to the following restrictions:
 #pragma once
 
 #include <vector>
+#include <array>
+#include <unordered_map>
 #include <deque>
 
 #include "misc.h"
+
+namespace std
+{
+    template<typename T, size_t N>
+    struct hash<array<T, N> >
+    {
+        typedef array<T, N> argument_type;
+        typedef size_t result_type;
+
+        result_type operator()(const argument_type& a) const
+        {
+            hash<T> hasher;
+            result_type h = 0;
+            for (result_type i = 0; i < N; ++i)
+            {
+                h = h * 31 + hasher(a[i]);
+            }
+            return h;
+        }
+    };
+}
 
 // Represents a single cache
 class Cache {
@@ -43,9 +66,13 @@ public:
    bool checkWriteback(uint64_t set, uint64_t& tag) const;
    // Line should not already exist in cache. Will remove the LRU line in set
    // if there is not enough space, so checkWriteback should be called before this
-   void insertLine(uint64_t set, uint64_t tag, CacheState state);
+   void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
+   void snapshot();
+   void checkSimilarity(std::array<int,64> lineData, int maskedBits);
+   void printSimilarity();
 private:
    std::vector<std::deque<CacheLine>> sets;
    unsigned int maxSetSize;
+   std::unordered_map<std::array<int,64>, int> occurence;
 };
 

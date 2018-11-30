@@ -5,11 +5,12 @@ CXXFLAGS=$(RELEASE_FLAGS)
 DEPS=$(wildcard *.h) Makefile
 OBJ=system.o cache.o prefetch.o
 BUILD_DIR=$(shell pwd)
+ZSTR_DIR=/home/vic/zstr/src/
 
 all: cache tags check tests/random tests/unit cscope.out 
 
 cache: main.cpp $(DEPS) $(OBJ)
-	$(CXX) $(CXXFLAGS) -o cache main.cpp $(OBJ)
+	$(CXX) $(CXXFLAGS) -I$(ZSTR_DIR) -o cache main.cpp $(OBJ) -lz
 
 tests/random: tests/random.cpp $(DEPS) $(OBJ)
 	$(CXX) $(CXXFLAGS) -I$(BUILD_DIR) -o tests/random tests/random.cpp $(OBJ)

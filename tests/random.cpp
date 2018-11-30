@@ -131,7 +131,7 @@ int main(int argc, char* argv[]) {
 
       auto start = chrono::high_resolution_clock::now();
       for (int j=0; j<2000; ++j) {
-         sys->memAccess(access_buffer[j].address, access_buffer[j].accessType, access_buffer[j].tid);
+         // sys->memAccess(access_buffer[j].address, access_buffer[j].accessType, access_buffer[j].tid);
       }
       auto end = chrono::high_resolution_clock::now();
       run_time += chrono::duration_cast<chrono::duration<double>>(end - start);

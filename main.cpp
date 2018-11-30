@@ -26,12 +26,13 @@ freely, subject to the following restrictions:
 #include <cassert>
 #include <sstream>
 #include <string>
+#include "/home/vic/zstr/src/zstr.hpp"
 
 #include "system.h"
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
    // tid_map is used to inform the simulator how
    // thread ids map to NUMA/cache domains. Using
@@ -48,20 +49,23 @@ int main()
    // whether to do virtual to physical translation,
    // and number of caches/domains
    // WARNING: counting compulsory misses doubles execution time
-   MultiCacheSystem sys(tid_map, 64, 1024, 64, std::move(prefetch), false, false, 2);
+   SingleCacheSystem sys(64, 16, 2, std::move(prefetch), false, false);
    char rw;
    uint64_t address;
    unsigned long long lines = 0;
-   ifstream infile;
+   zstr::ifstream infile("trace.out.gz");
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
-   infile.open("pinatrace.out", ifstream::in);
-   assert(infile.is_open());
+   // infile.open("trace.out", ifstream::in);
+   // assert(infile.is_open());
+
+   std::string line;
 
    while(!infile.eof())
+   // while(std::getline(infile, line))
    {
       infile.ignore(256, ':');
-
+      // Reading access
       infile >> rw;
       assert(rw == 'R' || rw == 'W');
       AccessType accessType;
@@ -70,16 +74,39 @@ int main()
       } else {
          accessType = AccessType::Write;
       }
-
+      // Reading address
       infile >> hex >> address;
+
+      // std::vector<int> lineData(64,0);
+      std::array<int,64> lineData = {0};
+      int value;
+      // Reading 64 values (64 bytes)
+      for (int i=0; i<64; i++) {
+        infile >> hex >> value;
+        lineData[i] = value;
+      }
+
       if(address != 0) {
          // By default the pinatrace tool doesn't record the tid,
          // so we make up a tid to stress the MultiCache functionality
-         sys.memAccess(address, accessType, lines%2);
+         sys.memAccess(address, accessType, lineData, lines%2);
+      }
+
+      if (lines == 83){
+        // cout << "Access Number: " << lines << "\n\n";
+        // sys.snapshot();
+        sys.printSimilarity();
+      }
+
+      if (rw == 'W') {
+        int x = atoi(argv[1]);
+        sys.checkSimilarity(lineData,x);
       }
 
       ++lines;
    }
+
+   std::cout << "Traditional Stats\n_________________\n\n";
 
    cout << "Accesses: " << lines << endl;
    cout << "Hits: " << sys.stats.hits << endl;
@@ -91,7 +118,7 @@ int main()
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
-   infile.close();
+   // infile.close();
 
    return 0;
 }

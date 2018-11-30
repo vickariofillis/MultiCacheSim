@@ -238,8 +238,7 @@ CacheState MultiCacheSystem::processMOESI(uint64_t set,
    return new_state;
 }
 
-void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, 
-      unsigned int tid)
+void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)
 {
    if (doAddrTrans) {
       address = virtToPhys(address);
@@ -273,7 +272,7 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType,
       if (accessType != AccessType::Prefetch) {
          stats.hits++;
          if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, *this);
+            stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
          }
       }
    }
@@ -293,10 +292,10 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType,
       bool local_traffic = isLocal(address, local);
       CacheState new_state = processMOESI(set, tag, remote_state, accessType, 
                                  local_traffic, local, remote);
-      caches[local]->insertLine(set, tag, new_state);
+      caches[local]->insertLine(set, tag, new_state, data);
 
       if (accessType == AccessType::Prefetch && prefetcher) {
-         stats.prefetched += prefetcher->prefetchMiss(address, tid, *this);
+         stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
       }
    }
 }
@@ -329,7 +328,7 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
    }
 }
 
-void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, unsigned int tid)
+void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)
 {
    bool is_prefetch = (accessType == AccessType::Prefetch);
 
@@ -361,7 +360,7 @@ void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, unsig
       if (!is_prefetch) {
          stats.hits++;
          if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, *this);
+            stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
          }
       }
 
@@ -386,10 +385,25 @@ void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, unsig
       stats.local_reads++;
    }
 
-   cache->insertLine(set, tag, new_state);
+   cache->insertLine(set, tag, new_state, data);
    if (!is_prefetch && prefetcher) {
-      stats.prefetched += prefetcher->prefetchMiss(address, tid, *this);
+      stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
    }
+}
+
+void SingleCacheSystem::snapshot()
+{
+    cache->snapshot();
+}
+
+void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits)
+{
+    cache->checkSimilarity(lineData, maskedBits);
+}
+
+void SingleCacheSystem::printSimilarity()
+{
+    cache->printSimilarity();
 }
 
 SingleCacheSystem::SingleCacheSystem( 

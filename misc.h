@@ -24,6 +24,8 @@ freely, subject to the following restrictions:
 #pragma once
 
 #include <cstdint>
+#include <vector>
+#include <array>
 
 #define PAGE_SIZE_4KB
 
@@ -44,9 +46,10 @@ enum class AccessType {Read, Write, Prefetch};
 struct CacheLine{
    uint64_t tag{0};
    CacheState state{CacheState::Invalid};
+   std::array<int,64> data;
 
-   CacheLine(uint64_t tag = 0, CacheState state = CacheState::Invalid) : 
-               tag(tag), state(state) {}
+   CacheLine(uint64_t tag = 0, CacheState state = CacheState::Invalid, std::array<int,64> data = {0}) : 
+               tag(tag), state(state), data(data) {}
    bool operator<(const CacheLine& rhs) const
    { return tag < rhs.tag; }
    bool operator==(const CacheLine& rhs) const
