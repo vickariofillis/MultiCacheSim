@@ -1,4 +1,4 @@
-cscope 15 $HOME/Documents/MultiCacheSim               0000468058
+cscope 15 $HOME/Documents/MultiCacheSim               0000468678
 	@cache.cpp
 
 24 
@@ -1159,15 +1159,67 @@ add»ss
 lšes
  = 0;
 
-56 
+57 
+¡d
+::
+¡ršg
+ 
+ty³
+;
+
+58 
+¡d
+::
+¡ršg
+ 
+b’chm¬k
+ = std::
+	`¡ršg
+(
+¬gv
+[2]);
+
+59 ià(
+b’chm¬k
+ == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
+
+60 
+b’chm¬k
+ == "swaptions" || benchmark == "vips" || benchmark == "x264") {
+
+61 
+¡d
+::
+¡ršg
+ 
+ty³
+ = "apps";
+
+63 ià(
+b’chm¬k
+ == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+
+64 
+¡d
+::
+¡ršg
+ 
+ty³
+ = "kernels";
+
+66 
 z¡r
 ::
 if¡»am
  
 	`šfže
-("trace.out.gz");
+("/«Ço-99/k¬yofyl/»suÉs/pš/pš©¿û/·r£c/" + 
+b’chm¬k
+ + "/sm®l/pkgs/" + 
+ty³
+ + "/" + benchmark + "/run/trace.out.gz");
 
-62 
+72 
 ¡d
 ::
 ¡ršg
@@ -1175,41 +1227,41 @@ if¡»am
 lše
 ;
 
-64 !
+74 !
 šfže
 .
 	`eof
 ())
 
-67 
+77 
 šfže
 .
 	`ignÜe
 (256, ':');
 
-69 
+79 
 šfže
  >> 
 rw
 ;
 
-70 
+80 
 	`as£¹
 (
 rw
  == 'R' ||„w == 'W');
 
-71 
+81 
 AcûssTy³
  
 acûssTy³
 ;
 
-72 ià(
+82 ià(
 rw
  == 'R') {
 
-73 
+83 
 acûssTy³
  = 
 AcûssTy³
@@ -1217,7 +1269,7 @@ AcûssTy³
 R—d
 ;
 
-75 
+85 
 acûssTy³
  = 
 AcûssTy³
@@ -1225,7 +1277,7 @@ AcûssTy³
 Wr™e
 ;
 
-78 
+88 
 šfže
  >> 
 hex
@@ -1233,7 +1285,7 @@ hex
 add»ss
 ;
 
-81 
+91 
 ¡d
 ::
 ¬¿y
@@ -1241,15 +1293,15 @@ add»ss
 lšeD©a
  = {0};
 
-82 
+92 
 v®ue
 ;
 
-84 
+94 
 i
 =0; i<64; i++) {
 
-85 
+95 
 šfže
  >> 
 hex
@@ -1257,7 +1309,7 @@ hex
 v®ue
 ;
 
-86 
+96 
 lšeD©a
 [
 i
@@ -1265,11 +1317,11 @@ i
 v®ue
 ;
 
-89 if(
+99 if(
 add»ss
  != 0) {
 
-92 
+102 
 sys
 .
 	`memAcûss
@@ -1283,21 +1335,21 @@ lšeD©a
 lšes
 %2);
 
-95 ià(
+105 ià(
 lšes
  == 83){
 
-98 
+108 
 sys
 .
 	`´štSimž¬™y
 ();
 
-101 ià(
+111 ià(
 rw
  == 'W') {
 
-102 
+112 
 x
  = 
 	`©oi
@@ -1305,7 +1357,7 @@ x
 ¬gv
 [1]);
 
-103 
+113 
 sys
 .
 	`checkSimž¬™y
@@ -1315,17 +1367,17 @@ lšeD©a
 x
 );
 
-106 ++
+116 ++
 lšes
 ;
 
-109 
+119 
 ¡d
 ::
 cout
  << "Traditional Stats\n_________________\n\n";
 
-111 
+121 
 cout
  << "Acûs£s: " << 
 lšes
@@ -1333,7 +1385,7 @@ lšes
 ’dl
 ;
 
-112 
+122 
 cout
  << "H™s: " << 
 sys
@@ -1345,7 +1397,7 @@ h™s
 ’dl
 ;
 
-113 
+123 
 cout
  << "Mis£s: " << 
 lšes
@@ -1359,7 +1411,7 @@ h™s
 ’dl
 ;
 
-114 
+124 
 cout
  << "LoÿÈ»ads: " << 
 sys
@@ -1371,7 +1423,7 @@ loÿl_»ads
 ’dl
 ;
 
-115 
+125 
 cout
  << "LoÿÈwr™es: " << 
 sys
@@ -1383,7 +1435,7 @@ loÿl_wr™es
 ’dl
 ;
 
-116 
+126 
 cout
  << "RemÙ»ads: " << 
 sys
@@ -1395,7 +1447,7 @@ sys
 ’dl
 ;
 
-117 
+127 
 cout
  << "RemÙwr™es: " << 
 sys
@@ -1407,7 +1459,7 @@ sys
 ’dl
 ;
 
-118 
+128 
 cout
  << "Oth”-ÿch»ads: " << 
 sys
@@ -1419,7 +1471,7 @@ sys
 ’dl
 ;
 
-124 
+134 
 	}
 }
 

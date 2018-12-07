@@ -53,7 +53,17 @@ int main(int argc, char* argv[])
    char rw;
    uint64_t address;
    unsigned long long lines = 0;
-   zstr::ifstream infile("trace.out.gz");
+   // zstr::ifstream infile("trace.out.gz");
+   std::string type;
+   std::string benchmark = std::string(argv[2]);
+   if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
+    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264") {
+     std::string type = "apps";
+   }
+   else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+     std::string type = "kernels";
+   }
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz");
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
    // infile.open("trace.out", ifstream::in);
