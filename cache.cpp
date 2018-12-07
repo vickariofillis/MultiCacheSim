@@ -143,7 +143,7 @@ void Cache::snapshot()
 
 }
 
-void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
+void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)
 {
     std::array<int,64> maskedData;
 
@@ -154,7 +154,12 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 254;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else if (maskedBits == 2) {
         for (int i=0; i<64; i++) {
@@ -163,7 +168,12 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 252;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else if (maskedBits == 4) {
         for (int i=0; i<64; i++) {
@@ -172,7 +182,12 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 240;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else if (maskedBits == 8) {
         for (int i=0; i<64; i++) {
@@ -181,7 +196,12 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 0;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else if (maskedBits == 16) {
         for (int i=0; i<64; i++) {
@@ -190,7 +210,12 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 0;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else if (maskedBits == 32) {
         for (int i=0; i<64; i++) {
@@ -199,10 +224,20 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)
                 maskedData[i] = 0;
             }
         }
-        occurence[maskedData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
     else {
-        occurence[lineData]++;
+        if (rw == 'W') {
+            occurence.insert({maskedData,0});
+        }
+        else if (rw == 'R') {
+            occurence[maskedData]++;
+        }
     }
 }
 

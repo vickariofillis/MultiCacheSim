@@ -68,7 +68,7 @@ public:
    // if there is not enough space, so checkWriteback should be called before this
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
    void snapshot();
-   void checkSimilarity(std::array<int,64> lineData, int maskedBits);
+   void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity();
 private:
    std::vector<std::deque<CacheLine>> sets;

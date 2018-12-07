@@ -396,9 +396,9 @@ void SingleCacheSystem::snapshot()
     cache->snapshot();
 }
 
-void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits)
+void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)
 {
-    cache->checkSimilarity(lineData, maskedBits);
+    cache->checkSimilarity(lineData, maskedBits, rw);
 }
 
 void SingleCacheSystem::printSimilarity()

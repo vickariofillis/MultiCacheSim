@@ -102,10 +102,13 @@ int main(int argc, char* argv[])
          sys.memAccess(address, accessType, lineData, lines%2);
       }
 
-      if (rw == 'W') {
-        int x = atoi(argv[1]);
-        sys.checkSimilarity(lineData,x);
-      }
+      // if (rw == 'R') {
+      //   int x = atoi(argv[1]);
+      //   sys.checkSimilarity(lineData,x);
+      // }
+
+      int x = atoi(argv[1]);
+      sys.checkSimilarity(lineData,x,rw);
 
       ++lines;
    }

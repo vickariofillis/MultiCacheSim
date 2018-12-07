@@ -116,7 +116,7 @@ public:
 
    void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
    void snapshot();
-   void checkSimilarity(std::array<int,64> lineData, int maskedBits);
+   void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity();
 private:
    std::unique_ptr<Cache> cache;
