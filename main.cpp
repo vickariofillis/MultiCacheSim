@@ -26,7 +26,7 @@ freely, subject to the following restrictions:
 #include <cassert>
 #include <sstream>
 #include <string>
-#include "/home/vic/zstr/src/zstr.hpp"
+#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
 
 #include "system.h"
 
