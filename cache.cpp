@@ -235,10 +235,10 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
     }
     else {
         if (rw == 'W') {
-            occurence.insert({maskedData,0});
+            occurence.insert({lineData,0});
         }
         else if (rw == 'R') {
-            occurence[maskedData]++;
+            occurence[lineData]++;
         }
     }
 }
