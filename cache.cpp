@@ -151,7 +151,7 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
         for (int i=0; i<64; i++) {
             maskedData[i] = lineData[i];
             if (i % 8 == 7) {
-                maskedData[i] = 254;
+                maskedData[i] = lineData[i] & 0xFE;
             }
         }
         if (rw == 'W') {
@@ -165,7 +165,7 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
         for (int i=0; i<64; i++) {
             maskedData[i] = lineData[i];
             if (i % 8 == 7) {
-                maskedData[i] = 252;
+                maskedData[i] = lineData[i] & 0xFC;
             }
         }
         if (rw == 'W') {
@@ -179,7 +179,7 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
         for (int i=0; i<64; i++) {
             maskedData[i] = lineData[i];
             if (i % 8 == 7) {
-                maskedData[i] = 240;
+                maskedData[i] = lineData[i] & 0xF0;
             }
         }
         if (rw == 'W') {
@@ -250,12 +250,10 @@ void Cache::printSimilarity()
     }
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
-        if (percentage > 10.00) {
-            std::cout << "Cache Data: ";
-            for (int i=0; i<64; i++) {
-                std::cout << it->first[i] << " ";
-            }
-            std::cout << "Count: " << it->second << " Percentage: " << percentage << "\n\n";
+        std::cout << "Cache Data: ";
+        for (int i=0; i<64; i++) {
+            std::cout << it->first[i] << " ";
         }
+        std::cout << "Count: " << it->second << " Percentage: " << percentage << "\n\n";
     }
 }
