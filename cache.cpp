@@ -28,6 +28,8 @@ freely, subject to the following restrictions:
 #include "misc.h"
 #include "cache.h"
 
+FILE * trace;
+
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
    assert(num_lines % assoc == 0);
@@ -250,10 +252,14 @@ void Cache::printSimilarity()
     }
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
+        trace = fopen("similarity.out","w");
         std::cout << "Cache Data: ";
+        fprintf(trace, "Cache Data: ");
         for (int i=0; i<64; i++) {
             std::cout << it->first[i] << " ";
+            fprintf("%d ", it->first[i]);
         }
         std::cout << "Count: " << it->second << " Percentage: " << percentage << "\n\n";
+        fprint("Count: %d Percentage: %f \n\n", it->second, percentage);      
     }
 }
