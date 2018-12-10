@@ -23,12 +23,13 @@ freely, subject to the following restrictions:
 
 #include <cassert>
 #include <iostream>
+#include <iomanip>
 #include <iterator>
 
 #include "misc.h"
 #include "cache.h"
 
-FILE * trace;
+// FILE * trace;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -249,18 +250,20 @@ void Cache::printSimilarity()
     std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
+        std::cout << "Total reads: " << all_reads << "\n\n";
+        // fprintf(trace, "Total reads: %d", all_reads);
     }
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
-        trace = fopen("similarity.out","w");
+        // trace = fopen("similarity.out","w");
         std::cout << "Cache Data: ";
-        fprintf(trace, "Cache Data: ");
+        // fprintf(trace, "Cache Data: ");
         for (int i=0; i<64; i++) {
             std::cout << it->first[i] << " ";
-            fprintf(trace, "%d ", it->first[i]);
+            // fprintf(trace, "%d ", it->first[i]);
         }
         std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
-        fprintf(trace, "Count: %d Percentage: %f \n\n", it->second, percentage);
+        // fprintf(trace, "Count: %d Percentage: %f \n\n", it->second, percentage);
     }
-    fclose(trace);
+    // fclose(trace);
 }
