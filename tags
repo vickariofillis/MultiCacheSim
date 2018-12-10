@@ -37,8 +37,8 @@ caches	system.h	/^   std::vector<std::unique_ptr<Cache>> caches;$/;"	m	class:Mul
 changeState	cache.cpp	/^void Cache::changeState(uint64_t set, uint64_t tag, CacheState state)$/;"	f	class:Cache
 checkCompulsory	system.cpp	/^void System::checkCompulsory(uint64_t line)$/;"	f	class:System
 checkRemoteStates	system.cpp	/^unsigned int MultiCacheSystem::checkRemoteStates(uint64_t set, $/;"	f	class:MultiCacheSystem
-checkSimilarity	cache.cpp	/^void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits)$/;"	f	class:Cache
-checkSimilarity	system.cpp	/^void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits)$/;"	f	class:SingleCacheSystem
+checkSimilarity	cache.cpp	/^void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)$/;"	f	class:Cache
+checkSimilarity	system.cpp	/^void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)$/;"	f	class:SingleCacheSystem
 checkWriteback	cache.cpp	/^bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const$/;"	f	class:Cache
 countCompulsory	system.h	/^   bool countCompulsory;$/;"	m	class:System
 data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine

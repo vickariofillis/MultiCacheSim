@@ -243,19 +243,19 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
 
 void Cache::printSimilarity()
 {
-    int unique_data = 0;
+    int all_reads = 0;
     std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
-        unique_data++;
+        all_reads = all_reads + it->second;
     }
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
-        double percentage = (double(it->second)/unique_data)*100;
+        double percentage = (double(it->second)/all_reads)*100;
         if (percentage > 10.00) {
             std::cout << "Cache Data: ";
             for (int i=0; i<64; i++) {
                 std::cout << it->first[i] << " ";
             }
-            std::cout << "Count: " << it->second << "\n\n";
+            std::cout << "Count: " << it->second << " Percentage: " << percentage << "\n\n";
         }
     }
 }

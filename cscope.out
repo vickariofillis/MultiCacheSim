@@ -1,4 +1,4 @@
-cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000598396
+cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000599071
 	@cache.cpp
 
 24 
@@ -491,6 +491,8 @@ checkSimž¬™y
 lšeD©a
 , 
 maskedB™s
+, 
+rw
 )
 
 148 
@@ -529,23 +531,39 @@ maskedD©a
 i
 ] = 254;
 
-157 
-	goccu»nû
+157 ià(
+	grw
+ == 'W') {
+
+158 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+160 ià(
+	grw
+ == 'R') {
+
+161 
+occu»nû
 [
 maskedD©a
 ]++;
 
-159 ià(
+164 ià(
 	gmaskedB™s
  == 2) {
 
-160 
+165 
 i
 =0; 
 	gi
 <64; i++) {
 
-161 
+166 
 	gmaskedD©a
 [
 i
@@ -553,33 +571,49 @@ i
 lšeD©a
 [i];
 
-162 ià(
+167 ià(
 	gi
  % 8 == 7) {
 
-163 
+168 
 maskedD©a
 [
 i
 ] = 252;
 
-166 
-	goccu»nû
+171 ià(
+	grw
+ == 'W') {
+
+172 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+174 ià(
+	grw
+ == 'R') {
+
+175 
+occu»nû
 [
 maskedD©a
 ]++;
 
-168 ià(
+178 ià(
 	gmaskedB™s
  == 4) {
 
-169 
+179 
 i
 =0; 
 	gi
 <64; i++) {
 
-170 
+180 
 	gmaskedD©a
 [
 i
@@ -587,33 +621,49 @@ i
 lšeD©a
 [i];
 
-171 ià(
+181 ià(
 	gi
  % 8 == 7) {
 
-172 
+182 
 maskedD©a
 [
 i
 ] = 240;
 
-175 
-	goccu»nû
+185 ià(
+	grw
+ == 'W') {
+
+186 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+188 ià(
+	grw
+ == 'R') {
+
+189 
+occu»nû
 [
 maskedD©a
 ]++;
 
-177 ià(
+192 ià(
 	gmaskedB™s
  == 8) {
 
-178 
+193 
 i
 =0; 
 	gi
 <64; i++) {
 
-179 
+194 
 	gmaskedD©a
 [
 i
@@ -621,33 +671,49 @@ i
 lšeD©a
 [i];
 
-180 ià(
+195 ià(
 	gi
  % 8 == 7) {
 
-181 
+196 
 maskedD©a
 [
 i
 ] = 0;
 
-184 
-	goccu»nû
+199 ià(
+	grw
+ == 'W') {
+
+200 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+202 ià(
+	grw
+ == 'R') {
+
+203 
+occu»nû
 [
 maskedD©a
 ]++;
 
-186 ià(
+206 ià(
 	gmaskedB™s
  == 16) {
 
-187 
+207 
 i
 =0; 
 	gi
 <64; i++) {
 
-188 
+208 
 	gmaskedD©a
 [
 i
@@ -655,35 +721,51 @@ i
 lšeD©a
 [i];
 
-189 ià(
+209 ià(
 	gi
  % 8 =ð6 || 
 i
  % 8 == 7) {
 
-190 
+210 
 maskedD©a
 [
 i
 ] = 0;
 
-193 
-	goccu»nû
+213 ià(
+	grw
+ == 'W') {
+
+214 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+216 ià(
+	grw
+ == 'R') {
+
+217 
+occu»nû
 [
 maskedD©a
 ]++;
 
-195 ià(
+220 ià(
 	gmaskedB™s
  == 32) {
 
-196 
+221 
 i
 =0; 
 	gi
 <64; i++) {
 
-197 
+222 
 	gmaskedD©a
 [
 i
@@ -691,47 +773,79 @@ i
 lšeD©a
 [i];
 
-198 ià(
+223 ià(
 	gi
  % 8 =ð4 || 
 i
  % 8 == 5 || i % 8 == 6 || i % 8 == 7) {
 
-199 
+224 
 maskedD©a
 [
 i
 ] = 0;
 
-202 
-	goccu»nû
+227 ià(
+	grw
+ == 'W') {
+
+228 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+230 ià(
+	grw
+ == 'R') {
+
+231 
+occu»nû
 [
 maskedD©a
 ]++;
 
-205 
-	goccu»nû
+235 ià(
+	grw
+ == 'W') {
+
+236 
+occu»nû
+.
+š£¹
+({
+maskedD©a
+,0});
+
+238 ià(
+	grw
+ == 'R') {
+
+239 
+occu»nû
 [
-lšeD©a
+maskedD©a
 ]++;
 
-209 
+244 
 	gCache
 ::
 	$´štSimž¬™y
 ()
 
-211 
-unique_d©a
+246 
+®l_»ads
  = 0;
 
-212 
+247 
 ¡d
 ::
 cout
  << "\nSimilarity Stats\n_________________\n\n";
 
-213 autØ
+248 autØ
 ™
  = 
 occu»nû
@@ -741,11 +855,15 @@ occu»nû
 	`’d
 (); ++it) {
 
-214 
-unique_d©a
-++;
+249 
+®l_»ads
+ =‡Î_»ad + 
+™
+->
+£cÚd
+;
 
-216 autØ
+251 autØ
 ™
  = 
 occu»nû
@@ -755,31 +873,31 @@ occu»nû
 	`’d
 (); ++it) {
 
-217 
+252 
 ³rûÁage
  = ((
 ™
 ->
 £cÚd
 )/
-unique_d©a
+®l_»ads
 )*100;
 
-218 ià(
+253 ià(
 ³rûÁage
  > 10.00) {
 
-219 
+254 
 ¡d
 ::
 cout
  << "Cache Data: ";
 
-220 
+255 
 i
 =0; i<64; i++) {
 
-221 
+256 
 ¡d
 ::
 cout
@@ -791,7 +909,7 @@ fœ¡
 i
 ] << " ";
 
-223 
+258 
 ¡d
 ::
 cout
@@ -799,9 +917,11 @@ cout
 ™
 ->
 £cÚd
+ << " P”ûÁage: " << 
+³rûÁage
  << "\n\n";
 
-226 
+261 
 	}
 }
 
@@ -1021,6 +1141,8 @@ d©a
 lšeD©a
 , 
 maskedB™s
+, 
+rw
 );
 
 72 
@@ -1325,11 +1447,7 @@ lšeD©a
 lšes
 %2);
 
-105 ià(
-rw
- == 'W') {
-
-106 
+110 
 x
  = 
 	`©oi
@@ -1337,7 +1455,7 @@ x
 ¬gv
 [1]);
 
-107 
+111 
 sys
 .
 	`checkSimž¬™y
@@ -1345,19 +1463,21 @@ sys
 lšeD©a
 ,
 x
+,
+rw
 );
 
-110 ++
+113 ++
 lšes
 ;
 
-113 
+116 
 ¡d
 ::
 cout
  << "Traditional Stats\n_________________\n\n";
 
-115 
+118 
 cout
  << "Acûs£s: " << 
 lšes
@@ -1365,7 +1485,7 @@ lšes
 ’dl
 ;
 
-116 
+119 
 cout
  << "H™s: " << 
 sys
@@ -1377,7 +1497,7 @@ h™s
 ’dl
 ;
 
-117 
+120 
 cout
  << "Mis£s: " << 
 lšes
@@ -1391,7 +1511,7 @@ h™s
 ’dl
 ;
 
-118 
+121 
 cout
  << "LoÿÈ»ads: " << 
 sys
@@ -1403,7 +1523,7 @@ loÿl_»ads
 ’dl
 ;
 
-119 
+122 
 cout
  << "LoÿÈwr™es: " << 
 sys
@@ -1415,7 +1535,7 @@ loÿl_wr™es
 ’dl
 ;
 
-120 
+123 
 cout
  << "RemÙ»ads: " << 
 sys
@@ -1427,7 +1547,7 @@ sys
 ’dl
 ;
 
-121 
+124 
 cout
  << "RemÙwr™es: " << 
 sys
@@ -1439,7 +1559,7 @@ sys
 ’dl
 ;
 
-122 
+125 
 cout
  << "Oth”-ÿch»ads: " << 
 sys
@@ -1451,13 +1571,13 @@ sys
 ’dl
 ;
 
-125 
+128 
 sys
 .
 	`´štSimž¬™y
 ();
 
-130 
+133 
 	}
 }
 
@@ -4103,6 +4223,8 @@ checkSimž¬™y
 lšeD©a
 , 
 maskedB™s
+, 
+rw
 )
 
 401 
@@ -4113,6 +4235,8 @@ checkSimž¬™y
 lšeD©a
 , 
 maskedB™s
+, 
+rw
 );
 
 404 
@@ -4797,6 +4921,8 @@ checkSimž¬™y
 lšeD©a
 , 
 maskedB™s
+, 
+rw
 );
 
 120 
