@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
    std::string type;
    std::string benchmark = argv[2];
    if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
-    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264") {
+    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmakr == "test") {
      type = "apps";
    }
    else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
