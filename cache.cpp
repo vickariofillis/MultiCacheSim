@@ -259,7 +259,8 @@ void Cache::printSimilarity()
             std::cout << it->first[i] << " ";
             fprintf(trace, "%d ", it->first[i]);
         }
-        std::cout << "Count: " << it->second << " Percentage: " << percentage << "\n\n";
+        std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
         fprintf(trace, "Count: %d Percentage: %f \n\n", it->second, percentage);
     }
+    fclose(trace);
 }
