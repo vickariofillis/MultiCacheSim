@@ -246,13 +246,6 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
 
 void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 {
-    if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
-    benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-     type = "apps";
-    }
-    else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-     type = "kernels";
-    }
     trace = fopen("/aenao-99/karyofyl/mcs/parsec/" + benchmark + "/small/" + bits_ignored + "/similarity.out","w");
     int all_reads = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
