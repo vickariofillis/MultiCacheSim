@@ -248,22 +248,22 @@ void Cache::printSimilarity()
 {
     trace = fopen("similarity.out","w");
     int all_reads = 0;
-    std::cout << "\nSimilarity Stats\n_________________\n\n";
+    // std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
     }
-    std::cout << "Total reads: " << all_reads << "\n\n";
-    fprintf(trace, "Total reads: %d\n\n", all_reads);
+    // std::cout << "Total reads: " << all_reads << "\n\n";
+    fprintf(trace, "%d\n", all_reads);
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
-        std::cout << "Cache Data: ";
-        fprintf(trace, "Cache Data: ");
-        for (int i=0; i<64; i++) {
-            std::cout << it->first[i] << " ";
-            fprintf(trace, "%d ", it->first[i]);
-        }
-        std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
-        fprintf(trace, "Count: %d Percentage: %.2f \n\n", it->second, percentage);
+        // std::cout << "Cache Data: ";
+        // fprintf(trace, "Cache Data: ");
+        // for (int i=0; i<64; i++) {
+        //     std::cout << it->first[i] << " ";
+        //     fprintf(trace, "%d ", it->first[i]);
+        // }
+        // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
+        fprintf(trace, "%d %.2f \n", it->second, percentage);
     }
     fclose(trace);
 }
