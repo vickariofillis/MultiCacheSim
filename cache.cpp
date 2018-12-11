@@ -246,7 +246,8 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
 
 void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 {
-    trace = fopen("/aenao-99/karyofyl/mcs/parsec/" + benchmark + "/small/" + bits_ignored + "/similarity.out","w");
+    std::string file_path = "/aenao-99/karyofyl/mcs/parsec/" + benchmark + "/small/" + bits_ignored + "/similarity.out"
+    trace = fopen(file_path.c_str(),"w");
     int all_reads = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
