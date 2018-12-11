@@ -25,12 +25,11 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <iomanip>
 #include <iterator>
-#include <vector>
 
 #include "misc.h"
 #include "cache.h"
 
-// FILE * trace;
+FILE * trace;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -248,44 +247,30 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
 void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 {
 
-    std::vector <std::vector<int>> stats;
-
-    std::cout << "Inside printSimilarity\n";
-    std::string str1, str2, str3, strf;
-    str1 = "/aenao-99/karyofyl/mcs/parsec/";
-    str2 = "/small/";
-    str3 = "/similarity.out";
     auto str_int = std::to_string(bits_ignored);
-    strf = str1 + benchmark + str2 + str_int + str3;
+    // std::string file_path = "/aenao-99/karyofyl/mcs/parsec/" + benchmark + "/small/" + bits_igno$
+    trace.open("/aenao-99/karyofyl/results/similarity.out");
 
-    std::cout << "Before opening similarity file\n";
-    // trace = fopen("similarity_cache.out","w");
-    std::cout << "After opening similarity file\n";
     int all_reads = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
     }
     // std::cout << "Total reads: " << all_reads << "\n\n";
-    // std::cout << all_reads << "\n";
-    // fprintf(trace, "%d\n", all_reads);
+    trace << all_reads << "\n";
+    for (auto it = occurence.begin(); it != occurence.end(); ++it) {
+        all_reads = all_reads + it->second;
+    }
+    // std::cout << "Total reads: " << all_reads << "\n\n";
+    trace << all_reads << "\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
-        // fprintf(trace, "Cache Data: ");
         // for (int i=0; i<64; i++) {
         //     std::cout << it->first[i] << " ";
-        //     fprintf(trace, "%d ", it->first[i]);
         // }
-        // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
-        // std::cout << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n";
-        // fprintf(trace, "%d %.2f \n", it->second, percentage);
-        std::vector<int> row(it->second, percentage);
-        stats.push_back(row);
+        // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecisi$
+        trace << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n\n";
     }
-    std::cout << "Before closing similarity file\n";
-    // fclose(trace);
-    std::cout << "After closing similarity file\n";
-
-    return stats;
+    trace.close();
 }
