@@ -125,7 +125,9 @@ int main(int argc, char* argv[])
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
+   std::cout << "Before printSimilarity";
    sys.printSimilarity(bits_ignored, benchmark);
+   std::cout << "After printSimilarity";
 
    // infile.close();
 
