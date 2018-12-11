@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 #include "misc.h"
 #include "cache.h"
 
-FILE * trace;
+// FILE * trace;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -246,14 +246,15 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
 
 void Cache::printSimilarity()
 {
-    trace = fopen("similarity.out","w");
+    // trace = fopen("similarity.out","w");
     int all_reads = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
     }
     // std::cout << "Total reads: " << all_reads << "\n\n";
-    fprintf(trace, "%d\n", all_reads);
+    std::cout << all_reads << "\n";
+    // fprintf(trace, "%d\n", all_reads);
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
@@ -263,7 +264,8 @@ void Cache::printSimilarity()
         //     fprintf(trace, "%d ", it->first[i]);
         // }
         // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecision(2) << percentage << "\n\n";
-        fprintf(trace, "%d %.2f \n", it->second, percentage);
+        std::cout << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n";
+        // fprintf(trace, "%d %.2f \n", it->second, percentage);
     }
-    fclose(trace);
+    // fclose(trace);
 }
