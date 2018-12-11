@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
    std::string type;
    std::string benchmark = argv[2];
    if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
-    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmakr == "test") {
+    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
      type = "apps";
    }
    else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
-   sys.printSimilarity();
+   sys.printSimilarity(x, benchmark);
 
    // infile.close();
 

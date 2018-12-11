@@ -401,9 +401,9 @@ void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedB
     cache->checkSimilarity(lineData, maskedBits, rw);
 }
 
-void SingleCacheSystem::printSimilarity()
+void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)
 {
-    cache->printSimilarity();
+    cache->printSimilarity(bits_ignored, benchmark);
 }
 
 SingleCacheSystem::SingleCacheSystem( 

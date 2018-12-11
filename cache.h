@@ -69,7 +69,7 @@ public:
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
    void snapshot();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
-   void printSimilarity();
+   void printSimilarity(int bits_ignored, std::string benchmark);
 private:
    std::vector<std::deque<CacheLine>> sets;
    unsigned int maxSetSize;
