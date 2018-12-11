@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
    // assert(infile.is_open());
 
    std::string line;
+   int bits_ignored = atoi(argv[1]);
 
    while(!infile.eof())
    // while(std::getline(infile, line))
@@ -107,8 +108,7 @@ int main(int argc, char* argv[])
       //   sys.checkSimilarity(lineData,x);
       // }
 
-      int x = atoi(argv[1]);
-      sys.checkSimilarity(lineData,x,rw);
+      sys.checkSimilarity(lineData,bits_ignored,rw);
 
       ++lines;
    }
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
-   sys.printSimilarity(x, benchmark);
+   sys.printSimilarity(bits_ignored, benchmark);
 
    // infile.close();
 

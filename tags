@@ -75,8 +75,8 @@ prefetchMiss	prefetch.cpp	/^int AdjPrefetch::prefetchMiss(uint64_t address, unsi
 prefetchMiss	prefetch.cpp	/^int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys)$/;"	f	class:SeqPrefetch
 prefetchNum	prefetch.h	/^   static constexpr unsigned int prefetchNum = 3;$/;"	m	class:SeqPrefetch
 prefetcher	system.h	/^   std::unique_ptr<Prefetch> prefetcher;$/;"	m	class:System
-printSimilarity	cache.cpp	/^void Cache::printSimilarity()$/;"	f	class:Cache
-printSimilarity	system.cpp	/^void SingleCacheSystem::printSimilarity()$/;"	f	class:SingleCacheSystem
+printSimilarity	cache.cpp	/^void Cache::printSimilarity(int bits_ignored, std::string benchmark)$/;"	f	class:Cache
+printSimilarity	system.cpp	/^void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)$/;"	f	class:SingleCacheSystem
 processMOESI	system.cpp	/^CacheState MultiCacheSystem::processMOESI(uint64_t set,$/;"	f	class:MultiCacheSystem
 result_type	cache.h	/^        typedef size_t result_type;$/;"	t	struct:std::hash
 seenLines	system.h	/^   std::unordered_set<uint64_t> seenLines;$/;"	m	class:System
