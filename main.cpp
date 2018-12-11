@@ -125,9 +125,16 @@ int main(int argc, char* argv[])
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
-   std::cout << "Before sys->printSimilarity";
-   sys.printSimilarity(bits_ignored, benchmark);
-   std::cout << "After sys->printSimilarity";
+   std::cout << "Before sys->printSimilarity\n";
+   std::vector <std::vector<int>> stats = sys.printSimilarity(bits_ignored, benchmark);
+   std::cout << "After sys->printSimilarity\n";
+
+   std::cout << "\n\n";
+   for (int i=0; i<stats.size(); i++){
+     for (int j=0; j<stats[i].size(); j++){
+       std::cout << stats[i][j] << "\n";
+     }
+   }
 
    // infile.close();
 
