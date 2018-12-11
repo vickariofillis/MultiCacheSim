@@ -403,6 +403,7 @@ void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedB
 
 void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)
 {
+    std::cout << "Inside sys->printSimilarity";
     cache->printSimilarity(bits_ignored, benchmark);
 }
 
