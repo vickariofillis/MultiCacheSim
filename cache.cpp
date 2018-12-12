@@ -25,11 +25,12 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <iomanip>
 #include <iterator>
+#include <fstream>
 
 #include "misc.h"
 #include "cache.h"
 
-FILE * trace;
+// std::ofstream trace("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "/similarity.out");
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -248,16 +249,12 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 {
 
     auto str_int = std::to_string(bits_ignored);
-    // std::string file_path = "/aenao-99/karyofyl/mcs/parsec/" + benchmark + "/small/" + bits_igno$
-    trace.open("/aenao-99/karyofyl/results/similarity.out");
+    std::string file_path = "/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small/" + str_int + "/similarity.out";
+    std::ofstream trace(file_path.c_str());
+    // trace.open("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "similarity.out");
 
     int all_reads = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
-    for (auto it = occurence.begin(); it != occurence.end(); ++it) {
-        all_reads = all_reads + it->second;
-    }
-    // std::cout << "Total reads: " << all_reads << "\n\n";
-    trace << all_reads << "\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
     }
@@ -270,7 +267,7 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
         //     std::cout << it->first[i] << " ";
         // }
         // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecisi$
-        trace << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n\n";
+        trace << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n";
     }
     trace.close();
 }

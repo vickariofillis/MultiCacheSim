@@ -1,4 +1,4 @@
-cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000599508
+cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000599450
 	@cache.cpp
 
 24 
@@ -17,21 +17,19 @@ cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000599508
 	~<ôî©‹
 >
 
-29 
+28 
+	~<f°ªam
+>
+
+30 
 	~"misc.h
 "
 
-30 
+31 
 	~"ˇche.h
 "
 
-32 
-FILE
- * 
-	gåa˚
-;
-
-34 
+35 
 	gCache
 ::
 	$Cache
@@ -45,7 +43,7 @@ assoc
 assoc
 )
 
-36 
+37 
 	`as£π
 (
 num_löes
@@ -53,7 +51,7 @@ num_löes
 assoc
  == 0);
 
-39 
+40 
 £ts
 .
 	`ªsize
@@ -63,11 +61,11 @@ num_löes
 assoc
 );
 
-40 
+41 
 	}
 }
 
-44 
+45 
 CacheSèã
  
 	gCache
@@ -81,7 +79,7 @@ uöt64_t
 èg
 ) const
 
-46 autÿ
+47 autÿ
 ô
  = 
 £ts
@@ -93,29 +91,29 @@ uöt64_t
 	`˚nd
 (); ++it) {
 
-47 i‡(
+48 i‡(
 ô
 ->
 èg
  ==Åag) {
 
-48  
+49  
 ô
 ->
 °©e
 ;
 
-52  
+53  
 CacheSèã
 ::
 InvÆid
 ;
 
-53 
+54 
 	}
 }
 
-58 
+59 
 	gCache
 ::
 	$ch™geSèã
@@ -131,7 +129,7 @@ CacheSèã
 °©e
 )
 
-60 autÿ
+61 autÿ
 ô
  = 
 £ts
@@ -143,13 +141,13 @@ CacheSèã
 	`íd
 (); ++it) {
 
-61 i‡(
+62 i‡(
 ô
 ->
 èg
  ==Åag) {
 
-62 i‡(
+63 i‡(
 °©e
  =
 CacheSèã
@@ -157,7 +155,7 @@ CacheSèã
 InvÆid
 ) {
 
-63 
+64 
 £ts
 [
 £t
@@ -167,17 +165,17 @@ InvÆid
 ô
 );
 
-66 
+67 
 ô
 ->
 °©e
  = state;
 
-71 
+72 
 	}
 }
 
-77 
+78 
 	gCache
 ::
 	$upd©eLRU
@@ -189,11 +187,11 @@ uöt64_t
 èg
 )
 
-79 #ifde‡
+80 #ifde‡
 DEBUG
 
 
-80 
+81 
 CacheSèã
  
 foundSèã
@@ -205,7 +203,7 @@ foundSèã
 èg
 );
 
-81 
+82 
 	`as£π
 (
 foundSèã
@@ -215,13 +213,13 @@ CacheSèã
 InvÆid
 );
 
-84 
+85 
 CacheLöe
  
 ãmp
 ;
 
-85 autÿ
+86 autÿ
 ô
  = 
 £ts
@@ -231,7 +229,7 @@ CacheLöe
 	`begö
 ();
 
-86 ; 
+87 ; 
 ô
  !
 £ts
@@ -241,19 +239,19 @@ CacheLöe
 	`íd
 (); ++it) {
 
-87 if(
+88 if(
 ô
 ->
 èg
  ==Åag) {
 
-88 
+89 
 ãmp
  = *
 ô
 ;
 
-93 
+94 
 £ts
 [
 £t
@@ -263,7 +261,7 @@ CacheLöe
 ô
 );
 
-94 
+95 
 £ts
 [
 £t
@@ -273,11 +271,11 @@ CacheLöe
 ãmp
 );
 
-95 
+96 
 	}
 }
 
-100 
+101 
 boﬁ
  
 	gCache
@@ -291,7 +289,7 @@ uöt64_t
 èg
 ) const
 
-102 i‡(
+103 i‡(
 £ts
 [
 £t
@@ -301,11 +299,11 @@ uöt64_t
 maxSëSize
 ) {
 
-105  
+106  
 Ál£
 ;
 
-108 c⁄° 
+109 c⁄° 
 CacheLöe
 & 
 evi˘
@@ -317,13 +315,13 @@ evi˘
 	`‰⁄t
 ();
 
-109 
+110 
 èg
  = 
 evi˘
 .tag;
 
-110  (
+111  (
 evi˘
 .
 °©e
@@ -335,11 +333,11 @@ Modifõd
 Ow√d
 );
 
-111 
+112 
 	}
 }
 
-115 
+116 
 	gCache
 ::
 ö£πLöe
@@ -361,7 +359,7 @@ CacheSèã
 d©a
 )
 
-117 i‡(
+118 i‡(
 	g£ts
 [
 £t
@@ -371,7 +369,7 @@ size
 maxSëSize
 ) {
 
-118 
+119 
 £ts
 [
 £t
@@ -379,7 +377,7 @@ maxSëSize
 p›_‰⁄t
 ();
 
-122 
+123 
 	g£ts
 [
 £t
@@ -393,17 +391,17 @@ em∂a˚_back
 d©a
 );
 
-125 
+126 
 	gCache
 ::
 	$¢≠shŸ
 ()
 
-127 
+128 
 way_cou¡
 ;
 
-130 
+131 
 uöt
  
 i
@@ -413,11 +411,11 @@ i
 	`size
 (); i++) {
 
-131 
+132 
 way_cou¡
  = 0;
 
-132 
+133 
 °d
 ::
 cout
@@ -425,7 +423,7 @@ cout
 i
  << " \n";
 
-133 autÿ
+134 autÿ
 ô
  = 
 £ts
@@ -437,7 +435,7 @@ i
 	`íd
 (); ++it) {
 
-135 
+136 
 °d
 ::
 cout
@@ -451,11 +449,11 @@ hex
 èg
  << ", Data: ";
 
-136 
+137 
 j
 =0; j<64; j++) {
 
-137 
+138 
 °d
 ::
 cout
@@ -469,27 +467,27 @@ d©a
 j
 ] << " ";
 
-140 
+141 
 way_cou¡
 ++;
 
-141 
+142 
 °d
 ::
 cout
  << "\n\n";
 
-145 
+146 
 °d
 ::
 cout
  << "\n";
 
-147 
+148 
 	}
 }
 
-149 
+150 
 	gCache
 ::
 checkSimû¨ôy
@@ -505,7 +503,7 @@ maskedBôs
 rw
 )
 
-151 
+152 
 	g°d
 ::
 ¨øy
@@ -513,17 +511,17 @@ rw
 	gmaskedD©a
 ;
 
-153 i‡(
+154 i‡(
 	gmaskedBôs
  == 1) {
 
-154 
+155 
 i
 =0; 
 	gi
 <64; i++) {
 
-155 
+156 
 	gmaskedD©a
 [
 i
@@ -531,11 +529,11 @@ i
 löeD©a
 [i];
 
-156 i‡(
+157 i‡(
 	gi
  % 8 == 7) {
 
-157 
+158 
 maskedD©a
 [
 i
@@ -543,11 +541,11 @@ i
 löeD©a
 [i] & 0xFE;
 
-160 i‡(
+161 i‡(
 	grw
  == 'W') {
 
-161 
+162 
 occuªn˚
 .
 ö£π
@@ -555,27 +553,27 @@ occuªn˚
 maskedD©a
 ,0});
 
-163 i‡(
+164 i‡(
 	grw
  == 'R') {
 
-164 
+165 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-167 i‡(
+168 i‡(
 	gmaskedBôs
  == 2) {
 
-168 
+169 
 i
 =0; 
 	gi
 <64; i++) {
 
-169 
+170 
 	gmaskedD©a
 [
 i
@@ -583,11 +581,11 @@ i
 löeD©a
 [i];
 
-170 i‡(
+171 i‡(
 	gi
  % 8 == 7) {
 
-171 
+172 
 maskedD©a
 [
 i
@@ -595,11 +593,11 @@ i
 löeD©a
 [i] & 0xFC;
 
-174 i‡(
+175 i‡(
 	grw
  == 'W') {
 
-175 
+176 
 occuªn˚
 .
 ö£π
@@ -607,27 +605,27 @@ occuªn˚
 maskedD©a
 ,0});
 
-177 i‡(
+178 i‡(
 	grw
  == 'R') {
 
-178 
+179 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-181 i‡(
+182 i‡(
 	gmaskedBôs
  == 4) {
 
-182 
+183 
 i
 =0; 
 	gi
 <64; i++) {
 
-183 
+184 
 	gmaskedD©a
 [
 i
@@ -635,11 +633,11 @@ i
 löeD©a
 [i];
 
-184 i‡(
+185 i‡(
 	gi
  % 8 == 7) {
 
-185 
+186 
 maskedD©a
 [
 i
@@ -647,11 +645,11 @@ i
 löeD©a
 [i] & 0xF0;
 
-188 i‡(
+189 i‡(
 	grw
  == 'W') {
 
-189 
+190 
 occuªn˚
 .
 ö£π
@@ -659,27 +657,27 @@ occuªn˚
 maskedD©a
 ,0});
 
-191 i‡(
+192 i‡(
 	grw
  == 'R') {
 
-192 
+193 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-195 i‡(
+196 i‡(
 	gmaskedBôs
  == 8) {
 
-196 
+197 
 i
 =0; 
 	gi
 <64; i++) {
 
-197 
+198 
 	gmaskedD©a
 [
 i
@@ -687,21 +685,21 @@ i
 löeD©a
 [i];
 
-198 i‡(
+199 i‡(
 	gi
  % 8 == 7) {
 
-199 
+200 
 maskedD©a
 [
 i
 ] = 0;
 
-202 i‡(
+203 i‡(
 	grw
  == 'W') {
 
-203 
+204 
 occuªn˚
 .
 ö£π
@@ -709,27 +707,27 @@ occuªn˚
 maskedD©a
 ,0});
 
-205 i‡(
+206 i‡(
 	grw
  == 'R') {
 
-206 
+207 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-209 i‡(
+210 i‡(
 	gmaskedBôs
  == 16) {
 
-210 
+211 
 i
 =0; 
 	gi
 <64; i++) {
 
-211 
+212 
 	gmaskedD©a
 [
 i
@@ -737,23 +735,23 @@ i
 löeD©a
 [i];
 
-212 i‡(
+213 i‡(
 	gi
  % 8 =6 || 
 i
  % 8 == 7) {
 
-213 
+214 
 maskedD©a
 [
 i
 ] = 0;
 
-216 i‡(
+217 i‡(
 	grw
  == 'W') {
 
-217 
+218 
 occuªn˚
 .
 ö£π
@@ -761,27 +759,27 @@ occuªn˚
 maskedD©a
 ,0});
 
-219 i‡(
+220 i‡(
 	grw
  == 'R') {
 
-220 
+221 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-223 i‡(
+224 i‡(
 	gmaskedBôs
  == 32) {
 
-224 
+225 
 i
 =0; 
 	gi
 <64; i++) {
 
-225 
+226 
 	gmaskedD©a
 [
 i
@@ -789,23 +787,23 @@ i
 löeD©a
 [i];
 
-226 i‡(
+227 i‡(
 	gi
  % 8 =4 || 
 i
  % 8 == 5 || i % 8 == 6 || i % 8 == 7) {
 
-227 
+228 
 maskedD©a
 [
 i
 ] = 0;
 
-230 i‡(
+231 i‡(
 	grw
  == 'W') {
 
-231 
+232 
 occuªn˚
 .
 ö£π
@@ -813,21 +811,21 @@ occuªn˚
 maskedD©a
 ,0});
 
-233 i‡(
+234 i‡(
 	grw
  == 'R') {
 
-234 
+235 
 occuªn˚
 [
 maskedD©a
 ]++;
 
-238 i‡(
+239 i‡(
 	grw
  == 'W') {
 
-239 
+240 
 occuªn˚
 .
 ö£π
@@ -835,17 +833,17 @@ occuªn˚
 löeD©a
 ,0});
 
-241 i‡(
+242 i‡(
 	grw
  == 'R') {
 
-242 
+243 
 occuªn˚
 [
 löeD©a
 ]++;
 
-247 
+248 
 	gCache
 ::
 ¥ötSimû¨ôy
@@ -859,34 +857,8 @@ bôs_ign‹ed
 bíchm¨k
 )
 
-249 
-°d
-::
-°rög
- 
-°r1
-, 
-	g°r2
-, 
-	g°r3
-, 
-	g°rf
-;
-
-250 
-	g°r1
- = "/aenao-99/karyofyl/mcs/parsec/";
-
-251 
-	g°r2
- = "/small/";
-
-252 
-	g°r3
- = "/similarity.out";
-
-253 autÿ
-	g°r_öt
+251 autÿ
+°r_öt
  = 
 °d
 ::
@@ -895,35 +867,35 @@ to_°rög
 bôs_ign‹ed
 );
 
-255 
-	g°rf
- = 
-°r1
- + 
+252 
+	g°d
+::
+°rög
+ 
+fûe_∑th
+ = "/´«o-99/k¨yofyl/ªsu…s/mcs/∑r£c/" + 
 bíchm¨k
- + 
-°r2
- + 
+ + "/smÆl/" + 
 °r_öt
- + 
-°r3
-;
+ + "/similarity.out";
 
-256 
-	gåa˚
- = 
-f›í
+253 
+	g°d
+::
+of°ªam
+ 
+åa˚
 (
-°rf
+fûe_∑th
 .
 c_°r
-(),"w");
+());
 
-257 
+256 
 	gÆl_ªads
  = 0;
 
-259 autÿ
+258 autÿ
 	gô
  = 
 occuªn˚
@@ -933,7 +905,7 @@ begö
 íd
 (); ++it) {
 
-260 
+259 
 	gÆl_ªads
  = 
 Æl_ªads
@@ -943,15 +915,13 @@ begö
 £c⁄d
 ;
 
-264 
-Ârötf
-(
-åa˚
-, "%d\n", 
-Æl_ªads
-);
+262 
+	gåa˚
+ << 
+	gÆl_ªads
+ << "\n";
 
-265 autÿ
+263 autÿ
 	gô
  = 
 occuªn˚
@@ -961,7 +931,7 @@ begö
 íd
 (); ++it) {
 
-266 
+264 
 	g≥r˚¡age
  = ((
 ô
@@ -971,23 +941,29 @@ begö
 Æl_ªads
 )*100;
 
-275 
-Ârötf
-(
-åa˚
-, "%d %.2‡\n", 
-ô
+270 
+	gåa˚
+ << 
+	gô
 ->
-£c⁄d
-, 
+	g£c⁄d
+ << " " << 
+	g°d
+::
+fixed
+ << 
+°d
+::
+£çªcisi⁄
+(2Ë<< 
 ≥r˚¡age
-);
+ << "\n";
 
-277 
-f˛o£
-(
-åa˚
-);
+272 
+	gåa˚
+.
+˛o£
+();
 
 	@cache.h
 

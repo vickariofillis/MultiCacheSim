@@ -91,7 +91,6 @@ std	cache.h	/^namespace std$/;"	n
 tagMask	system.h	/^   uint64_t tagMask;$/;"	m	class:System
 tid	tests/random.cpp	/^   unsigned int tid;$/;"	m	struct:AccessData	file:
 tidToDomain	system.h	/^   std::vector<unsigned int>& tidToDomain;$/;"	m	class:MultiCacheSystem
-trace	cache.cpp	/^FILE * trace;$/;"	v
 updateLRU	cache.cpp	/^void Cache::updateLRU(uint64_t set, uint64_t tag)$/;"	f	class:Cache
 updatePageToDomain	system.cpp	/^void MultiCacheSystem::updatePageToDomain(uint64_t address, $/;"	f	class:MultiCacheSystem
 usage	tests/random.cpp	/^void usage() {$/;"	f
