@@ -254,12 +254,15 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     // trace.open("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "similarity.out");
 
     int all_reads = 0;
+    int unique_lines = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
+        unique_lines++;
     }
     // std::cout << "Total reads: " << all_reads << "\n\n";
     trace << all_reads << "\n";
+    trace << unique_lines << "\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
