@@ -256,6 +256,7 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     int all_reads = 0;
     int unique_lines = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
+    trace << "reads,percentage";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
         unique_lines++;
@@ -270,7 +271,7 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
         //     std::cout << it->first[i] << " ";
         // }
         // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecisi$
-        trace << it->second << " " << std::fixed << std::setprecision(2) << percentage << "\n";
+        trace << it->second << "," << std::fixed << std::setprecision(2) << percentage << "\n";
     }
     trace.close();
 }
