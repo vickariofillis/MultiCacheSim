@@ -34,18 +34,23 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    std::string method;
+    int frequency;
+    std::string benchmark;
+    int bits_ignored;
+
     for (int i; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
-            std::string method = argv[i+1];
+            method = argv[i+1];
         }
         else if (std::string(argv[i]) == "-f") {
-            int frequency = atoi(argv[i+1]);
+            frequency = atoi(argv[i+1]);
         }
         else if (std::string(argv[i]) == "-b") {
-            std::string benchmark = argv[i+1];
+            benchmark = argv[i+1];
         }
         else if (std::string(argv[i]) == "-i") {
-            int bits_ignored = atoi(argv[i+1]);
+            bits_ignored = atoi(argv[i+1]);
         }
     }
 

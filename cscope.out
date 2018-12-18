@@ -1,4 +1,4 @@
-cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000599450
+cscope 15 /aenao-99/karyofyl/MultiCacheSim               0000600044
 	@cache.cpp
 
 24 
@@ -891,8 +891,12 @@ fže_·th
 c_¡r
 ());
 
-256 
+255 
 	g®l_»ads
+ = 0;
+
+256 
+	gunique_lšes
  = 0;
 
 258 autØ
@@ -915,13 +919,27 @@ begš
 £cÚd
 ;
 
-262 
+260 
+	gunique_lšes
+++;
+
+263 
 	gŒaû
  << 
 	g®l_»ads
  << "\n";
 
-263 autØ
+264 
+	gŒaû
+ << 
+	gunique_lšes
+ << "\n";
+
+265 
+	gŒaû
+ << "reads,percentage\n";
+
+266 autØ
 	g™
  = 
 occu»nû
@@ -931,7 +949,7 @@ begš
 ’d
 (); ++it) {
 
-264 
+267 
 	g³rûÁage
  = ((
 ™
@@ -941,13 +959,31 @@ begš
 ®l_»ads
 )*100;
 
+269 
+	gi
+=0; i<64; i++) {
+
 270 
 	gŒaû
  << 
 	g™
 ->
+	gfœ¡
+[
+i
+] << " ";
+
+272 
+	gŒaû
+ << ",";
+
+273 
+	gŒaû
+ << 
+	g™
+->
 	g£cÚd
- << " " << 
+ << "," << 
 	g¡d
 ::
 fixed
@@ -959,7 +995,7 @@ fixed
 ³rûÁage
  << "\n";
 
-272 
+275 
 	gŒaû
 .
 þo£
@@ -1273,11 +1309,117 @@ usšg
 ¬gv
 [])
 
-40 
+37 
+¡d
+::
+¡ršg
+ 
+m‘hod
+;
+
+38 
+äequ’cy
+;
+
+39 
+¡d
+::
+¡ršg
+ 
+b’chm¬k
+;
+
+40 
+b™s_ignÜed
+;
+
+42 
+i
+; i<
+¬gc
+; i++) {
+
+43 ià(
+¡d
+::
+	`¡ršg
+(
+¬gv
+[
+i
+]) == "-m") {
+
+44 
+m‘hod
+ = 
+¬gv
+[
+i
++1];
+
+46 ià(
+¡d
+::
+	`¡ršg
+(
+¬gv
+[
+i
+]) == "-f") {
+
+47 
+äequ’cy
+ = 
+	`©oi
+(
+¬gv
+[
+i
++1]);
+
+49 ià(
+¡d
+::
+	`¡ršg
+(
+¬gv
+[
+i
+]) == "-b") {
+
+50 
+b’chm¬k
+ = 
+¬gv
+[
+i
++1];
+
+52 ià(
+¡d
+::
+	`¡ršg
+(
+¬gv
+[
+i
+]) == "-i") {
+
+53 
+b™s_ignÜed
+ = 
+	`©oi
+(
+¬gv
+[
+i
++1]);
+
+60 
 ¬r_m­
 [] = {0, 1};
 
-41 
+61 
 veùÜ
 <> 
 	`tid_m­
@@ -1285,11 +1427,11 @@ veùÜ
 ¬r_m­
 ,‡rr_map +
 
-42 (
+62 (
 ¬r_m­
 ) / ());
 
-43 
+63 
 ¡d
 ::
 unique_±r
@@ -1301,7 +1443,7 @@ SeqP»ãtch
 make_unique
 <SeqPrefetch>();
 
-52 
+72 
 SšgËCacheSy¡em
  
 	`sys
@@ -1315,21 +1457,21 @@ SšgËCacheSy¡em
 çl£
 , false);
 
-53 
+73 
 rw
 ;
 
-54 
+74 
 ušt64_t
  
 add»ss
 ;
 
-55 
+75 
 lšes
  = 0;
 
-57 
+77 
 ¡d
 ::
 ¡ršg
@@ -1337,37 +1479,27 @@ lšes
 ty³
 ;
 
-58 
-¡d
-::
-¡ršg
- 
-b’chm¬k
- = 
-¬gv
-[2];
-
-59 ià(
+78 ià(
 b’chm¬k
  == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
 
-60 
+79 
 b’chm¬k
  == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
 
-61 
+80 
 ty³
  = "apps";
 
-63 ià(
+82 ià(
 b’chm¬k
  == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
 
-64 
+83 
 ty³
  = "kernels";
 
-66 
+85 
 z¡r
 ::
 if¡»am
@@ -1379,7 +1511,7 @@ b’chm¬k
 ty³
  + "/" + benchmark + "/run/trace.out.gz");
 
-72 
+91 
 ¡d
 ::
 ¡ršg
@@ -1387,49 +1519,41 @@ ty³
 lše
 ;
 
-73 
-b™s_ignÜed
- = 
-	`©oi
-(
-¬gv
-[1]);
-
-75 !
+93 !
 šfže
 .
 	`eof
 ())
 
-78 
+96 
 šfže
 .
 	`ignÜe
 (256, ':');
 
-80 
+98 
 šfže
  >> 
 rw
 ;
 
-81 
+99 
 	`as£¹
 (
 rw
  == 'R' ||„w == 'W');
 
-82 
+100 
 AcûssTy³
  
 acûssTy³
 ;
 
-83 ià(
+101 ià(
 rw
  == 'R') {
 
-84 
+102 
 acûssTy³
  = 
 AcûssTy³
@@ -1437,7 +1561,7 @@ AcûssTy³
 R—d
 ;
 
-86 
+104 
 acûssTy³
  = 
 AcûssTy³
@@ -1445,7 +1569,7 @@ AcûssTy³
 Wr™e
 ;
 
-89 
+107 
 šfže
  >> 
 hex
@@ -1453,7 +1577,7 @@ hex
 add»ss
 ;
 
-92 
+110 
 ¡d
 ::
 ¬¿y
@@ -1461,15 +1585,15 @@ add»ss
 lšeD©a
  = {0};
 
-93 
+111 
 v®ue
 ;
 
-95 
+113 
 i
 =0; i<64; i++) {
 
-96 
+114 
 šfže
  >> 
 hex
@@ -1477,7 +1601,7 @@ hex
 v®ue
 ;
 
-97 
+115 
 lšeD©a
 [
 i
@@ -1485,11 +1609,11 @@ i
 v®ue
 ;
 
-100 if(
+118 if(
 add»ss
  != 0) {
 
-103 
+121 
 sys
 .
 	`memAcûss
@@ -1503,7 +1627,7 @@ lšeD©a
 lšes
 %2);
 
-111 
+129 
 sys
 .
 	`checkSimž¬™y
@@ -1515,17 +1639,17 @@ b™s_ignÜed
 rw
 );
 
-113 ++
+131 ++
 lšes
 ;
 
-116 
+134 
 ¡d
 ::
 cout
  << "Traditional Stats\n_________________\n\n";
 
-118 
+136 
 cout
  << "Acûs£s: " << 
 lšes
@@ -1533,7 +1657,7 @@ lšes
 ’dl
 ;
 
-119 
+137 
 cout
  << "H™s: " << 
 sys
@@ -1545,7 +1669,7 @@ h™s
 ’dl
 ;
 
-120 
+138 
 cout
  << "Mis£s: " << 
 lšes
@@ -1559,7 +1683,7 @@ h™s
 ’dl
 ;
 
-121 
+139 
 cout
  << "LoÿÈ»ads: " << 
 sys
@@ -1571,7 +1695,7 @@ loÿl_»ads
 ’dl
 ;
 
-122 
+140 
 cout
  << "LoÿÈwr™es: " << 
 sys
@@ -1583,7 +1707,7 @@ loÿl_wr™es
 ’dl
 ;
 
-123 
+141 
 cout
  << "RemÙ»ads: " << 
 sys
@@ -1595,7 +1719,7 @@ sys
 ’dl
 ;
 
-124 
+142 
 cout
  << "RemÙwr™es: " << 
 sys
@@ -1607,7 +1731,7 @@ sys
 ’dl
 ;
 
-125 
+143 
 cout
  << "Oth”-ÿch»ads: " << 
 sys
@@ -1619,7 +1743,7 @@ sys
 ’dl
 ;
 
-128 
+146 
 sys
 .
 	`´štSimž¬™y
@@ -1629,7 +1753,7 @@ b™s_ignÜed
 b’chm¬k
 );
 
-133 
+151 
 	}
 }
 
