@@ -34,6 +34,21 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+    for (int i; i<argc; i++) {
+        if (std::string(argv[i]) == "-m") {
+            std::string method = argv[i+1];
+        }
+        else if (std::string(argv[i]) == "-f") {
+            int frequency = atoi(argv[i+1]);
+        }
+        else if (std::string(argv[i]) == "-b") {
+            std::string benchmark = argv[i+1];
+        }
+        else if (std::string(argv[i]) == "-i") {
+            int bits_ignored = atoi(argv[i+1]);
+        }
+    }
+
    // tid_map is used to inform the simulator how
    // thread ids map to NUMA/cache domains. Using
    // the tid as an index gives the NUMA domain.
@@ -55,7 +70,6 @@ int main(int argc, char* argv[])
    unsigned long long lines = 0;
    // zstr::ifstream infile("trace.out.gz");
    std::string type;
-   std::string benchmark = argv[2];
    if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
     benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
      type = "apps";
@@ -70,7 +84,6 @@ int main(int argc, char* argv[])
    // assert(infile.is_open());
 
    std::string line;
-   int bits_ignored = atoi(argv[1]);
 
    while(!infile.eof())
    // while(std::getline(infile, line))
