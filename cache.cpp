@@ -251,12 +251,10 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     auto str_int = std::to_string(bits_ignored);
     std::string file_path = "/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small/" + str_int + "/similarity.out";
     std::ofstream trace(file_path.c_str());
-    // trace.open("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "similarity.out");
 
     int all_reads = 0;
     int unique_lines = 0;
     // std::cout << "\nSimilarity Stats\n_________________\n\n";
-    trace << "reads,percentage";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         all_reads = all_reads + it->second;
         unique_lines++;
@@ -264,13 +262,14 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     // std::cout << "Total reads: " << all_reads << "\n\n";
     trace << all_reads << "\n";
     trace << unique_lines << "\n";
+    trace << "reads,percentage";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
-        // for (int i=0; i<64; i++) {
-        //     std::cout << it->first[i] << " ";
-        // }
-        // std::cout << "Count: " << it->second << " Percentage: " << std::fixed << std::setprecisi$
+        for (int i=0; i<64; i++) {
+            trace << it->first[i] << " ";
+        }
+        trace << ",";
         trace << it->second << "," << std::fixed << std::setprecision(2) << percentage << "\n";
     }
     trace.close();
