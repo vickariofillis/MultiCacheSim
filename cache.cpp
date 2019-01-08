@@ -288,9 +288,9 @@ void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
             std::cout << "Data: ";
             for (int j=0; j<64; j++) {
                 std::cout << std::hex << it->data[j] << " ";
+                tempData += std::to_string(std::hex << it->data[j]);
             }
             std::cout << "\n";
-            tempData += std::to_string(std::hex << it->data[j]);
             tempNum = stoi(tempData);
             inputData.push_back(tempNum);
             std::cout << "tempNum: " << tempNum;
