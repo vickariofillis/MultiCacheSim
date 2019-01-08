@@ -274,3 +274,26 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     }
     trace.close();
 }
+
+void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
+{
+    std::vector<int> inputData;
+    std::string tempData;
+    int tempNum;
+
+    std::cout << "Table Update" << "\n\n";
+    //Iterate over the cache and keep the cache data as input
+    for (uint i=0; i<sets.size(); i++) {
+        for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
+            std::cout << "Data: ";
+            for (int j=0; j<64; j++) {
+                std::cout << std::hex << it->data[j] << " ";
+            }
+            std::cout << "\n";
+            tempData += std::to_string(std::hex << it->data[j]);
+            tempNum = stoi(tempData);
+            inputData.push_back(tempNum);
+            std::cout << "tempNum: " << tempNum;
+        }
+    }
+}

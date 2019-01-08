@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
     int frequency;
     std::string benchmark;
     int bits_ignored;
+    std::string suite;
+    int entries;
 
     for (int i; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -51,6 +53,12 @@ int main(int argc, char* argv[])
         }
         else if (std::string(argv[i]) == "-i") {
             bits_ignored = atoi(argv[i+1]);
+        }
+        else if (std::string(argv[i]) == "-s") {
+            suite = argv[i+1];
+        }
+        else if (std::string(argv[i]) == "-x") {
+            entries = atoi(argv[i+1]);
         }
     }
 
@@ -73,16 +81,26 @@ int main(int argc, char* argv[])
    char rw;
    uint64_t address;
    unsigned long long lines = 0;
-   // zstr::ifstream infile("trace.out.gz");
-   std::string type;
-   if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" || benchmark == "raytrace" ||
-    benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-     type = "apps";
+
+   if (suite == "parsec") {
+        std::string type;
+        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
+         benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
+         type = "apps";
+        }
+        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+            type = "kernels";
+        }
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz");
    }
-   else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-     type = "kernels";
+   else if (suite == "perfect") {
+        // FIX-ME: possibly wrong path
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + benchmark + "/small/trace.out.gz");
    }
-   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz");
+   else if (suite == "phoenix") {
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/small/trace.out.gz");
+   }
+   
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
    // infile.open("trace.out", ifstream::in);
@@ -91,7 +109,6 @@ int main(int argc, char* argv[])
    std::string line;
 
    while(!infile.eof())
-   // while(std::getline(infile, line))
    {
       infile.ignore(256, ':');
       // Reading access
@@ -106,7 +123,6 @@ int main(int argc, char* argv[])
       // Reading address
       infile >> hex >> address;
 
-      // std::vector<int> lineData(64,0);
       std::array<int,64> lineData = {0};
       int value;
       // Reading 64 values (64 bytes)
@@ -121,10 +137,12 @@ int main(int argc, char* argv[])
          sys.memAccess(address, accessType, lineData, lines%2);
       }
 
-      // if (rw == 'R') {
-      //   int x = atoi(argv[1]);
-      //   sys.checkSimilarity(lineData,x);
-      // }
+      int writes = 0;
+      if (rw == "W") {
+        if ((writes % frequency) == 0) {
+            sys.tableUpdate(entries, method, bits_ignored);
+        }
+      }
 
       sys.checkSimilarity(lineData,bits_ignored,rw);
 
