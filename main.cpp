@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
       }
 
       int writes = 0;
-      if (rw == "W") {
+      if (rw == 'W') {
         if ((writes % frequency) == 0) {
             sys.tableUpdate(entries, method, bits_ignored);
         }
