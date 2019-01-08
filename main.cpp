@@ -82,6 +82,7 @@ int main(int argc, char* argv[])
    uint64_t address;
    unsigned long long lines = 0;
 
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
    if (suite == "parsec") {
         std::string type;
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
