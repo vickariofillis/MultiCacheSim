@@ -294,7 +294,7 @@ void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
             }
             std::cout << "\n";
             // tmpNum = stoi(tmpData);
-            inputData.push_back(stoi(tmpNum));
+            inputData.push_back(stoi(tmpData));
             std::cout << "tmpNum: " << tmpNum;
         }
     }
