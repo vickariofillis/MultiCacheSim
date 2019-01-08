@@ -118,7 +118,7 @@ public:
    void snapshot();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity(int bits_ignored, std::string benchmark);
-   void tableUpdate(int entries, std:string method, int bits_ignored);
+   void tableUpdate(int entries, std::string method, int bits_ignored);
 private:
    std::unique_ptr<Cache> cache;
 };
