@@ -278,8 +278,8 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
 {
     std::vector<int> inputData;
-    std::string tempData;
-    int tempNum;
+    std::string tmpData;
+    int tmpNum;
 
     std::cout << "Table Update" << "\n\n";
     //Iterate over the cache and keep the cache data as input
@@ -288,12 +288,14 @@ void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
             std::cout << "Data: ";
             for (int j=0; j<64; j++) {
                 std::cout << std::hex << it->data[j] << " ";
-                tempData += std::to_string(std::hex << it->data[j]);
+                tmpNum = it->data[j];
+                // tempData += std::to_string(std::hex << it->data[j]);
+                tmpData += std::to_string(tmpNum);
             }
             std::cout << "\n";
-            tempNum = stoi(tempData);
-            inputData.push_back(tempNum);
-            std::cout << "tempNum: " << tempNum;
+            // tmpNum = stoi(tmpData);
+            inputData.push_back(stoi(tmpNum));
+            std::cout << "tmpNum: " << tmpNum;
         }
     }
 }
