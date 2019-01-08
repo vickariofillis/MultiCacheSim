@@ -266,10 +266,10 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
-        for (int i=0; i<64; i++) {
-            trace << it->first[i] << " ";
-        }
-        trace << ",";
+        // for (int i=0; i<64; i++) {
+        //     trace << it->first[i] << " ";
+        // }
+        // trace << ",";
         trace << it->second << "," << std::fixed << std::setprecision(2) << percentage << "\n";
     }
     trace.close();
