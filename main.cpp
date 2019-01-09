@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     int entries = 8;
     std::string size = "small";
 
-    for (int i=0; i<argc; i++) {
+    for (int i; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
             method = argv[i+1];
         }
@@ -93,11 +93,11 @@ int main(int argc, char* argv[])
    std::string extra2 = "/test";
    std::string extra3 = "/run";
    if (suite == "parsec") {
-        cout << "\nInto suite=parsec\n";
+        // cout << "\nInto suite=parsec\n";
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
          benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
          type = "apps";
-         cout << "Into benchmark\n";
+         // cout << "Into benchmark\n";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
             type = "kernels";
