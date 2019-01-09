@@ -22,6 +22,7 @@ freely, subject to the following restrictions:
 */
 
 #include <iostream>
+#include <iosfwd>
 #include <fstream>
 #include <cassert>
 #include <sstream>
