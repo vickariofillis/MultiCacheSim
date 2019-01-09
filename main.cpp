@@ -95,15 +95,17 @@ int main(int argc, char* argv[])
    if (suite == "parsec") {
         cout << "\nInto suite=parsec\n";
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
-         benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-         type = "apps";
-         cout << "Into benchmark\n";
+            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
+            cout << "Into apps\n";
+            type = "apps";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+            cout << "Into kernels\n";
             type = "kernels";
         }
+        cout << "Before extra1+extra2\n";
         extra1 = "/pkgs/";
-        std::string extra2 = "/" + benchmark;
+        extra2 = "/" + benchmark;
    }
    else if (suite == "perfect") {
         cout << "\nInto suite=perfect\n";
@@ -122,7 +124,7 @@ int main(int argc, char* argv[])
    }
    cout << "Before infile\n";
    // cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nExtra1: " << extra1 << << "\nExtra2: " << extra2 << << "\nExtra3: " << extra3;
-   cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz";
+   cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    cout << "After infile\n";
    
