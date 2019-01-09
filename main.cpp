@@ -86,10 +86,12 @@ int main(int argc, char* argv[])
 
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
    if (suite == "parsec") {
+        cout << "Into suite=parsec";
         std::string type;
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
          benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
          type = "apps";
+         cout << "Into benchmark=blackscholes";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
             type = "kernels";
