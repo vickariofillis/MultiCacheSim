@@ -84,6 +84,7 @@ int main(int argc, char* argv[])
    uint64_t address;
    unsigned long long lines = 0;
 
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
    if (suite == "parsec") {
         std::string type;
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
@@ -93,18 +94,14 @@ int main(int argc, char* argv[])
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
             type = "kernels";
         }
-        zstr::ifstream infile{"/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz"};
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz");
    }
    else if (suite == "perfect") {
         // FIX-ME: possibly wrong path
-        zstr::ifstream infile{"/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + benchmark + "/small/trace.out.gz"};
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + benchmark + "/small/trace.out.gz");
    }
    else if (suite == "phoenix") {
-        zstr::ifstream infile{"/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/small/trace.out.gz"};
-   }
-   else {
-        // Run on test data
-        zstr::ifstream infile{"/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz"}; 
+        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/small/trace.out.gz");
    } 
    
    // This code works with the output from the 
