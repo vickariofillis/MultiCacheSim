@@ -121,6 +121,8 @@ int main(int argc, char* argv[])
         extra3 = "";
    }
    cout << "Before infile\n";
+   // cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nExtra1: " << extra1 << << "\nExtra2: " << extra2 << << "\nExtra3: " << extra3;
+   cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz";
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    cout << "After infile\n";
    
