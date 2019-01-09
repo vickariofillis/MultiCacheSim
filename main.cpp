@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     std::string suite;
     int entries = 8;
 
-    for (int i; i<argc; i++) {
+    for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
             method = argv[i+1];
         }
@@ -84,14 +84,15 @@ int main(int argc, char* argv[])
    uint64_t address;
    unsigned long long lines = 0;
 
-   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
+   // zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/blackscholes/small/pkgs/apps/blackscholes/run/trace.out.gz");
    if (suite == "parsec") {
-        cout << "Into suite=parsec";
+        cout << "\nInto suite=parsec\n";
         std::string type;
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
          benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
          type = "apps";
-         cout << "Into benchmark=blackscholes";
+         cout << "Into benchmark=blackscholes\n";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
             type = "kernels";
