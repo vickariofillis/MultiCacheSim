@@ -93,22 +93,22 @@ int main(int argc, char* argv[])
    std::string extra2 = "/test";
    std::string extra3 = "/run";
    if (suite == "parsec") {
-        cout << "\nInto suite=parsec\n";
+        // cout << "\nInto suite=parsec\n";
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
             benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            cout << "Into apps\n";
+            // cout << "Into apps\n";
             type = "apps";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            cout << "Into kernels\n";
+            // cout << "Into kernels\n";
             type = "kernels";
         }
-        cout << "Before extra1+extra2\n";
+        // cout << "Before extra1+extra2\n";
         extra1 = "/pkgs/";
         extra2 = "/" + benchmark;
    }
    else if (suite == "perfect") {
-        cout << "\nInto suite=perfect\n";
+        // cout << "\nInto suite=perfect\n";
         // FIX-ME: possibly wrong path
         type = "";
         extra1 = "";
@@ -116,17 +116,16 @@ int main(int argc, char* argv[])
         extra3 = "";
    }
    else if (suite == "phoenix") {
-        cout << "\nInto suite=phoenix\n";
+        // cout << "\nInto suite=phoenix\n";
         type = "";
         extra1 = "";
         extra2 = "";
         extra3 = "";
    }
-   cout << "Before infile\n";
-   // cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nExtra1: " << extra1 << << "\nExtra2: " << extra2 << << "\nExtra3: " << extra3;
-   cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
+   // cout << "Before infile\n";
+   // cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
-   cout << "After infile\n";
+   // cout << "After infile\n";
    
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
