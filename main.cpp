@@ -38,10 +38,11 @@ int main(int argc, char* argv[])
 {
     std::string method;
     int frequency = 0;
-    std::string benchmark;
+    std::string benchmark = "test";
     int bits_ignored = 0;
-    std::string suite;
+    std::string suite = "parsec";
     int entries = 8;
+    std::string size = "small";
 
     for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -61,6 +62,9 @@ int main(int argc, char* argv[])
         }
         else if (std::string(argv[i]) == "-x") {
             entries = atoi(argv[i+1]);
+        }
+        else if (std::string(argv[i]) == "-t") {
+            size = argv[i+1];
         }
     }
 
@@ -84,28 +88,39 @@ int main(int argc, char* argv[])
    uint64_t address;
    unsigned long long lines = 0;
 
-   // zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/test/small/pkgs/apps/test/run/trace.out.gz");
-   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/blackscholes/small/pkgs/apps/blackscholes/run/trace.out.gz");
+   std::string type = "apps";
+   std::string extra1 = "/pkgs/";
+   std::string extra2 = "/test";
+   std::string extra3 = "/run";
    if (suite == "parsec") {
         cout << "\nInto suite=parsec\n";
-        std::string type;
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
          benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
          type = "apps";
-         cout << "Into benchmark=blackscholes\n";
+         cout << "Into benchmark\n";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
             type = "kernels";
         }
-        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/small/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz");
+        extra1 = "/pkgs/";
+        std::string extra2 = "/" + benchmark;
    }
    else if (suite == "perfect") {
+        cout << "\nInto suite=perfect\n";
         // FIX-ME: possibly wrong path
-        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + benchmark + "/small/trace.out.gz");
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
    }
    else if (suite == "phoenix") {
-        zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/small/trace.out.gz");
-   } 
+        cout << "\nInto suite=phoenix\n";
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
+   }
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
