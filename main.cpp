@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
         extra2 = "";
         extra3 = "";
    }
-   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    
    // This code works with the output from the 
    // ManualExamples/pinatrace pin tool
