@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include <sstream>
 #include <string>
 #include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
+#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
