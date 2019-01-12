@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 
 #include "misc.h"
 #include "cache.h"
+#include "kmeans.h"
 
 // std::ofstream trace("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "/similarity.out");
 
@@ -277,12 +278,17 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
 
 void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
 {
+    int line_cnt = 0;
     std::vector<std::array<int,64>> inputData;
 
     //Iterate over the cache and keep the cache data as input
     for (uint i=0; i<sets.size(); i++) {
+        line_cnt++;
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
             inputData.push_back(it->data);
         }
     }
+
+    // max_iterations = 100
+    clustering(line_cnt, entries, 100, inputData);
 }
