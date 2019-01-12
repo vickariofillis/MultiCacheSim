@@ -66,8 +66,10 @@ public:
     void run(vector<Point> & points);
 };
 
-class Entries
-{
-public:
-    void clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines);
-};
+// class Entries
+// {
+// public:
+//     void clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines);
+// };
+
+void clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines);
