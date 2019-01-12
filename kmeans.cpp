@@ -250,7 +250,7 @@ void KMeans::run(vector<Point> & points)
     }
 }
 
-Entries::clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines)
+void Entries::clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines)
 {
     srand (time(NULL));
 
