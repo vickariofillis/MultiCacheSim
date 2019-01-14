@@ -285,7 +285,7 @@ void Entries::clustering(vector<array<int,64>> cacheLines)
 
         int value;
         for (int j=0; j<64; j++) {
-            value = cacheLines[i].[j];
+            value = cacheLines[i][j];
             values.push_back(value);
         }
 
