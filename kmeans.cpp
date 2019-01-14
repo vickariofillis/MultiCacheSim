@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Point::Point(int id_point, vector<int>& values, string name = "")
+Point::Point(int id_point, vector<int>& values, string name)
 {
     this->id_point = id_point;
     total_values = values.size();
@@ -258,7 +258,7 @@ void Entries::clustering(int total_points, int K, int max_iterations, vector<arr
     srand (time(NULL));
 
     // Total points = # cache lines (vector size), Total values = 64, K = Precompression table entries, Max iterations = depends, Has name = 0
-    int total_points, total_values = 64, K, max_iterations, has_name = 0;
+    // int total_points, total_values = 64, K, max_iterations, has_name = 0;
 
     vector<Point> points;
     string point_name;
@@ -278,6 +278,4 @@ void Entries::clustering(int total_points, int K, int max_iterations, vector<arr
 
     KMeans kmeans(K, total_points, total_values, max_iterations);
     kmeans.run(points);
-
-    return 0;
 }

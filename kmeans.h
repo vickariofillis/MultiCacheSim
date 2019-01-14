@@ -79,6 +79,5 @@ private:
     int total_points, max_iterations;
     vector<array<int,64>>& cacheLines;
 public:
-    Entries();
     void clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines);
 };
