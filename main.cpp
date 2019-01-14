@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
       }
 
       if (rw == 'W') {
-        if ((writes % frequency) != 0) {
+        if ((writes % frequency) == 0 && writes != 0) {
             cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(entries, method, bits_ignored);
             updates++;
