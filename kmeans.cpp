@@ -274,12 +274,18 @@ void Entries::clustering(vector<array<int,64>> cacheLines)
     for (uint i=0; i<cacheLines.size(); i++) {
 
         vector<int> values;
-        for (auto it = cacheLines[i].begin(); it != cacheLines[i].end(); ++it) {
-            int value;
-            for (int j=0; j<64; j++) {
-                value = it->data[j];
-                values.push_back(value);
-            }
+        // for (auto it = cacheLines[i].begin(); it != cacheLines[i].end(); ++it) {
+        //     int value;
+        //     for (int j=0; j<64; j++) {
+        //         value = it->data[j];
+        //         values.push_back(value);
+        //     }
+        // }
+
+        int value;
+        for (int j=0; j<64; j++) {
+            value = it->data[j];
+            values.push_back(value);
         }
 
         Point p(i, values);
