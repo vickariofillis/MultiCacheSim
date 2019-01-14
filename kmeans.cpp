@@ -275,17 +275,9 @@ void Entries::clustering(vector<array<int,64>> const &cacheLines)
     // for (auto it = cacheLines.begin(); it != cacheLines.end(); ++it) {
 
         vector<int> values;
-        // for (auto it = cacheLines[i].begin(); it != cacheLines[i].end(); ++it) {
-        //     int value;
-        //     for (int j=0; j<64; j++) {
-        //         value = it->data[j];
-        //         values.push_back(value);
-        //     }
-        // }
 
-        int value;
         for (int j=0; j<64; j++) {
-            value = cacheLines[i][j];
+            int value = cacheLines[i][j];
             values.push_back(value);
         }
 

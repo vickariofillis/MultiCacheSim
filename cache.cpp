@@ -126,14 +126,11 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 
 void Cache::snapshot()
 {
-    int way_count;
-    // int data_count;
-
     for (uint i=0; i<sets.size(); i++) {
-        way_count = 0;
+        int way_count = 0;
         std::cout << "Cache Line #" << i << " \n";
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
-            // data_count = 0;
+            // int data_count = 0;
             std::cout << "Way #" << way_count << ", Tag: " << std::hex << it->tag << ", Data: ";
             for (int j=0; j<64; j++) {
                 std::cout << std::hex << it->data[j] << " ";
@@ -246,7 +243,7 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
     }
 }
 
-void Cache::printSimilarity(int bits_ignored, std::string benchmark)
+void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
 {
 
     auto str_int = std::to_string(bits_ignored);
@@ -276,7 +273,7 @@ void Cache::printSimilarity(int bits_ignored, std::string benchmark)
     trace.close();
 }
 
-void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
+void Cache::tableUpdate(const int entries, const std::string method, const int bits_ignored)
 {
     int line_cnt = 0;
     std::vector<std::array<int,64>> inputData;
