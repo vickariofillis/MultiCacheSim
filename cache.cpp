@@ -291,5 +291,5 @@ void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
 
     Entries cluster(line_cnt, 64, entries, 100);
     // max_iterations = 100
-    cluster.clustering(vector<array<int,64>> &inputData);
+    cluster.clustering(inputData);
 }
