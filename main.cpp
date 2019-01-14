@@ -163,11 +163,14 @@ int main(int argc, char* argv[])
          sys.memAccess(address, accessType, lineData, lines%2);
       }
 
-      int writes = 0;
+      int writes = 0, updates = 0;
       if (rw == 'W') {
         if ((writes % frequency) == 0) {
+            cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(entries, method, bits_ignored);
+            updates++;
         }
+        writes++;
       }
 
       sys.checkSimilarity(lineData,bits_ignored,rw);
