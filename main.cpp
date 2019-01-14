@@ -68,6 +68,8 @@ int main(int argc, char* argv[])
         }
     }
 
+    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency << "\n\n";
+
    // tid_map is used to inform the simulator how
    // thread ids map to NUMA/cache domains. Using
    // the tid as an index gives the NUMA domain.
@@ -133,6 +135,7 @@ int main(int argc, char* argv[])
    // assert(infile.is_open());
 
    std::string line;
+   int writes = 0, updates = 0;
 
    while(!infile.eof())
    {
@@ -163,9 +166,8 @@ int main(int argc, char* argv[])
          sys.memAccess(address, accessType, lineData, lines%2);
       }
 
-      int writes = 0, updates = 0;
       if (rw == 'W') {
-        if ((writes % frequency) == 0) {
+        if ((writes % frequency) != 0) {
             cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(entries, method, bits_ignored);
             updates++;
