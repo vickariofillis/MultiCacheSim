@@ -77,7 +77,7 @@ class Entries
 private:
     int K;
     int total_points, total_values, max_iterations;
-    vector<array<int,64>>& cacheLines;
+    vector<array<int,64>> cacheLines;
 public:
     Entries (int total_points, int total_values, int K, int max_iterations);
     void clustering(vector<array<int,64>>& cacheLines);

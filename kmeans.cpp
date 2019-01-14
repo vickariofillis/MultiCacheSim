@@ -259,7 +259,7 @@ Entries::Entries(int total_points, int total_values, int K, int max_iterations)
 }
 
 // void Entries::clustering(int total_points, int K, int max_iterations, vector<array<int,64>>& cacheLines)
-void Entries::clustering(vector<array<int,64>>& cacheLines)
+void Entries::clustering(vector<array<int,64>> cacheLines)
 {
     srand (time(NULL));
 
