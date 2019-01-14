@@ -239,10 +239,10 @@ void KMeans::run(vector<Point> & points)
         {
             cout << "Point " << dec << clusters[i].getPoint(j).getID() + 1 << ": ";
             table << "Point " << dec << clusters[i].getPoint(j).getID() + 1 << ": ";
-            for(int p = 0; p < total_values; p++)
+            for(int p = 0; p < total_values; p++) {
                 cout << hex << clusters[i].getPoint(j).getValue(p) << " ";
                 table << hex << clusters[i].getPoint(j).getValue(p) << " ";
-
+            }
             string point_name = clusters[i].getPoint(j).getName();
 
             if(point_name != "")
@@ -256,13 +256,16 @@ void KMeans::run(vector<Point> & points)
         cout << "Cluster values: ";
         table << "Cluster values: ";
 
-        for(int j = 0; j < total_values; j++)
+        for(int j = 0; j < total_values; j++) {
             cout << hex << clusters[i].getCentralValue(j) << " ";
             table << hex << clusters[i].getCentralValue(j) << " ";
-
+        }
+        
         cout << "\n\n";
         table << "\n\n";
     }
+
+    table.close();
 }
 
 Entries::Entries(int total_points, int total_values, int K, int max_iterations)
