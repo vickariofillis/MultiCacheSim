@@ -289,7 +289,7 @@ void Cache::tableUpdate(int entries, std::string method, int bits_ignored)
         }
     }
 
-    // Entries cluster;
+    Entries cluster(line_cnt, 64, entries, 100);
     // max_iterations = 100
-    Entries clustering(line_cnt, entries, 100, inputData);
+    cluster.clustering(inputData);
 }
