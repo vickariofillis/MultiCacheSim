@@ -5,6 +5,7 @@
 #include <time.h>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <bitset>
 #include <climits>
 

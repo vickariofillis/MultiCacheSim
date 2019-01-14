@@ -150,6 +150,10 @@ int KMeans::getIDNearestCenter(Point point)
 
 void KMeans::run(vector<Point> & points)
 {
+
+    ofstream table;
+    table.open("precomp_entries.out");
+
     if(K > total_points)
         return;
 
@@ -217,6 +221,7 @@ void KMeans::run(vector<Point> & points)
         if(done == true || iter >= max_iterations)
         {
             cout << "Break in iteration " << iter << "\n\n";
+            table << "Break in iteration " << iter << "\n\n";
             break;
         }
 
@@ -229,26 +234,34 @@ void KMeans::run(vector<Point> & points)
         int total_points_cluster =  clusters[i].getTotalPoints();
 
         cout << "Cluster " << dec << clusters[i].getID() + 1 << endl;
+        table << "Cluster " << dec << clusters[i].getID() + 1 << endl;
         for(int j = 0; j < total_points_cluster; j++)
         {
             cout << "Point " << dec << clusters[i].getPoint(j).getID() + 1 << ": ";
+            table << "Point " << dec << clusters[i].getPoint(j).getID() + 1 << ": ";
             for(int p = 0; p < total_values; p++)
                 cout << hex << clusters[i].getPoint(j).getValue(p) << " ";
+                table << hex << clusters[i].getPoint(j).getValue(p) << " ";
 
             string point_name = clusters[i].getPoint(j).getName();
 
             if(point_name != "")
                 cout << "- " << point_name;
+                table << "- " << point_name;
 
             cout << endl;
+            table << endl;
         }
 
         cout << "Cluster values: ";
+        table << "Cluster values: ";
 
         for(int j = 0; j < total_values; j++)
             cout << hex << clusters[i].getCentralValue(j) << " ";
+            table << hex << clusters[i].getCentralValue(j) << " ";
 
         cout << "\n\n";
+        table << "\n\n";
     }
 }
 
