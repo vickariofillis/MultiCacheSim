@@ -245,10 +245,11 @@ void KMeans::run(vector<Point> & points)
             }
             string point_name = clusters[i].getPoint(j).getName();
 
-            if(point_name != "")
+            if(point_name != "") {
                 cout << "- " << point_name;
                 table << "- " << point_name;
-
+            }
+            
             cout << endl;
             table << endl;
         }
@@ -260,7 +261,7 @@ void KMeans::run(vector<Point> & points)
             cout << hex << clusters[i].getCentralValue(j) << " ";
             table << hex << clusters[i].getCentralValue(j) << " ";
         }
-        
+
         cout << "\n\n";
         table << "\n\n";
     }
