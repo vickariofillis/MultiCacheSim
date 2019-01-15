@@ -175,8 +175,11 @@ void KMeans::run(vector<Point> & points)
             {
                 cout << "Kmeans #0.3\n";
                 prohibited_indexes.push_back(index_point);
+                cout << "Kmeans #0.3.1\n";
                 points[index_point].setCluster(i);
+                cout << "Kmeans #0.3.2\n";
                 Cluster cluster(i, points[index_point]);
+                cout << "Kmeans #0.3.3\n";
                 clusters.push_back(cluster);
                 break;
             }
