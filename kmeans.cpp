@@ -167,11 +167,13 @@ void KMeans::run(vector<Point> & points)
         cout << "Kmeans #0.1\n";
         while(true)
         {
+            cout << "Kmeans #0.2\n";
             int index_point = rand() % total_points;
 
             if(find(prohibited_indexes.begin(), prohibited_indexes.end(),
                     index_point) == prohibited_indexes.end())
             {
+                cout << "Kmeans #0.3\n";
                 prohibited_indexes.push_back(index_point);
                 points[index_point].setCluster(i);
                 Cluster cluster(i, points[index_point]);
