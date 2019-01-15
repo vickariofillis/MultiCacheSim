@@ -154,6 +154,8 @@ void KMeans::run(vector<Point> & points)
     ofstream table;
     table.open("precomp_entries.out");
 
+    cout << "Kmeans #0\n";
+
     if(K > total_points)
         return;
 
@@ -162,6 +164,7 @@ void KMeans::run(vector<Point> & points)
     // choose K distinct values for the centers of the clusters
     for(int i = 0; i < K; i++)
     {
+        cout << "Kmeans #0.1\n";
         while(true)
         {
             int index_point = rand() % total_points;
@@ -178,10 +181,12 @@ void KMeans::run(vector<Point> & points)
         }
     }
 
+    cout << "Kmeans #1\n";
     int iter = 1;
 
     while(true)
     {
+        cout << "Kmeans #1.1\n";
         bool done = true;
 
         // associates each point to the nearest center
@@ -228,9 +233,11 @@ void KMeans::run(vector<Point> & points)
         iter++;
     }
 
+    cout << "Kmeans #2\n";
     // shows elements of clusters
     for(int i = 0; i < K; i++)
     {
+        cout << "Kmeans #2.1\n";
         int total_points_cluster =  clusters[i].getTotalPoints();
 
         cout << "Cluster " << dec << clusters[i].getID() + 1 << endl;
@@ -249,7 +256,7 @@ void KMeans::run(vector<Point> & points)
                 cout << "- " << point_name;
                 table << "- " << point_name;
             }
-            
+
             cout << endl;
             table << endl;
         }
