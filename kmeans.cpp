@@ -194,11 +194,13 @@ void KMeans::run(vector<Point> & points)
         // associates each point to the nearest center
         for(int i = 0; i < total_points; i++)
         {
+            cout << "Kmeans #1.2\n";
             int id_old_cluster = points[i].getCluster();
             int id_nearest_center = getIDNearestCenter(points[i]);
 
             if(id_old_cluster != id_nearest_center)
             {
+                cout << "Kmeans #1.3\n";
                 if(id_old_cluster != -1)
                     clusters[id_old_cluster].removePoint(points[i].getID());
 
@@ -208,31 +210,39 @@ void KMeans::run(vector<Point> & points)
             }
         }
 
+        cout << "Kmeans #1.4\n";
         // recalculating the center of each cluster
         for(int i = 0; i < K; i++)
         {
+            cout << "Kmeans #1.5\n";
             for(int j = 0; j < total_values; j++)
             {
+                cout << "Kmeans #1.6\n";
                 int total_points_cluster = clusters[i].getTotalPoints();
                 double sum = 0.0;
 
                 if(total_points_cluster > 0)
                 {
+                    cout << "Kmeans #1.7\n";
                     for(int p = 0; p < total_points_cluster; p++)
                         sum += clusters[i].getPoint(p).getValue(j);
+                    cout << "Kmeans #1.8\n";
                     clusters[i].setCentralValue(j, sum / total_points_cluster);
                 }
             }
         }
 
+        cout << "Kmeans #1.9\n";
         if(done == true || iter >= max_iterations)
         {
+            cout << "Kmeans #1.10\n";
             cout << "Break in iteration " << iter << "\n\n";
             table << "Break in iteration " << iter << "\n\n";
             break;
         }
 
         iter++;
+        cout << "Kmeans #1.11\n";
     }
 
     cout << "Kmeans #2\n";
