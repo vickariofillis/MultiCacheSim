@@ -181,15 +181,11 @@ int main(int argc, char* argv[])
             // Kmeans
             cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(entries, method, bits_ignored);
-            sys.snapshot();
+            // sys.snapshot();
             updates++;
         }
         writes++;
       }
-
-      // if (lines == 83){
-      //   sys.snapshot();
-      // }
 
       sys.checkSimilarity(lineData,bits_ignored,rw);
 

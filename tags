@@ -59,7 +59,7 @@ clusters	kmeans.h	/^    vector<Cluster> clusters;$/;"	m	class:KMeans
 countCompulsory	system.h	/^   bool countCompulsory;$/;"	m	class:System
 data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine
 doAddrTrans	system.h	/^   bool doAddrTrans;$/;"	m	class:System
-enable_prints	cache.cpp	/^bool enable_prints = 1;$/;"	v
+enable_prints	cache.cpp	/^bool enable_prints = 0;$/;"	v
 evictTraffic	system.cpp	/^void MultiCacheSystem::evictTraffic(uint64_t set, $/;"	f	class:MultiCacheSystem
 findTag	cache.cpp	/^CacheState Cache::findTag(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 getCentralValue	kmeans.cpp	/^int Cluster::getCentralValue(int index)$/;"	f	class:Cluster
