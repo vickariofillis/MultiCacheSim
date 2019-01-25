@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     }
 
     cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency\
-     << "\n" << "n_________________" << "\n";
+     << "\n" << "_________________" << "\n\n";
 
    // tid_map is used to inform the simulator how
    // thread ids map to NUMA/cache domains. Using
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
    // whether to do virtual to physical translation,
    // and number of caches/domains
    // WARNING: counting compulsory misses doubles execution time
-   SingleCacheSystem sys(64, 16, 2, std::move(prefetch), false, false);
+   SingleCacheSystem sys(64, 32768, 2, std::move(prefetch), false, false);
    char rw;
    uint64_t address;
    unsigned long long lines = 0;
