@@ -31,6 +31,7 @@ int Point::getCluster()
 
 int Point::getValue(int index)
 {
+    cout << "Point: getValue\n";
     return values[index];
 }
 
@@ -83,6 +84,7 @@ bool Cluster::removePoint(int id_point)
 
 int Cluster::getCentralValue(int index)
 {
+    cout << "Cluster: getCentralValue\n";
     return central_values[index];
 }
 
@@ -116,35 +118,43 @@ KMeans::KMeans(int K, int total_points, int total_values, int max_iterations)
 
 int KMeans::getIDNearestCenter(Point point)
 {
+    cout << "Kmeans Nearest Center #0\n";
     int sum = 0, min_dist;
     int id_cluster_center = 0;
 
     // Check distance to cluster #0 
     for(int i = 0; i < total_values; i++) {
+        cout << "Kmeans Nearest Center #1\n";
         sum += abs(clusters[0].getCentralValue(i) - point.getValue(i));
     }
 
+    cout << "Kmeans Nearest Center #2\n";
     min_dist = sum;
 
     // Check distance to the rest of the clusters and see which one is the smallest
     for(int i = 1; i < K; i++) {
+        cout << "Kmeans Nearest Center #3\n";
         int dist;
         sum = 0;
 
         for(int j = 0; j < total_values; j++) {
+            cout << "Kmeans Nearest Center #4\n";
             sum += abs(clusters[i].getCentralValue(j) - point.getValue(j));
         }
 
+        cout << "Kmeans Nearest Center #5\n";
         dist = sum;
 
         if(dist < min_dist)
         {
+            cout << "Kmeans Nearest Center #6\n";
             min_dist = dist;
             id_cluster_center = i;
         }
 
     }
 
+    cout << "Kmeans Nearest Center #7\n";
     return id_cluster_center;
 }
 
@@ -170,16 +180,21 @@ void KMeans::run(vector<Point> & points)
             cout << "Kmeans #0.2\n";
             int index_point = rand() % total_points;
 
+            // Checks to see whether the random index point exists in the prohibited_indexes vector
             if(find(prohibited_indexes.begin(), prohibited_indexes.end(),
                     index_point) == prohibited_indexes.end())
             {
                 cout << "Kmeans #0.3\n";
+                // Insert the random index_point into the prohibited_indexes vector
                 prohibited_indexes.push_back(index_point);
                 cout << "Kmeans #0.3.1\n";
-                points[index_point].setCluster(i);
+                // 
+                points[index_point].setCluster(i);          
                 cout << "Kmeans #0.3.2\n";
+                // Create a cluster with the index_point as a centroid
                 Cluster cluster(i, points[index_point]);
                 cout << "Kmeans #0.3.3\n";
+                // Inserting the element (of type cluster) into the vector named clusters
                 clusters.push_back(cluster);
                 cout << "Kmeans #0.3.4\n";
                 break;
@@ -200,7 +215,9 @@ void KMeans::run(vector<Point> & points)
         {
             cout << "Kmeans #1.2\n";
             int id_old_cluster = points[i].getCluster();
+            cout << "Kmeans #1.2.1\n";
             int id_nearest_center = getIDNearestCenter(points[i]);
+            cout << "Kmeans #1.2.2\n";
 
             if(id_old_cluster != id_nearest_center)
             {

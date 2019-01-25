@@ -29,9 +29,14 @@ freely, subject to the following restrictions:
 
 #include "misc.h"
 #include "cache.h"
-#include "kmeans.h"
-
+// Kmeans
+/* Local */
+// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+/* Cluster */
+#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 // std::ofstream trace("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "/similarity.out");
+
+bool enable_prints = 0;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -126,19 +131,22 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 
 void Cache::snapshot()
 {
+    std::cout << "\nSnapshot\n\n";
     for (uint i=0; i<sets.size(); i++) {
         int way_count = 0;
         std::cout << "Cache Line #" << i << " \n";
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
-            // int data_count = 0;
-            std::cout << "Way #" << way_count << ", Tag: " << std::hex << it->tag << ", Data: ";
+            std::cout << "Way #" << way_count << ", Tag: " << std::hex << it->tag << ", Data: (";
             for (int j=0; j<64; j++) {
-                std::cout << std::hex << it->data[j] << " ";
-                // data_count++;
+                if (j != 63) {
+                    std::cout << std::hex << it->data[j] << " ";
+                }
+                else {
+                    std::cout << std::hex << it->data[j] << ")";
+                }
             }
             way_count++;
             std::cout << "\n\n";
-            // std::cout << "Data count: " << std::dec << data_count << "\n";
         }
     }
     std::cout << "\n";
@@ -273,20 +281,73 @@ void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
     trace.close();
 }
 
+// Kmeans
 void Cache::tableUpdate(const int entries, const std::string method, const int bits_ignored)
 {
-    int line_cnt = 0;
     std::vector<std::array<int,64>> inputData;
 
     //Iterate over the cache and keep the cache data as input
     for (uint i=0; i<sets.size(); i++) {
-        line_cnt++;
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
             inputData.push_back(it->data);
         }
     }
 
-    Entries cluster(line_cnt, 64, entries, 100);
-    // max_iterations = 100
-    cluster.clustering(inputData);
+    // Test for printing the data that goes into the "inputData" vector
+    // for (uint i=0; i<sets.size(); i++) {
+    //     int way_count = 0;
+    //     std::cout << "Cache Line #" << i << " \n";
+    //     for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
+    //         std::cout << "Way #" << way_count << ", Tag: " << std::hex << it->tag << ", Data: (";
+    //         inputData.push_back(it->data);
+    //         for (int j=0; j<64; j++) {
+    //             if (j != 63) {
+    //                 std::cout << std::hex << it->data[j] << " ";
+    //             }
+    //             else {
+    //                 std::cout << std::hex << it->data[j] << ")";
+    //             }
+    //         }
+    //         way_count++;
+    //         std::cout << "\n\n";
+    //     }
+    // }
+
+    auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
+
+    std::cout << "Means:\n\n";
+    int means = 0;
+    for (const auto& mean : std::get<0>(cluster_data)) {
+        std::cout << "#" << means << ": (";
+        means++;
+        for (int i=0; i<64; i++) {
+            std::cout << mean[i] << " ";
+        }
+        std::cout << ")\n\n";
+    }
+    if (enable_prints) {
+        std::cout << "\nCluster mapping:\n";
+        std::cout << "\tPoint:\n";
+        for (const auto& point : inputData) {
+            std::stringstream value;
+            value << "\t(";
+            for (int i=0; i<64; i++) {
+                if (i != 63) {
+                    value << std::hex << point[i] << " ";
+                }
+                else {
+                    value << std::hex << point[i];
+                }              
+            }
+            value << ")";
+            std::cout << value.str() << "\n";
+        }
+        std::cout << "\n\tLabel:";
+        std::stringstream labels;
+        labels << "(";
+        for (const auto& label : std::get<1>(cluster_data)) {
+            labels << label << ",";
+        }
+        std::cout << labels.str() << "\n";
+    }
 }

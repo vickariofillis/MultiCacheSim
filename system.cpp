@@ -406,6 +406,7 @@ void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)
     cache->printSimilarity(bits_ignored, benchmark);
 }
 
+// Kmeans
 void SingleCacheSystem::tableUpdate(int entries, std::string method, int bits_ignored)
 {
     cache->tableUpdate(entries, method, bits_ignored);

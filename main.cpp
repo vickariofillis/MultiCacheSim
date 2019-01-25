@@ -27,8 +27,12 @@ freely, subject to the following restrictions:
 #include <cassert>
 #include <sstream>
 #include <string>
+/* Cluster */
 #include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
 #include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
+/* Local */
+// #include "/home/vic/zstr/src/zstr.hpp"
+// #include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
@@ -68,7 +72,8 @@ int main(int argc, char* argv[])
         }
     }
 
-    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency << "\n\n";
+    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency\
+     << "\n" << "n_________________" << "\n";
 
    // tid_map is used to inform the simulator how
    // thread ids map to NUMA/cache domains. Using
@@ -126,7 +131,12 @@ int main(int argc, char* argv[])
    }
    // cout << "Before infile\n";
    // cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
+
+   /* Cluster */
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
+   /* Local */
+   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/trace.out.gz");
+
    // cout << "After infile\n";
    
    // This code works with the output from the 
@@ -168,12 +178,18 @@ int main(int argc, char* argv[])
 
       if (rw == 'W') {
         if ((writes % frequency) == 0 && writes != 0) {
+            // Kmeans
             cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(entries, method, bits_ignored);
+            sys.snapshot();
             updates++;
         }
         writes++;
       }
+
+      // if (lines == 83){
+      //   sys.snapshot();
+      // }
 
       sys.checkSimilarity(lineData,bits_ignored,rw);
 
@@ -192,7 +208,7 @@ int main(int argc, char* argv[])
    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
    
-   sys.printSimilarity(bits_ignored, benchmark);
+   // sys.printSimilarity(bits_ignored, benchmark);
 
    // infile.close();
 

@@ -70,6 +70,7 @@ public:
    void snapshot();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity(const int bits_ignored, const std::string benchmark);
+   // Kmeans
    void tableUpdate(const int entries, const std::string method, const int bits_ignored);
 private:
    std::vector<std::deque<CacheLine>> sets;

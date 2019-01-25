@@ -13,12 +13,22 @@ Cache	cache.h	/^class Cache {$/;"	c
 CacheLine	misc.h	/^   CacheLine(uint64_t tag = 0, CacheState state = CacheState::Invalid, std::array<int,64> data = {0}) : $/;"	f	struct:CacheLine
 CacheLine	misc.h	/^struct CacheLine{$/;"	s
 CacheState	misc.h	/^enum class CacheState {Modified, Owned, Exclusive, Shared, Invalid};$/;"	c
+Cluster	kmeans.cpp	/^Cluster::Cluster(int id_cluster, Point point)$/;"	f	class:Cluster
+Cluster	kmeans.h	/^class Cluster$/;"	c
+Entries	kmeans.cpp	/^Entries::Entries(int total_points, int total_values, int K, int max_iterations)$/;"	f	class:Entries
+Entries	kmeans.h	/^class Entries$/;"	c
 Exclusive	misc.h	/^enum class CacheState {Modified, Owned, Exclusive, Shared, Invalid};$/;"	m	class:CacheState
+K	kmeans.h	/^    int K; \/\/ number of clusters$/;"	m	class:KMeans
+K	kmeans.h	/^    int K;$/;"	m	class:Entries
+KMeans	kmeans.cpp	/^KMeans::KMeans(int K, int total_points, int total_values, int max_iterations)$/;"	f	class:KMeans
+KMeans	kmeans.h	/^class KMeans$/;"	c
 Modified	misc.h	/^enum class CacheState {Modified, Owned, Exclusive, Shared, Invalid};$/;"	m	class:CacheState
 MultiCacheSystem	system.cpp	/^MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain, $/;"	f	class:MultiCacheSystem
 MultiCacheSystem	system.h	/^class MultiCacheSystem : public System {$/;"	c
 Owned	misc.h	/^enum class CacheState {Modified, Owned, Exclusive, Shared, Invalid};$/;"	m	class:CacheState
 PAGE_SIZE_4KB	misc.h	30;"	d
+Point	kmeans.cpp	/^Point::Point(int id_point, vector<int>& values, string name)$/;"	f	class:Point
+Point	kmeans.h	/^class Point$/;"	c
 Prefetch	prefetch.h	/^class Prefetch {$/;"	c
 Read	misc.h	/^enum class AccessType {Read, Write, Prefetch};$/;"	m	class:AccessType
 SeqPrefetch	prefetch.h	/^class SeqPrefetch : public Prefetch {$/;"	c
@@ -30,30 +40,53 @@ System	system.h	/^class System {$/;"	c
 SystemStats	system.h	/^struct SystemStats {$/;"	s
 Write	misc.h	/^enum class AccessType {Read, Write, Prefetch};$/;"	m	class:AccessType
 accessType	tests/random.cpp	/^   AccessType accessType;$/;"	m	struct:AccessData	file:
+addPoint	kmeans.cpp	/^void Cluster::addPoint(Point point)$/;"	f	class:Cluster
+addValue	kmeans.cpp	/^void Point::addValue(int value)$/;"	f	class:Point
 address	tests/random.cpp	/^   uint64_t address;$/;"	m	struct:AccessData	file:
 argument_type	cache.h	/^        typedef array<T, N> argument_type;$/;"	t	struct:std::hash
 cache	system.h	/^   std::unique_ptr<Cache> cache;$/;"	m	class:SingleCacheSystem
+cacheLines	kmeans.h	/^    vector<array<int,64>> cacheLines;$/;"	m	class:Entries
 caches	system.h	/^   std::vector<std::unique_ptr<Cache>> caches;$/;"	m	class:MultiCacheSystem
+central_values	kmeans.h	/^    vector<int> central_values;$/;"	m	class:Cluster
 changeState	cache.cpp	/^void Cache::changeState(uint64_t set, uint64_t tag, CacheState state)$/;"	f	class:Cache
 checkCompulsory	system.cpp	/^void System::checkCompulsory(uint64_t line)$/;"	f	class:System
 checkRemoteStates	system.cpp	/^unsigned int MultiCacheSystem::checkRemoteStates(uint64_t set, $/;"	f	class:MultiCacheSystem
 checkSimilarity	cache.cpp	/^void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)$/;"	f	class:Cache
 checkSimilarity	system.cpp	/^void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)$/;"	f	class:SingleCacheSystem
 checkWriteback	cache.cpp	/^bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const$/;"	f	class:Cache
+clustering	kmeans.cpp	/^void Entries::clustering(vector<array<int,64>> const &cacheLines)$/;"	f	class:Entries
+clusters	kmeans.h	/^    vector<Cluster> clusters;$/;"	m	class:KMeans
 countCompulsory	system.h	/^   bool countCompulsory;$/;"	m	class:System
 data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine
 doAddrTrans	system.h	/^   bool doAddrTrans;$/;"	m	class:System
+enable_prints	cache.cpp	/^bool enable_prints = 1;$/;"	v
 evictTraffic	system.cpp	/^void MultiCacheSystem::evictTraffic(uint64_t set, $/;"	f	class:MultiCacheSystem
 findTag	cache.cpp	/^CacheState Cache::findTag(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
+getCentralValue	kmeans.cpp	/^int Cluster::getCentralValue(int index)$/;"	f	class:Cluster
+getCluster	kmeans.cpp	/^int Point::getCluster()$/;"	f	class:Point
+getID	kmeans.cpp	/^int Cluster::getID()$/;"	f	class:Cluster
+getID	kmeans.cpp	/^int Point::getID()$/;"	f	class:Point
+getIDNearestCenter	kmeans.cpp	/^int KMeans::getIDNearestCenter(Point point)$/;"	f	class:KMeans
+getName	kmeans.cpp	/^string Point::getName()$/;"	f	class:Point
+getPoint	kmeans.cpp	/^Point Cluster::getPoint(int index)$/;"	f	class:Cluster
+getTotalPoints	kmeans.cpp	/^int Cluster::getTotalPoints()$/;"	f	class:Cluster
+getTotalValues	kmeans.cpp	/^int Point::getTotalValues()$/;"	f	class:Point
+getValue	kmeans.cpp	/^int Point::getValue(int index)$/;"	f	class:Point
 hash	cache.h	/^    struct hash<array<T, N> >$/;"	s	namespace:std
+id_cluster	kmeans.h	/^    int id_cluster;$/;"	m	class:Cluster
+id_cluster	kmeans.h	/^    int id_point, id_cluster;$/;"	m	class:Point
+id_point	kmeans.h	/^    int id_point, id_cluster;$/;"	m	class:Point
 insertLine	cache.cpp	/^void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data)$/;"	f	class:Cache
 isLocal	system.cpp	/^bool MultiCacheSystem::isLocal(uint64_t address, unsigned int local)$/;"	f	class:MultiCacheSystem
 lineMask	system.h	/^   uint64_t lineMask;$/;"	m	class:System
 main	main.cpp	/^int main(int argc, char* argv[])$/;"	f
 main	tests/random.cpp	/^int main(int argc, char* argv[]) {$/;"	f
 maxSetSize	cache.h	/^   unsigned int maxSetSize;$/;"	m	class:Cache
+max_iterations	kmeans.h	/^    int total_points, total_values, max_iterations;$/;"	m	class:Entries
+max_iterations	kmeans.h	/^    int total_values, total_points, max_iterations;$/;"	m	class:KMeans
 memAccess	system.cpp	/^void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)$/;"	f	class:MultiCacheSystem
 memAccess	system.cpp	/^void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)$/;"	f	class:SingleCacheSystem
+name	kmeans.h	/^    string name;$/;"	m	class:Point
 occurence	cache.h	/^   std::unordered_map<std::array<int,64>, int> occurence;$/;"	m	class:Cache
 operator ()	cache.h	/^        result_type operator()(const argument_type& a) const$/;"	f	struct:std::hash
 operator <	misc.h	/^   bool operator<(const CacheLine& rhs) const$/;"	f	struct:CacheLine
@@ -69,17 +102,22 @@ pageMask	misc.h	/^constexpr uint64_t pageMask = 0xFFFFFFFFFFFFF000;$/;"	v
 pageShift	misc.h	/^constexpr uint32_t pageShift = 12;$/;"	v
 pageShift	misc.h	/^constexpr uint32_t pageShift = 21;$/;"	v
 pageToDomain	system.h	/^   std::unordered_map<uint64_t, unsigned int> pageToDomain;$/;"	m	class:MultiCacheSystem
+points	kmeans.h	/^    vector<Point> points;$/;"	m	class:Cluster
 prefetchHit	prefetch.cpp	/^int AdjPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys)$/;"	f	class:AdjPrefetch
 prefetchHit	prefetch.cpp	/^int SeqPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys)$/;"	f	class:SeqPrefetch
 prefetchMiss	prefetch.cpp	/^int AdjPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys)$/;"	f	class:AdjPrefetch
 prefetchMiss	prefetch.cpp	/^int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys)$/;"	f	class:SeqPrefetch
 prefetchNum	prefetch.h	/^   static constexpr unsigned int prefetchNum = 3;$/;"	m	class:SeqPrefetch
 prefetcher	system.h	/^   std::unique_ptr<Prefetch> prefetcher;$/;"	m	class:System
-printSimilarity	cache.cpp	/^void Cache::printSimilarity(int bits_ignored, std::string benchmark)$/;"	f	class:Cache
+printSimilarity	cache.cpp	/^void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)$/;"	f	class:Cache
 printSimilarity	system.cpp	/^void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)$/;"	f	class:SingleCacheSystem
 processMOESI	system.cpp	/^CacheState MultiCacheSystem::processMOESI(uint64_t set,$/;"	f	class:MultiCacheSystem
+removePoint	kmeans.cpp	/^bool Cluster::removePoint(int id_point)$/;"	f	class:Cluster
 result_type	cache.h	/^        typedef size_t result_type;$/;"	t	struct:std::hash
+run	kmeans.cpp	/^void KMeans::run(vector<Point> & points)$/;"	f	class:KMeans
 seenLines	system.h	/^   std::unordered_set<uint64_t> seenLines;$/;"	m	class:System
+setCentralValue	kmeans.cpp	/^void Cluster::setCentralValue(int index, int value)$/;"	f	class:Cluster
+setCluster	kmeans.cpp	/^void Point::setCluster(int id_cluster)$/;"	f	class:Point
 setMask	system.h	/^   uint64_t setMask;$/;"	m	class:System
 setRemoteStates	system.cpp	/^void MultiCacheSystem::setRemoteStates(uint64_t set, $/;"	f	class:MultiCacheSystem
 setShift	system.h	/^   uint32_t setShift;$/;"	m	class:System
@@ -88,11 +126,19 @@ snapshot	cache.cpp	/^void Cache::snapshot()$/;"	f	class:Cache
 snapshot	system.cpp	/^void SingleCacheSystem::snapshot()$/;"	f	class:SingleCacheSystem
 stats	system.h	/^   SystemStats stats;$/;"	m	class:System
 std	cache.h	/^namespace std$/;"	n
+tableUpdate	cache.cpp	/^void Cache::tableUpdate(const int entries, const std::string method, const int bits_ignored)$/;"	f	class:Cache
+tableUpdate	system.cpp	/^void SingleCacheSystem::tableUpdate(int entries, std::string method, int bits_ignored)$/;"	f	class:SingleCacheSystem
 tagMask	system.h	/^   uint64_t tagMask;$/;"	m	class:System
 tid	tests/random.cpp	/^   unsigned int tid;$/;"	m	struct:AccessData	file:
 tidToDomain	system.h	/^   std::vector<unsigned int>& tidToDomain;$/;"	m	class:MultiCacheSystem
+total_points	kmeans.h	/^    int total_points, total_values, max_iterations;$/;"	m	class:Entries
+total_points	kmeans.h	/^    int total_values, total_points, max_iterations;$/;"	m	class:KMeans
+total_values	kmeans.h	/^    int total_points, total_values, max_iterations;$/;"	m	class:Entries
+total_values	kmeans.h	/^    int total_values, total_points, max_iterations;$/;"	m	class:KMeans
+total_values	kmeans.h	/^    int total_values;$/;"	m	class:Point
 updateLRU	cache.cpp	/^void Cache::updateLRU(uint64_t set, uint64_t tag)$/;"	f	class:Cache
 updatePageToDomain	system.cpp	/^void MultiCacheSystem::updatePageToDomain(uint64_t address, $/;"	f	class:MultiCacheSystem
 usage	tests/random.cpp	/^void usage() {$/;"	f
+values	kmeans.h	/^    vector<int> values;$/;"	m	class:Point
 virtToPhys	system.cpp	/^uint64_t System::virtToPhys(uint64_t address)$/;"	f	class:System
 virtToPhysMap	system.h	/^   std::unordered_map<uint64_t, uint64_t> virtToPhysMap;$/;"	m	class:System

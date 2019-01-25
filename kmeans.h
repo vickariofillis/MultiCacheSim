@@ -48,8 +48,8 @@ public:
     bool removePoint(int id_point);
     int getCentralValue(int index);
     void setCentralValue(int index, int value);
-    Point getPoint(int index);
-    int getTotalPoints();
+    Point getPoint(int index);                          //return specific point (based on index)
+    int getTotalPoints();                               //return size of vector points
     int getID();
 };
 
