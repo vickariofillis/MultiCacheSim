@@ -413,8 +413,8 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
         table_trace << "\n";
     }
 
-    std::cout << "\nCluster mapping:\n";
-    std::cout << "\tPoint:\n";
+    if (enable_prints) std::cout << "\nCluster mapping:\n";
+    if (enable_prints) std::cout << "\tPoint:\n";
     for (const auto& point : inputData) {
         std::stringstream value;
         std::stringstream value_file;
@@ -433,16 +433,18 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
         if (enable_prints) std::cout << value.str() << "\n";
         before_trace << value_file.str() << "\n";
     }
-    std::cout << "\n\tLabel:";
+    if (enable_prints) std::cout << "\n\tLabel:";
     std::stringstream labels;
     std::stringstream labels_file;
     labels << "(";
     for (const auto& label : std::get<1>(cluster_data)) {
-        labels << label << ",";
-        labels_file << label;
+        if (enable_prints) labels << label << ",";
+        // labels_file << label;
+        // table_trace << labels_file.str() << "\n";
+        table_trace << label << "\n";
     }
+    labels << ")";
     std::cout << labels.str() << "\n";
-    table_trace << labels_file.str() << "\n";
 
     before_test_trace.close();
     before_trace.close();
