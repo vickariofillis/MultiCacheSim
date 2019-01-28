@@ -60,6 +60,7 @@ countCompulsory	system.h	/^   bool countCompulsory;$/;"	m	class:System
 data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine
 doAddrTrans	system.h	/^   bool doAddrTrans;$/;"	m	class:System
 enable_prints	cache.cpp	/^bool enable_prints = 0;$/;"	v
+enable_prints_file	cache.cpp	/^bool enable_prints_file = 0;$/;"	v
 evictTraffic	system.cpp	/^void MultiCacheSystem::evictTraffic(uint64_t set, $/;"	f	class:MultiCacheSystem
 findTag	cache.cpp	/^CacheState Cache::findTag(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 getCentralValue	kmeans.cpp	/^int Cluster::getCentralValue(int index)$/;"	f	class:Cluster
@@ -91,6 +92,7 @@ occurence	cache.h	/^   std::unordered_map<std::array<int,64>, int> occurence;$/;
 operator ()	cache.h	/^        result_type operator()(const argument_type& a) const$/;"	f	struct:std::hash
 operator <	misc.h	/^   bool operator<(const CacheLine& rhs) const$/;"	f	struct:CacheLine
 operator ==	misc.h	/^   bool operator==(const CacheLine& rhs) const$/;"	f	struct:CacheLine
+outfile_generation	cache.cpp	/^std::string Cache::outfile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\\$/;"	f	class:Cache
 override	prefetch.h	/^   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:AdjPrefetch
 override	prefetch.h	/^   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:SeqPrefetch
 override	prefetch.h	/^   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:AdjPrefetch
@@ -126,8 +128,8 @@ snapshot	cache.cpp	/^void Cache::snapshot()$/;"	f	class:Cache
 snapshot	system.cpp	/^void SingleCacheSystem::snapshot()$/;"	f	class:SingleCacheSystem
 stats	system.h	/^   SystemStats stats;$/;"	m	class:System
 std	cache.h	/^namespace std$/;"	n
-tableUpdate	cache.cpp	/^void Cache::tableUpdate(const int entries, const std::string method, const int bits_ignored)$/;"	f	class:Cache
-tableUpdate	system.cpp	/^void SingleCacheSystem::tableUpdate(int entries, std::string method, int bits_ignored)$/;"	f	class:SingleCacheSystem
+tableUpdate	cache.cpp	/^void Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)$/;"	f	class:Cache
+tableUpdate	system.cpp	/^void SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)$/;"	f	class:SingleCacheSystem
 tagMask	system.h	/^   uint64_t tagMask;$/;"	m	class:System
 tid	tests/random.cpp	/^   unsigned int tid;$/;"	m	struct:AccessData	file:
 tidToDomain	system.h	/^   std::vector<unsigned int>& tidToDomain;$/;"	m	class:MultiCacheSystem

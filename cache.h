@@ -67,11 +67,13 @@ public:
    // Line should not already exist in cache. Will remove the LRU line in set
    // if there is not enough space, so checkWriteback should be called before this
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
+   std::string outfile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
+     const std::string state);
    void snapshot();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity(const int bits_ignored, const std::string benchmark);
    // Kmeans
-   void tableUpdate(const int entries, const std::string method, const int bits_ignored);
+   void tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored);
 private:
    std::vector<std::deque<CacheLine>> sets;
    unsigned int maxSetSize;

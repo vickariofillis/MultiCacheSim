@@ -34,9 +34,9 @@ freely, subject to the following restrictions:
 // #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 /* Cluster */
 #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
-// std::ofstream trace("/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small" + bits_ignored + "/similarity.out");
 
 bool enable_prints = 0;
+bool enable_prints_file = 0;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -127,6 +127,55 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
    // std::cout << "Max Set Size" << maxSetSize << "\n";
 
    sets[set].emplace_back(tag, state, data);
+}
+
+std::string Cache::outfile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
+     const std::string state)
+{
+
+    std::string file_path;
+    std::string type = "apps";
+    std::string extra1 = "/pkgs/";
+    std::string extra2 = "/test";
+    std::string extra3 = "/run";
+
+    if (suite == "parsec") {
+        // cout << "\nInto suite=parsec\n";
+        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
+            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
+            // cout << "Into apps\n";
+            type = "apps";
+        }
+        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+            // cout << "Into kernels\n";
+            type = "kernels";
+        }
+        // cout << "Before extra1+extra2\n";
+        extra1 = "/pkgs/";
+        extra2 = "/" + benchmark;
+    }
+    else if (suite == "perfect") {
+        // cout << "\nInto suite=perfect\n";
+        // FIX-ME: possibly wrong path
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
+    }
+    else if (suite == "phoenix") {
+        // cout << "\nInto suite=phoenix\n";
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
+    }
+
+    if (function == "tableUpdate") {
+        auto updates_str = std::to_string(updates);
+        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
+    }
+
+    return file_path;
 }
 
 void Cache::snapshot()
@@ -282,14 +331,29 @@ void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
 }
 
 // Kmeans
-void Cache::tableUpdate(const int entries, const std::string method, const int bits_ignored)
+void Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
 {
+    std::string function = "tableUpdate";
+
     std::vector<std::array<int,64>> inputData;
+
+    // Test before data
+    std::string state = "before_test";
+    std::string before_test_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream before_test_trace(before_test_outfile.c_str());
 
     //Iterate over the cache and keep the cache data as input
     for (uint i=0; i<sets.size(); i++) {
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
             inputData.push_back(it->data);
+            for (int j=0; j<64; j++) {
+                if (j != 63) {
+                    before_test_trace << std::hex << it->data[j] << " ";
+                }
+                else {
+                    before_test_trace << std::hex << it->data[j] << "\n";
+                }
+            }
         }
     }
 
@@ -313,41 +377,77 @@ void Cache::tableUpdate(const int entries, const std::string method, const int b
     //     }
     // }
 
+    // Before file (cache data before precompression)
+    state = "before";
+    std::string before_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream before_trace(before_outfile.c_str());
+    // After file (cache data after precompression)
+    state = "after";
+    std::string after_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream after_trace(after_outfile.c_str());
+    // Precompression table entries
+    state = "table";
+    std::string table_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream table_trace(table_outfile.c_str());
+
     auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
+    //FIXME: print the before files (includes the cache lines with the mapping + file of Precompression table entries)
     std::cout << "Means:\n\n";
     int means = 0;
     for (const auto& mean : std::get<0>(cluster_data)) {
         std::cout << "#" << means << ": (";
         means++;
         for (int i=0; i<64; i++) {
-            std::cout << mean[i] << " ";
+            if (i != 63) {
+                std::cout << mean[i] << " ";
+                table_trace << mean[i] << " ";
+            }
+            else {
+                std::cout << mean[i];
+                table_trace << mean[i];
+            }
+            
         }
         std::cout << ")\n\n";
+        table_trace << "\n";
     }
-    if (enable_prints) {
-        std::cout << "\nCluster mapping:\n";
-        std::cout << "\tPoint:\n";
-        for (const auto& point : inputData) {
-            std::stringstream value;
-            value << "\t(";
-            for (int i=0; i<64; i++) {
-                if (i != 63) {
-                    value << std::hex << point[i] << " ";
-                }
-                else {
-                    value << std::hex << point[i];
-                }              
+
+    std::cout << "\nCluster mapping:\n";
+    std::cout << "\tPoint:\n";
+    for (const auto& point : inputData) {
+        std::stringstream value;
+        std::stringstream value_file;
+        value << "\t(";
+        for (int i=0; i<64; i++) {
+            if (i != 63) {
+                value << std::hex << point[i] << " ";
+                value_file << std::hex << point[i] << " ";
             }
-            value << ")";
-            std::cout << value.str() << "\n";
+            else {
+                value << std::hex << point[i];
+                value_file << std::hex << point[i];
+            }              
         }
-        std::cout << "\n\tLabel:";
-        std::stringstream labels;
-        labels << "(";
-        for (const auto& label : std::get<1>(cluster_data)) {
-            labels << label << ",";
-        }
-        std::cout << labels.str() << "\n";
+        value << ")";
+        if (enable_prints) std::cout << value.str() << "\n";
+        before_trace << value_file.str() << "\n";
     }
+    std::cout << "\n\tLabel:";
+    std::stringstream labels;
+    std::stringstream labels_file;
+    labels << "(";
+    for (const auto& label : std::get<1>(cluster_data)) {
+        labels << label << ",";
+        labels_file << label;
+    }
+    std::cout << labels.str() << "\n";
+    table_trace << labels_file.str() << "\n";
+
+    before_test_trace.close();
+    before_trace.close();
+    after_trace.close();
+    table_trace.close();
 }
+
+//FIXME: Have a function that reads the before file and produces the after file

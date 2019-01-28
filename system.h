@@ -119,7 +119,7 @@ public:
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity(int bits_ignored, std::string benchmark);
    // Kmeans
-   void tableUpdate(int entries, std::string method, int bits_ignored);
+   void tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
 private:
    std::unique_ptr<Cache> cache;
 };
