@@ -334,26 +334,14 @@ void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
 void Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
 {
     std::string function = "tableUpdate";
+    std::string state;
 
     std::vector<std::array<int,64>> inputData;
-
-    // Test before data
-    std::string state = "before_test";
-    std::string before_test_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
-    std::ofstream before_test_trace(before_test_outfile.c_str());
 
     //Iterate over the cache and keep the cache data as input
     for (uint i=0; i<sets.size(); i++) {
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
             inputData.push_back(it->data);
-            for (int j=0; j<64; j++) {
-                if (j != 63) {
-                    before_test_trace << std::hex << it->data[j] << " ";
-                }
-                else {
-                    before_test_trace << std::hex << it->data[j] << "\n";
-                }
-            }
         }
     }
 
@@ -389,6 +377,10 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     state = "table";
     std::string table_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
     std::ofstream table_trace(table_outfile.c_str());
+    // Mapping between precompression table entries and cache lines
+    state = "mapping";
+    std::string mapping_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream mapping_trace(mapping_outfile.c_str());
 
     auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
@@ -438,18 +430,16 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     std::stringstream labels_file;
     labels << "(";
     for (const auto& label : std::get<1>(cluster_data)) {
-        if (enable_prints) labels << label << ",";
-        // labels_file << label;
-        // table_trace << labels_file.str() << "\n";
-        table_trace << label << "\n";
+        labels << label << ",";
+        mapping_trace << label << "\n";
     }
     labels << ")";
-    std::cout << labels.str() << "\n";
+    if (enable_prints) std::cout << labels.str() << "\n";
 
-    before_test_trace.close();
     before_trace.close();
     after_trace.close();
     table_trace.close();
+    mapping_trace.close();
 }
 
 //FIXME: Have a function that reads the before file and produces the after file
