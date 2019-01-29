@@ -412,12 +412,17 @@ void SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::str
     cache->tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
 }
 
+void SingleCacheSystem::modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
+{
+    cache->modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
+}
+
 SingleCacheSystem::SingleCacheSystem( 
             unsigned int line_size, unsigned int num_lines, unsigned int assoc,
             std::unique_ptr<Prefetch> prefetcher, 
             bool count_compulsory /*=false*/,
             bool do_addr_trans /*=false*/) : 
             System(line_size, num_lines, assoc,
-               std::move(prefetcher), count_compulsory, do_addr_trans), 
+            std::move(prefetcher), count_compulsory, do_addr_trans), 
             cache(std::make_unique<Cache>(num_lines, assoc))
 {}

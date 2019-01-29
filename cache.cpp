@@ -170,8 +170,62 @@ std::string Cache::outfile_generation(std::string function, const std::string su
         extra3 = "";
     }
 
-    if (function == "tableUpdate") {
-        auto updates_str = std::to_string(updates);
+    auto updates_str = std::to_string(updates);
+
+    if (function == "tableUpdate" || "modifyData") {
+        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
+    }
+
+    // if (function == "modifyData") {
+    //     file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
+    // }
+
+    return file_path;
+}
+
+std::string Cache::infile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
+     const std::string state)
+{
+    std::string file_path;
+    std::string type = "apps";
+    std::string extra1 = "/pkgs/";
+    std::string extra2 = "/test";
+    std::string extra3 = "/run";
+
+    if (suite == "parsec") {
+        // cout << "\nInto suite=parsec\n";
+        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
+            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
+            // cout << "Into apps\n";
+            type = "apps";
+        }
+        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+            // cout << "Into kernels\n";
+            type = "kernels";
+        }
+        // cout << "Before extra1+extra2\n";
+        extra1 = "/pkgs/";
+        extra2 = "/" + benchmark;
+    }
+    else if (suite == "perfect") {
+        // cout << "\nInto suite=perfect\n";
+        // FIX-ME: possibly wrong path
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
+    }
+    else if (suite == "phoenix") {
+        // cout << "\nInto suite=phoenix\n";
+        type = "";
+        extra1 = "";
+        extra2 = "";
+        extra3 = "";
+    }
+
+    auto updates_str = std::to_string(updates);
+
+    if (function == "modifyData") {
         file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
     }
 
@@ -369,10 +423,6 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     state = "before";
     std::string before_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
     std::ofstream before_trace(before_outfile.c_str());
-    // After file (cache data after precompression)
-    state = "after";
-    std::string after_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
-    std::ofstream after_trace(after_outfile.c_str());
     // Precompression table entries
     state = "table";
     std::string table_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
@@ -384,7 +434,6 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
 
     auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
-    //FIXME: print the before files (includes the cache lines with the mapping + file of Precompression table entries)
     std::cout << "Means:\n\n";
     int means = 0;
     for (const auto& mean : std::get<0>(cluster_data)) {
@@ -427,7 +476,6 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     }
     if (enable_prints) std::cout << "\n\tLabel:";
     std::stringstream labels;
-    std::stringstream labels_file;
     labels << "(";
     for (const auto& label : std::get<1>(cluster_data)) {
         labels << label << ",";
@@ -437,9 +485,98 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     if (enable_prints) std::cout << labels.str() << "\n";
 
     before_trace.close();
-    after_trace.close();
     table_trace.close();
     mapping_trace.close();
 }
 
-//FIXME: Have a function that reads the before file and produces the after file
+void Cache::modifyData(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
+{
+    std::string function = "modifyData";
+
+    // After file (cache data after precompression)
+    std::string state = "after";
+    std::string after_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ofstream after_trace(after_outfile.c_str());
+
+    int lines, lines_test;
+
+    // Read data from before file
+    state = "before";
+    std::string before_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ifstream before_trace(before_infile.c_str());
+
+    std::vector<std::array<int,64>> beforeData;
+
+    while(!before_trace.eof())
+    {
+        std::array<int,64> lineData;
+        int value;
+        for (int i=0; i<64; i++) {
+            before_trace >> std::hex >> value;
+            lineData[i] = value;
+        }
+        beforeData.push_back(lineData);
+        lines++;
+    }
+
+    // Read data from mapping file
+    state = "mapping";
+    std::string mapping_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ifstream mapping_trace(mapping_infile.c_str());
+
+    std::vector<int> mappingData;
+
+    while(!mapping_trace.eof())
+    {
+        int value;
+        mapping_trace >> value;
+        lines_test++;
+    }
+
+    assert(lines == lines_test);
+
+    // Read data from table file
+    state = "table";
+    std::string table_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::ifstream table_trace(table_infile.c_str());
+
+    std::vector<std::array<int,64>> tableEntries;
+
+    while(!table_trace.eof())
+    {
+        std::array<int,64> entry;
+        int value;
+        for (int i=0; i<64; i++) {
+            table_trace >> std::hex >> value;
+            entry[i] = value;
+        }
+        tableEntries.push_back(entry);
+    }
+
+    // Modify data (distinguish based on method - xor or add)
+    std::vector<std::array<int,64>> afterData;
+    for (uint i=0; i<beforeData.size(); i++) {
+
+        int mapped_entry = mappingData[i];
+
+        for (int j=0; j<64; j++) {
+            if (method == "xor") {
+                //FIXME: Xor between beforeData and tableEntries
+            }
+            else if (method == "add") {
+                afterData[i][j] = beforeData[i][j] + tableEntries[mapped_entry][j];
+            }
+        }
+    }
+
+    // Write data to after file
+    for (uint i=0; i<afterData.size(); i++) {
+        std::stringstream value_file;
+        for (int j=0; j<64; j++) {
+            value_file << std::hex << afterData[i][j];
+        }
+        after_trace << value_file.str() << "\n";
+    }
+
+    after_trace.close();
+}

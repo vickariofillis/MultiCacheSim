@@ -181,6 +181,7 @@ int main(int argc, char* argv[])
             // Kmeans
             cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
+            sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
             // sys.snapshot();
             updates++;
         }

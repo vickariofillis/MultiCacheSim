@@ -120,6 +120,7 @@ public:
    void printSimilarity(int bits_ignored, std::string benchmark);
    // Kmeans
    void tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
+   void modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
 private:
    std::unique_ptr<Cache> cache;
 };
