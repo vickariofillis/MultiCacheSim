@@ -498,7 +498,7 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
     std::string after_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
     std::ofstream after_trace(after_outfile.c_str());
 
-    int lines = 0
+    int lines = 0;
     int lines_test = 0;
 
     // Read data from before file
