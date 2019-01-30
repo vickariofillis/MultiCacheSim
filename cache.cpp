@@ -563,6 +563,7 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
         for (int j=0; j<64; j++) {
             if (method == "xor") {
                 //FIXME: Xor between beforeData and tableEntries
+                afterData[i][j] = beforeData[i][j] ^ tableEntries[mapped_entry][j];
             }
             else if (method == "add") {
                 afterData[i][j] = beforeData[i][j] + tableEntries[mapped_entry][j];
