@@ -401,9 +401,9 @@ void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedB
     cache->checkSimilarity(lineData, maskedBits, rw);
 }
 
-void SingleCacheSystem::printSimilarity(int bits_ignored, std::string benchmark)
+void SingleCacheSystem::printSimilarity(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
 {
-    cache->printSimilarity(bits_ignored, benchmark);
+    cache->printSimilarity(updates, benchmark, suite, size, entries, method, bits_ignored);
 }
 
 // Kmeans

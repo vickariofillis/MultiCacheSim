@@ -35,8 +35,13 @@ freely, subject to the following restrictions:
 /* Cluster */
 #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 
+using namespace std;
+
 bool enable_prints = 0;
 bool enable_prints_file = 0;
+
+/* Local */
+bool local = 0;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -129,8 +134,8 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
    sets[set].emplace_back(tag, state, data);
 }
 
-std::string Cache::outfile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
-     const std::string state)
+std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \
+    const int updates, const std::string state, const int binary_file)
 {
 
     std::string file_path;
@@ -140,30 +145,23 @@ std::string Cache::outfile_generation(std::string function, const std::string su
     std::string extra3 = "/run";
 
     if (suite == "parsec") {
-        // cout << "\nInto suite=parsec\n";
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
             benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            // cout << "Into apps\n";
             type = "apps";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            // cout << "Into kernels\n";
             type = "kernels";
         }
-        // cout << "Before extra1+extra2\n";
         extra1 = "/pkgs/";
         extra2 = "/" + benchmark;
     }
     else if (suite == "perfect") {
-        // cout << "\nInto suite=perfect\n";
-        // FIX-ME: possibly wrong path
         type = "";
         extra1 = "";
         extra2 = "";
         extra3 = "";
     }
     else if (suite == "phoenix") {
-        // cout << "\nInto suite=phoenix\n";
         type = "";
         extra1 = "";
         extra2 = "";
@@ -171,20 +169,50 @@ std::string Cache::outfile_generation(std::string function, const std::string su
     }
 
     auto updates_str = std::to_string(updates);
+    auto bits_ignored_str = std::to_string(bits_ignored);
 
-    if (function == "tableUpdate" || "modifyData") {
-        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
+    if (function == "tableUpdate") {
+        if (binary_file) {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + updates_str + ".out";
+        }
+    }
+    else if (function == "modifyData") {
+        if (binary_file) {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + method + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + method + "_" + updates_str + ".out";
+        }
+    }
+    else if (function == "printSimilarity") {
+        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/similarity.out";
     }
 
-    // if (function == "modifyData") {
-    //     file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
-    // }
+    if ((function == "tableUpdate") && local) {
+        if (binary_file) {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + ".out";
+        }
+    }
+    else if ((function == "modifyData") && local) {
+        if (binary_file) {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + method + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + method + "_" + updates_str + ".out";
+        }
+    }
 
     return file_path;
 }
 
-std::string Cache::infile_generation(std::string function, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
-     const std::string state)
+std::string Cache::infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \
+    const int updates, const std::string state, const int binary_file)
 {
     std::string file_path;
     std::string type = "apps";
@@ -193,30 +221,23 @@ std::string Cache::infile_generation(std::string function, const std::string sui
     std::string extra3 = "/run";
 
     if (suite == "parsec") {
-        // cout << "\nInto suite=parsec\n";
         if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
             benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            // cout << "Into apps\n";
             type = "apps";
         }
         else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            // cout << "Into kernels\n";
             type = "kernels";
         }
-        // cout << "Before extra1+extra2\n";
         extra1 = "/pkgs/";
         extra2 = "/" + benchmark;
     }
     else if (suite == "perfect") {
-        // cout << "\nInto suite=perfect\n";
-        // FIX-ME: possibly wrong path
         type = "";
         extra1 = "";
         extra2 = "";
         extra3 = "";
     }
     else if (suite == "phoenix") {
-        // cout << "\nInto suite=phoenix\n";
         type = "";
         extra1 = "";
         extra2 = "";
@@ -226,7 +247,22 @@ std::string Cache::infile_generation(std::string function, const std::string sui
     auto updates_str = std::to_string(updates);
 
     if (function == "modifyData") {
-        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + updates_str + ".out";
+        if (binary_file) {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/" + state + "_" + updates_str + ".out";
+        }
+    }
+
+    if ((function == "modifyData") && local) {
+        if (binary_file) {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + "_binary.out";
+        }
+        else {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + ".out";
+        }
+        
     }
 
     return file_path;
@@ -354,12 +390,13 @@ void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw
     }
 }
 
-void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
+void Cache::printSimilarity(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
 {
-
-    auto str_int = std::to_string(bits_ignored);
-    std::string file_path = "/aenao-99/karyofyl/results/mcs/parsec/" + benchmark + "/small/" + str_int + "/similarity.out";
-    std::ofstream trace(file_path.c_str());
+    std::string function = "printSimilarity";
+    // State is irrelevant in this function
+    string state = "after";
+    std::string similarity_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::ofstream similarity_trace(similarity_outfile.c_str());
 
     int all_reads = 0;
     int unique_lines = 0;
@@ -369,19 +406,19 @@ void Cache::printSimilarity(const int bits_ignored, const std::string benchmark)
         unique_lines++;
     }
     // std::cout << "Total reads: " << all_reads << "\n\n";
-    trace << all_reads << "\n";
-    trace << unique_lines << "\n";
-    trace << "reads,percentage\n";
+    similarity_trace << all_reads << "\n";
+    similarity_trace << unique_lines << "\n";
+    similarity_trace << "reads,percentage\n";
     for (auto it = occurence.begin(); it != occurence.end(); ++it) {
         double percentage = (double(it->second)/all_reads)*100;
         // std::cout << "Cache Data: ";
         // for (int i=0; i<64; i++) {
-        //     trace << it->first[i] << " ";
+        //     similarity_trace << it->first[i] << " ";
         // }
-        // trace << ",";
-        trace << it->second << "," << std::fixed << std::setprecision(2) << percentage << "\n";
+        // similarity_trace << ",";
+        similarity_trace << it->second << "," << std::fixed << std::setprecision(2) << percentage << "\n";
     }
-    trace.close();
+    similarity_trace.close();
 }
 
 // Kmeans
@@ -419,38 +456,44 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     //     }
     // }
 
+    /* Non-binary files */
     // Before file (cache data before precompression)
     state = "before";
-    std::string before_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string before_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ofstream before_trace(before_outfile.c_str());
     // Precompression table entries
     state = "table";
-    std::string table_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string table_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ofstream table_trace(table_outfile.c_str());
     // Mapping between precompression table entries and cache lines
     state = "mapping";
-    std::string mapping_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string mapping_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ofstream mapping_trace(mapping_outfile.c_str());
+
+    /* Binary files */
+    state = "before";
+    std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
+    std::ofstream before_trace_binary(before_outfile_binary.c_str(), ios::binary);
 
     auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
-    std::cout << "Means:\n\n";
+    if (enable_prints) std::cout << "Means:\n\n";
     int means = 0;
     for (const auto& mean : std::get<0>(cluster_data)) {
-        std::cout << "#" << means << ": (";
+        if (enable_prints) std::cout << "#" << means << ": (";
         means++;
         for (int i=0; i<64; i++) {
             if (i != 63) {
-                std::cout << mean[i] << " ";
-                table_trace << mean[i] << " ";
+                table_trace << std::hex << mean[i] << " ";
+                if (enable_prints) cout << std::hex << mean[i] << " ";
             }
             else {
-                std::cout << mean[i];
-                table_trace << mean[i];
+                table_trace << std::hex << mean[i];
+                if (enable_prints) cout << std::hex << mean[i] << " ";
             }
             
         }
-        std::cout << ")\n\n";
+        if (enable_prints) std::cout << ")\n\n";
         table_trace << "\n";
     }
 
@@ -468,12 +511,18 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
             else {
                 value << std::hex << point[i];
                 value_file << std::hex << point[i];
-            }              
+            }
+            before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
+            // char endline = '\n';
+            // before_trace_binary.write((char*)&endline, sizeof(char));
+            // char space = ' ';
+            // before_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
         }
         value << ")";
         if (enable_prints) std::cout << value.str() << "\n";
         before_trace << value_file.str() << "\n";
     }
+
     if (enable_prints) std::cout << "\n\tLabel:";
     std::stringstream labels;
     labels << "(";
@@ -487,33 +536,45 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     before_trace.close();
     table_trace.close();
     mapping_trace.close();
+
+    before_trace_binary.close();
 }
 
 void Cache::modifyData(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
 {
+
     std::string function = "modifyData";
 
+    /* Non-binary files */
     // After file (cache data after precompression)
     std::string state = "after";
-    std::string after_outfile = this->outfile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string after_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ofstream after_trace(after_outfile.c_str());
 
-    int lines = 0;
-    int lines_test = 0;
+    /* Binary files */
+    state = "after";
+    std::string after_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
+    std::ofstream after_trace_binary(after_outfile_binary.c_str(), ios::binary);
+
+    int lines = 1;
+    int lines_test = 1;
 
     // Read data from before file
     state = "before";
-    std::string before_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string before_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ifstream before_trace(before_infile.c_str());
 
     std::vector<std::array<int,64>> beforeData;
 
-    while(!before_trace.eof())
+    std::string line;
+
+    while(getline(before_trace,line))
     {
+        istringstream iss(line);
         std::array<int,64> lineData;
         int value;
         for (int i=0; i<64; i++) {
-            before_trace >> std::hex >> value;
+            iss >> std::hex >> value;
             lineData[i] = value;
         }
         beforeData.push_back(lineData);
@@ -522,15 +583,17 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Read data from mapping file
     state = "mapping";
-    std::string mapping_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string mapping_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ifstream mapping_trace(mapping_infile.c_str());
 
     std::vector<int> mappingData;
 
-    while(!mapping_trace.eof())
+    while(getline(mapping_trace,line))
     {
+        istringstream iss(line);
         int value;
-        mapping_trace >> value;
+        iss >> value;
+        mappingData.push_back(value);
         lines_test++;
     }
 
@@ -538,17 +601,18 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Read data from table file
     state = "table";
-    std::string table_infile = this->infile_generation(function, suite, benchmark, size, bits_ignored, updates, state);
+    std::string table_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
     std::ifstream table_trace(table_infile.c_str());
 
     std::vector<std::array<int,64>> tableEntries;
 
-    while(!table_trace.eof())
+    while(getline(table_trace,line))
     {
+        istringstream iss(line);
         std::array<int,64> entry;
         int value;
         for (int i=0; i<64; i++) {
-            table_trace >> std::hex >> value;
+            iss >> std::hex >> value;
             entry[i] = value;
         }
         tableEntries.push_back(entry);
@@ -556,26 +620,59 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Modify data (distinguish based on method - xor or add)
     std::vector<std::array<int,64>> afterData;
+
     for (uint i=0; i<beforeData.size(); i++) {
 
         int mapped_entry = mappingData[i];
+        std::array<int,64> afterData_entry;
 
         for (int j=0; j<64; j++) {
             if (method == "xor") {
-                //FIXME: Xor between beforeData and tableEntries
-                afterData[i][j] = beforeData[i][j] ^ tableEntries[mapped_entry][j];
+                afterData_entry[j] = beforeData[i][j] ^ tableEntries[mapped_entry][j];
+                if ((afterData_entry[j]) > 255 || (afterData_entry[j]) < -255) {
+                    std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! (afterData_entry) with a value of:" << afterData_entry[j] << "\n";
+                    abort();
+                }
             }
             else if (method == "add") {
-                afterData[i][j] = beforeData[i][j] + tableEntries[mapped_entry][j];
+                // FIXME: How to address when values are outside of [0,255]
+                afterData_entry[j] = beforeData[i][j] - tableEntries[mapped_entry][j];
+                if ((afterData_entry[j]) > 255 || (afterData_entry[j]) < -255) {
+                    std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! (afterData_entry) with a value of:" << afterData_entry[j] << "\n";
+                    abort();
+                }
+            }
+            else {
+                std::cout << "\n! The method you provided is wrong !\n";
+                abort();
             }
         }
+        afterData.push_back(afterData_entry);
     }
 
     // Write data to after file
     for (uint i=0; i<afterData.size(); i++) {
         std::stringstream value_file;
         for (int j=0; j<64; j++) {
-            value_file << std::hex << afterData[i][j];
+            if (j!=63) {
+                value_file << std::hex << afterData[i][j] << " ";
+                if ((afterData[i][j]) > 255 || (afterData[i][j]) < -255) {
+                    std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! (afterData) with a value of:" << afterData[i][j] << "\n";
+                    abort();
+                }
+            }
+            else {
+                value_file << std::hex << afterData[i][j];
+                if ((afterData[i][j]) > 255 || (afterData[i][j]) < -255) {
+                    std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! (afterData) with a value of:" << afterData[i][j] << "\n";
+                    abort();
+                }
+            }
+            after_trace_binary.write(reinterpret_cast <const char *> (&afterData[i][j]), sizeof(char));
+            // char endline = '\n';
+            // after_trace_binary.write((char*)&endline, sizeof(char));
+            // char space = ' ';
+            // after_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
         }
         after_trace << value_file.str() << "\n";
     }

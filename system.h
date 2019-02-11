@@ -117,7 +117,7 @@ public:
    void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
    void snapshot();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
-   void printSimilarity(int bits_ignored, std::string benchmark);
+   void printSimilarity(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
    // Kmeans
    void tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
    void modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);

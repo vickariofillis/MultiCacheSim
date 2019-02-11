@@ -72,6 +72,7 @@ int main(int argc, char* argv[])
         }
     }
 
+    cout << "\nInput Stats\n_________________\n\n";
     cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency\
      << "\n" << "_________________" << "\n\n";
 
@@ -83,14 +84,22 @@ int main(int argc, char* argv[])
          sizeof(arr_map) / sizeof(unsigned int));
    std::unique_ptr<SeqPrefetch> prefetch = std::make_unique<SeqPrefetch>();
    // The constructor parameters are:
-   // the tid_map, the cache line size in bytes,
-   // number of cache lines, the associativity,
+   // the tid_map, 
+   // the cache line size in bytes,
+   // number of cache lines, 
+   // the associativity,
    // the prefetcher object,
    // whether to count compulsory misses,
    // whether to do virtual to physical translation,
    // and number of caches/domains
    // WARNING: counting compulsory misses doubles execution time
-   SingleCacheSystem sys(64, 32768, 2, std::move(prefetch), false, false);
+   SingleCacheSystem sys(64, 8, 2, std::move(prefetch), false, false);
+   /* Quick stats for LLC (assuming 64 byte sized lines)*/
+   /* 
+   2MB -> 32768 lines
+   4MB -> 65536 lines
+   8MB -> 131072 lines
+   */
    char rw;
    uint64_t address;
    unsigned long long lines = 0;
@@ -135,7 +144,8 @@ int main(int argc, char* argv[])
    /* Cluster */
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    /* Local */
-   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/trace.out.gz");
+   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
+   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace_given_data.out.gz");
 
    // cout << "After infile\n";
    
@@ -179,7 +189,7 @@ int main(int argc, char* argv[])
       if (rw == 'W') {
         if ((writes % frequency) == 0 && writes != 0) {
             // Kmeans
-            cout << "Precompression Table Update #" << updates << "\n\n";
+            // cout << "Precompression Table Update #" << updates << "\n\n";
             sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
             sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
             // sys.snapshot();
@@ -193,7 +203,8 @@ int main(int argc, char* argv[])
       ++lines;
    }
 
-   std::cout << "Traditional Stats\n_________________\n\n";
+   cout << "Updates: " << updates << "\n_________________\n\n";
+   cout << "Traditional Stats\n_________________\n\n";
 
    cout << "Accesses: " << lines << endl;
    cout << "Hits: " << sys.stats.hits << endl;
