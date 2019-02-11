@@ -245,6 +245,7 @@ std::string Cache::infile_generation(std::string function, const std::string met
     }
 
     auto updates_str = std::to_string(updates);
+    auto bits_ignored_str = std::to_string(bits_ignored);
 
     if (function == "modifyData") {
         if (binary_file) {
