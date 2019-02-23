@@ -173,18 +173,18 @@ std::string Cache::outfile_generation(std::string function, const std::string me
 
     if (function == "tableUpdate") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + ".out";
         }
     }
     else if (function == "modifyData") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + method + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + method + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + method + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + method + "_" + updates_str + ".out";
         }
     }
     else if (function == "printSimilarity") {
@@ -249,10 +249,10 @@ std::string Cache::infile_generation(std::string function, const std::string met
 
     if (function == "modifyData") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/" + bits_ignored_str + "/" + state + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + ".out";
         }
     }
 
