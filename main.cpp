@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
             size = argv[i+1];
         }
         else if (std::string(argv[i]) == "-l") {
-            trace_accesses = argv[i+1];
+            trace_accesses = atoi(argv[i+1]);
         }
     }
 
