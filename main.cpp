@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
-    unsigned long long trace_accesses = 0;
+    unsigned long long trace_accesses = std::numeric_limits<unsigned long long>::max();
 
     for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -161,36 +161,36 @@ int main(int argc, char* argv[])
    std::string line;
    int writes = 0, updates = 0;
 
-   while(!infile.eof() && (lines <= trace_accesses) && (trace_accesses != 0))
+   while(!infile.eof() && (lines <= trace_accesses))
    {
-      infile.ignore(256, ':');
-      // Reading access
-      infile >> rw;
-      assert(rw == 'R' || rw == 'W');
-      AccessType accessType;
-      if (rw == 'R') {
+        infile.ignore(256, ':');
+        // Reading access
+        infile >> rw;
+        assert(rw == 'R' || rw == 'W');
+        AccessType accessType;
+        if (rw == 'R') {
          accessType = AccessType::Read;
-      } else {
+        } else {
          accessType = AccessType::Write;
-      }
-      // Reading address
-      infile >> hex >> address;
+        }
+        // Reading address
+        infile >> hex >> address;
 
-      std::array<int,64> lineData = {0};
-      int value;
-      // Reading 64 values (64 bytes)
-      for (int i=0; i<64; i++) {
+        std::array<int,64> lineData = {0};
+        int value;
+        // Reading 64 values (64 bytes)
+        for (int i=0; i<64; i++) {
         infile >> hex >> value;
         lineData[i] = value;
-      }
+        }
 
-      if(address != 0) {
+        if(address != 0) {
          // By default the pinatrace tool doesn't record the tid,
          // so we make up a tid to stress the MultiCache functionality
          sys.memAccess(address, accessType, lineData, lines%2);
-      }
+        }
 
-      if (rw == 'W') {
+        if (rw == 'W') {
         if ((writes % frequency) == 0 && writes != 0) {
             // Kmeans
             // cout << "Precompression Table Update #" << updates << "\n\n";
@@ -200,11 +200,11 @@ int main(int argc, char* argv[])
             updates++;
         }
         writes++;
-      }
+        }
 
-      sys.checkSimilarity(lineData,bits_ignored,rw);
+        sys.checkSimilarity(lineData,bits_ignored,rw);
 
-      ++lines;
+        ++lines;
    }
 
    cout << "Updates: " << updates << "\n_________________\n\n";
