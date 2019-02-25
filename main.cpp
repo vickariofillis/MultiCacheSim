@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
    std::string line;
    int writes = 0, updates = 0;
 
-   while(!infile.eof() && ((lines <= trace_accesses) && (trace_accesses != 0)))
+   while(!infile.eof() && (lines <= trace_accesses) && (trace_accesses != 0))
    {
       infile.ignore(256, ':');
       // Reading access
