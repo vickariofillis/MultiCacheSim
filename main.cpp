@@ -47,6 +47,7 @@ int main(int argc, char* argv[])
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
+    unsigned long long trace_accesses = 0;
 
     for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -69,6 +70,9 @@ int main(int argc, char* argv[])
         }
         else if (std::string(argv[i]) == "-t") {
             size = argv[i+1];
+        }
+        else if (std::string(argv[i]) == "-l") {
+            trace_accesses = argv[i+1];
         }
     }
 
@@ -157,7 +161,7 @@ int main(int argc, char* argv[])
    std::string line;
    int writes = 0, updates = 0;
 
-   while(!infile.eof())
+   while(!infile.eof() && ((lines <= trace_accesses) && (trace_accesses != 0)))
    {
       infile.ignore(256, ':');
       // Reading access
