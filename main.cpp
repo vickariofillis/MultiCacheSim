@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 #include <iosfwd>
 #include <fstream>
 #include <cassert>
+#include <limits>
 #include <sstream>
 #include <string>
 /* Cluster */
