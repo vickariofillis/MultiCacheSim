@@ -30,10 +30,11 @@ freely, subject to the following restrictions:
 #include "misc.h"
 #include "cache.h"
 // Kmeans
-/* Local */
-// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 /* Cluster */
 #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
+/* Local */
+// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+
 
 using namespace std;
 

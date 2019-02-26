@@ -80,7 +80,7 @@ infile_generation	cache.cpp	/^std::string Cache::infile_generation(std::string f
 insertLine	cache.cpp	/^void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data)$/;"	f	class:Cache
 isLocal	system.cpp	/^bool MultiCacheSystem::isLocal(uint64_t address, unsigned int local)$/;"	f	class:MultiCacheSystem
 lineMask	system.h	/^   uint64_t lineMask;$/;"	m	class:System
-local	cache.cpp	/^bool local = 1;$/;"	v
+local	cache.cpp	/^bool local = 0;$/;"	v
 main	main.cpp	/^int main(int argc, char* argv[])$/;"	f
 main	tests/random.cpp	/^int main(int argc, char* argv[]) {$/;"	f
 maxSetSize	cache.h	/^   unsigned int maxSetSize;$/;"	m	class:Cache

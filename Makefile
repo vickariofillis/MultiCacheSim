@@ -1,4 +1,4 @@
-CXX = g++
+#CXX = ${CXX}
 DEBUG_FLAGS = -O2 -g -Wall -Wextra -DDEBUG -std=gnu++14
 RELEASE_FLAGS= -O3 -march=native -Wall -Wextra -std=gnu++14 -flto -static
 CXXFLAGS=$(RELEASE_FLAGS)
