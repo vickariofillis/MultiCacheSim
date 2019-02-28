@@ -48,7 +48,9 @@ int main(int argc, char* argv[])
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
-    unsigned long long trace_accesses = std::numeric_limits<unsigned long long>::max();
+    unsigned int trace_accesses_start = 0;
+    unsigned long long trace_accesses_end = std::numeric_limits<unsigned long long>::max();
+    cout << "trace accesses: " << trace_accesses_end << "\n";
 
     for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -73,8 +75,14 @@ int main(int argc, char* argv[])
             size = argv[i+1];
         }
         else if (std::string(argv[i]) == "-l") {
-            trace_accesses = atoi(argv[i+1]);
+            trace_accesses_start = atoi(argv[i+1]);
+            trace_accesses_end = atoi(argv[i+2]);
         }
+    }
+
+    if (trace_accesses_end <= trace_accesses_start) {
+        cout << "! The end of the simulation window is earlier than the start. Reseted to the end of the trace file.\n";
+        trace_accesses_end = std::numeric_limits<unsigned long long>::max();
     }
 
     cout << "\nInput Stats\n_________________\n\n";
@@ -150,7 +158,7 @@ int main(int argc, char* argv[])
    zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    /* Local */
    // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
-   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace_given_data.out.gz");
+   // // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace_given_data.out.gz");
 
    // cout << "After infile\n";
    
@@ -162,7 +170,7 @@ int main(int argc, char* argv[])
    std::string line;
    int writes = 0, updates = 0;
 
-   while(!infile.eof() && (lines <= trace_accesses))
+   while(!infile.eof() && (lines >= trace_accesses_start) && lines <= trace_accesses_end)
    {
         infile.ignore(256, ':');
         // Reading access

@@ -1,4 +1,4 @@
-cscope 15 $HOME/Documents/MultiCacheSim               0000532955
+cscope 15 $HOME/Documents/MultiCacheSim               0000533332
 	@cache.cpp
 
 24 
@@ -5167,8 +5167,12 @@ suôe
 size
  = "small";
 
-51 
-åa˚_ac˚s£s
+51 
+åa˚_ac˚s£s_°¨t
+ = 0;
+
+52 
+åa˚_ac˚s£s_íd
  = 
 °d
 ::
@@ -5177,13 +5181,19 @@ numîic_limôs
 	`max
 ();
 
-53 
+53 
+cout
+ << "åa˚ác˚s£s: " << 
+åa˚_ac˚s£s_íd
+ << "\n";
+
+55 
 i
 =0; i<
 ¨gc
 ; i++) {
 
-54 i‡(
+56 i‡(
 °d
 ::
 	`°rög
@@ -5193,7 +5203,7 @@ i
 i
 ]) == "-m") {
 
-55 
+57 
 mëhod
  = 
 ¨gv
@@ -5201,7 +5211,7 @@ mëhod
 i
 +1];
 
-57 i‡(
+59 i‡(
 °d
 ::
 	`°rög
@@ -5211,7 +5221,7 @@ i
 i
 ]) == "-f") {
 
-58 
+60 
 ‰equícy
  = 
 	`©oi
@@ -5221,7 +5231,7 @@ i
 i
 +1]);
 
-60 i‡(
+62 i‡(
 °d
 ::
 	`°rög
@@ -5231,7 +5241,7 @@ i
 i
 ]) == "-b") {
 
-61 
+63 
 bíchm¨k
  = 
 ¨gv
@@ -5239,7 +5249,7 @@ bíchm¨k
 i
 +1];
 
-63 i‡(
+65 i‡(
 °d
 ::
 	`°rög
@@ -5249,7 +5259,7 @@ i
 i
 ]) == "-i") {
 
-64 
+66 
 bôs_ign‹ed
  = 
 	`©oi
@@ -5259,7 +5269,7 @@ bôs_ign‹ed
 i
 +1]);
 
-66 i‡(
+68 i‡(
 °d
 ::
 	`°rög
@@ -5269,7 +5279,7 @@ i
 i
 ]) == "-s") {
 
-67 
+69 
 suôe
  = 
 ¨gv
@@ -5277,7 +5287,7 @@ suôe
 i
 +1];
 
-69 i‡(
+71 i‡(
 °d
 ::
 	`°rög
@@ -5287,7 +5297,7 @@ i
 i
 ]) == "-x") {
 
-70 
+72 
 íåõs
  = 
 	`©oi
@@ -5297,7 +5307,7 @@ i
 i
 +1]);
 
-72 i‡(
+74 i‡(
 °d
 ::
 	`°rög
@@ -5307,7 +5317,7 @@ i
 i
 ]) == "-t") {
 
-73 
+75 
 size
  = 
 ¨gv
@@ -5315,7 +5325,7 @@ size
 i
 +1];
 
-75 i‡(
+77 i‡(
 °d
 ::
 	`°rög
@@ -5325,8 +5335,8 @@ i
 i
 ]) == "-l") {
 
-76 
-åa˚_ac˚s£s
+78 
+åa˚_ac˚s£s_°¨t
  = 
 	`©oi
 (
@@ -5335,11 +5345,41 @@ i
 i
 +1]);
 
-80 
+79 
+åa˚_ac˚s£s_íd
+ = 
+	`©oi
+(
+¨gv
+[
+i
++2]);
+
+83 i‡(
+åa˚_ac˚s£s_íd
+ <
+åa˚_ac˚s£s_°¨t
+) {
+
+84 
+cout
+ << "! TheÉnd ofÅhe simulation window isÉarlierÅhanÅhe start. ResetedÅoÅheÉnd ofÅheÅrace file.\n";
+
+85 
+åa˚_ac˚s£s_íd
+ = 
+°d
+::
+numîic_limôs
+<>::
+	`max
+();
+
+88 
 cout
  << "\nInput Stats\n_________________\n\n";
 
-81 
+89 
 cout
  << "Suôe: " << 
 suôe
@@ -5355,11 +5395,11 @@ bôs_ign‹ed
 ‰equícy
 \
 
-87 
+95 
 ¨r_m≠
 [] = {0, 1};
 
-88 
+96 
 ve˘‹
 <> 
 	`tid_m≠
@@ -5367,11 +5407,11 @@ ve˘‹
 ¨r_m≠
 ,árr_map +
 
-89 (
+97 (
 ¨r_m≠
 ) / ());
 
-90 
+98 
 °d
 ::
 unique_±r
@@ -5383,7 +5423,7 @@ SeqPª„tch
 make_unique
 <SeqPrefetch>();
 
-101 
+109 
 SögÀCacheSy°em
  
 	`sys
@@ -5397,21 +5437,21 @@ SögÀCacheSy°em
 Ál£
 , false);
 
-108 
+116 
 rw
 ;
 
-109 
+117 
 uöt64_t
  
 addªss
 ;
 
-110 
+118 
 löes
  = 0;
 
-112 
+120 
 °d
 ::
 °rög
@@ -5419,7 +5459,7 @@ löes
 ty≥
  = "apps";
 
-113 
+121 
 °d
 ::
 °rög
@@ -5427,7 +5467,7 @@ ty≥
 exåa1
  = "/pkgs/";
 
-114 
+122 
 °d
 ::
 °rög
@@ -5435,7 +5475,7 @@ exåa1
 exåa2
  = "/test";
 
-115 
+123 
 °d
 ::
 °rög
@@ -5443,81 +5483,81 @@ exåa2
 exåa3
  = "/run";
 
-116 i‡(
+124 i‡(
 suôe
  == "parsec") {
 
-118 i‡(
+126 i‡(
 bíchm¨k
  == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
 
-119 
+127 
 bíchm¨k
  == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
 
-121 
+129 
 ty≥
  = "apps";
 
-123 i‡(
+131 i‡(
 bíchm¨k
  == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
 
-125 
+133 
 ty≥
  = "kernels";
 
-128 
+136 
 exåa1
  = "/pkgs/";
 
-129 
+137 
 exåa2
  = "/" + 
 bíchm¨k
 ;
 
-131 i‡(
+139 i‡(
 suôe
  == "perfect") {
 
-134 
-ty≥
- = "";
-
-135 
-exåa1
- = "";
-
-136 
-exåa2
- = "";
-
-137 
-exåa3
- = "";
-
-139 i‡(
-suôe
- == "phoenix") {
-
-141 
-ty≥
- = "";
-
 142 
-exåa1
+ty≥
  = "";
 
 143 
-exåa2
+exåa1
  = "";
 
 144 
+exåa2
+ = "";
+
+145 
 exåa3
  = "";
 
+147 i‡(
+suôe
+ == "phoenix") {
+
+149 
+ty≥
+ = "";
+
+150 
+exåa1
+ = "";
+
+151 
+exåa2
+ = "";
+
 152 
+exåa3
+ = "";
+
+160 
 z°r
 ::
 if°ªam
@@ -5525,7 +5565,7 @@ if°ªam
 	`öfûe
 ("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
 
-162 
+170 
 °d
 ::
 °rög
@@ -5533,51 +5573,53 @@ if°ªam
 löe
 ;
 
-163 
+171 
 wrôes
  = 0, 
 upd©es
  = 0;
 
-165 !
+173 !
 öfûe
 .
 	`eof
 (Ë&& (
 löes
- <
-åa˚_ac˚s£s
-))
+ >
+åa˚_ac˚s£s_°¨t
+Ë&&Üöe†<
+åa˚_ac˚s£s_íd
+)
 
-167 
+175 
 öfûe
 .
 	`ign‹e
 (256, ':');
 
-169 
+177 
 öfûe
  >> 
 rw
 ;
 
-170 
+178 
 	`as£π
 (
 rw
  == 'R' ||Ñw == 'W');
 
-171 
+179 
 Ac˚ssTy≥
  
 ac˚ssTy≥
 ;
 
-172 i‡(
+180 i‡(
 rw
  == 'R') {
 
-173 
+181 
 ac˚ssTy≥
  = 
 Ac˚ssTy≥
@@ -5585,7 +5627,7 @@ Ac˚ssTy≥
 Ród
 ;
 
-175 
+183 
 ac˚ssTy≥
  = 
 Ac˚ssTy≥
@@ -5593,7 +5635,7 @@ Ac˚ssTy≥
 Wrôe
 ;
 
-178 
+186 
 öfûe
  >> 
 hex
@@ -5601,7 +5643,7 @@ hex
 addªss
 ;
 
-180 
+188 
 °d
 ::
 ¨øy
@@ -5609,15 +5651,15 @@ addªss
 löeD©a
  = {0};
 
-181 
+189 
 vÆue
 ;
 
-183 
+191 
 i
 =0; i<64; i++) {
 
-184 
+192 
 öfûe
  >> 
 hex
@@ -5625,7 +5667,7 @@ hex
 vÆue
 ;
 
-185 
+193 
 löeD©a
 [
 i
@@ -5633,11 +5675,11 @@ i
 vÆue
 ;
 
-188 if(
+196 if(
 addªss
  != 0) {
 
-191 
+199 
 sys
 .
 	`memAc˚ss
@@ -5651,17 +5693,17 @@ löeD©a
 löes
 %2);
 
-194 i‡(
+202 i‡(
 rw
  == 'W') {
 
-195 i‡((
+203 i‡((
 wrôes
  % 
 ‰equícy
 ) == 0 && writes != 0) {
 
-198 
+206 
 sys
 .
 	`èbÀUpd©e
@@ -5681,7 +5723,7 @@ mëhod
 bôs_ign‹ed
 );
 
-199 
+207 
 sys
 .
 	`modifyD©a
@@ -5701,15 +5743,15 @@ mëhod
 bôs_ign‹ed
 );
 
-201 
+209 
 upd©es
 ++;
 
-203 
+211 
 wrôes
 ++;
 
-206 
+214 
 sys
 .
 	`checkSimû¨ôy
@@ -5721,21 +5763,21 @@ bôs_ign‹ed
 rw
 );
 
-208 ++
+216 ++
 löes
 ;
 
-211 
+219 
 cout
  << "Upd©es: " << 
 upd©es
  << "\n_________________\n\n";
 
-212 
+220 
 cout
  << "Traditional Stats\n_________________\n\n";
 
-214 
+222 
 cout
  << "Ac˚s£s: " << 
 löes
@@ -5743,7 +5785,7 @@ löes
 ídl
 ;
 
-215 
+223 
 cout
  << "Hôs: " << 
 sys
@@ -5755,7 +5797,7 @@ hôs
 ídl
 ;
 
-216 
+224 
 cout
  << "Mis£s: " << 
 löes
@@ -5769,7 +5811,7 @@ hôs
 ídl
 ;
 
-217 
+225 
 cout
  << "Loˇ»ªads: " << 
 sys
@@ -5781,7 +5823,7 @@ loˇl_ªads
 ídl
 ;
 
-218 
+226 
 cout
  << "Loˇ»wrôes: " << 
 sys
@@ -5793,7 +5835,7 @@ loˇl_wrôes
 ídl
 ;
 
-219 
+227 
 cout
  << "RemŸêªads: " << 
 sys
@@ -5805,7 +5847,7 @@ sys
 ídl
 ;
 
-220 
+228 
 cout
  << "RemŸêwrôes: " << 
 sys
@@ -5817,7 +5859,7 @@ sys
 ídl
 ;
 
-221 
+229 
 cout
  << "Othî-ˇchêªads: " << 
 sys
@@ -5829,7 +5871,7 @@ sys
 ídl
 ;
 
-229 
+237 
 	}
 }
 
