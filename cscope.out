@@ -1,4 +1,4 @@
-cscope 15 $HOME/Documents/MultiCacheSim               0000533332
+cscope 15 $HOME/Documents/MultiCacheSim               0000533283
 	@cache.cpp
 
 24 
@@ -5583,13 +5583,7 @@ upd©es
 šfže
 .
 	`eof
-(è&& (
-lšes
- >ð
-Œaû_acûs£s_¡¬t
-è&&†še <ð
-Œaû_acûs£s_’d
-)
+())
 
 175 
 šfže
@@ -5627,7 +5621,7 @@ AcûssTy³
 R—d
 ;
 
-183 
+184 
 acûssTy³
  = 
 AcûssTy³
@@ -5635,7 +5629,7 @@ AcûssTy³
 Wr™e
 ;
 
-186 
+187 
 šfže
  >> 
 hex
@@ -5643,7 +5637,7 @@ hex
 add»ss
 ;
 
-188 
+189 
 ¡d
 ::
 ¬¿y
@@ -5651,15 +5645,15 @@ add»ss
 lšeD©a
  = {0};
 
-189 
+190 
 v®ue
 ;
 
-191 
+192 
 i
 =0; i<64; i++) {
 
-192 
+193 
 šfže
  >> 
 hex
@@ -5667,7 +5661,7 @@ hex
 v®ue
 ;
 
-193 
+194 
 lšeD©a
 [
 i
@@ -5675,11 +5669,19 @@ i
 v®ue
 ;
 
-196 if(
+198 ià(
+lšes
+ >ð
+Œaû_acûs£s_¡¬t
+ &&†še <ð
+Œaû_acûs£s_’d
+) {
+
+199 if(
 add»ss
  != 0) {
 
-199 
+202 
 sys
 .
 	`memAcûss
@@ -5693,17 +5695,17 @@ lšeD©a
 lšes
 %2);
 
-202 ià(
+205 ià(
 rw
  == 'W') {
 
-203 ià((
+206 ià((
 wr™es
  % 
 äequ’cy
 ) == 0 && writes != 0) {
 
-206 
+209 
 sys
 .
 	`bËUpd©e
@@ -5723,7 +5725,7 @@ m‘hod
 b™s_ignÜed
 );
 
-207 
+210 
 sys
 .
 	`modifyD©a
@@ -5743,41 +5745,29 @@ m‘hod
 b™s_ignÜed
 );
 
-209 
+212 
 upd©es
 ++;
 
-211 
+214 
 wr™es
 ++;
 
-214 
-sys
-.
-	`checkSimž¬™y
-(
-lšeD©a
-,
-b™s_ignÜed
-,
-rw
-);
-
-216 ++
+219 ++
 lšes
 ;
 
-219 
+222 
 cout
  << "Upd©es: " << 
 upd©es
  << "\n_________________\n\n";
 
-220 
+223 
 cout
  << "Traditional Stats\n_________________\n\n";
 
-222 
+225 
 cout
  << "Acûs£s: " << 
 lšes
@@ -5785,7 +5775,7 @@ lšes
 ’dl
 ;
 
-223 
+226 
 cout
  << "H™s: " << 
 sys
@@ -5797,7 +5787,7 @@ h™s
 ’dl
 ;
 
-224 
+227 
 cout
  << "Mis£s: " << 
 lšes
@@ -5811,7 +5801,7 @@ h™s
 ’dl
 ;
 
-225 
+228 
 cout
  << "LoÿÈ»ads: " << 
 sys
@@ -5823,7 +5813,7 @@ loÿl_»ads
 ’dl
 ;
 
-226 
+229 
 cout
  << "LoÿÈwr™es: " << 
 sys
@@ -5835,7 +5825,7 @@ loÿl_wr™es
 ’dl
 ;
 
-227 
+230 
 cout
  << "RemÙ»ads: " << 
 sys
@@ -5847,7 +5837,7 @@ sys
 ’dl
 ;
 
-228 
+231 
 cout
  << "RemÙwr™es: " << 
 sys
@@ -5859,7 +5849,7 @@ sys
 ’dl
 ;
 
-229 
+232 
 cout
  << "Oth”-ÿch»ads: " << 
 sys
@@ -5871,7 +5861,7 @@ sys
 ’dl
 ;
 
-237 
+240 
 	}
 }
 

@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
    std::string line;
    int writes = 0, updates = 0;
 
-   while(!infile.eof() && (lines >= trace_accesses_start) && lines <= trace_accesses_end)
+   while(!infile.eof())
    {
         infile.ignore(256, ':');
         // Reading access
@@ -178,9 +178,10 @@ int main(int argc, char* argv[])
         assert(rw == 'R' || rw == 'W');
         AccessType accessType;
         if (rw == 'R') {
-         accessType = AccessType::Read;
-        } else {
-         accessType = AccessType::Write;
+            accessType = AccessType::Read;
+        } 
+        else {
+            accessType = AccessType::Write;
         }
         // Reading address
         infile >> hex >> address;
@@ -189,29 +190,31 @@ int main(int argc, char* argv[])
         int value;
         // Reading 64 values (64 bytes)
         for (int i=0; i<64; i++) {
-        infile >> hex >> value;
-        lineData[i] = value;
+            infile >> hex >> value;
+            lineData[i] = value;
         }
 
-        if(address != 0) {
-         // By default the pinatrace tool doesn't record the tid,
-         // so we make up a tid to stress the MultiCache functionality
-         sys.memAccess(address, accessType, lineData, lines%2);
-        }
+        // Restrictring the part of the trace that is being simulated
+        if (lines >= trace_accesses_start && lines <= trace_accesses_end) {
+            if(address != 0) {
+                // By default the pinatrace tool doesn't record the tid,
+                // so we make up a tid to stress the MultiCache functionality
+                sys.memAccess(address, accessType, lineData, lines%2);
+            }
 
-        if (rw == 'W') {
-        if ((writes % frequency) == 0 && writes != 0) {
-            // Kmeans
-            // cout << "Precompression Table Update #" << updates << "\n\n";
-            sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
-            sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
-            // sys.snapshot();
-            updates++;
+            if (rw == 'W') {
+                if ((writes % frequency) == 0 && writes != 0) {
+                    // Kmeans
+                    // cout << "Precompression Table Update #" << updates << "\n\n";
+                    sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
+                    sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
+                    // sys.snapshot();
+                    updates++;
+                }
+                writes++;
+            }
+            // sys.checkSimilarity(lineData,bits_ignored,rw);
         }
-        writes++;
-        }
-
-        sys.checkSimilarity(lineData,bits_ignored,rw);
 
         ++lines;
    }
