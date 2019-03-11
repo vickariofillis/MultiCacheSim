@@ -31,9 +31,9 @@ freely, subject to the following restrictions:
 #include "cache.h"
 // Kmeans
 /* Cluster */
-#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
+// #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 /* Local */
-// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+#include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 
 
 using namespace std;
@@ -42,7 +42,7 @@ bool enable_prints = 0;
 bool enable_prints_file = 0;
 
 /* Local */
-bool local = 0;
+bool local = 1;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -294,6 +294,20 @@ void Cache::snapshot()
 
 }
 
+int Cache::cacheElements()
+{
+    int elements = 0;
+
+    //Iterate over the cache and track the lines currently in it
+    for (uint i=0; i<sets.size(); i++) {
+        for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
+            elements++;
+        }
+    }
+
+    return elements;
+}
+
 void Cache::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)
 {
     std::array<int,64> maskedData;
@@ -477,63 +491,66 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
     std::ofstream before_trace_binary(before_outfile_binary.c_str(), ios::binary);
 
-    auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
+    int cache_elements = cacheElements();
+    if (cache_elements >= entries) {
+        auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
-    if (enable_prints) std::cout << "Means:\n\n";
-    int means = 0;
-    for (const auto& mean : std::get<0>(cluster_data)) {
-        if (enable_prints) std::cout << "#" << means << ": (";
-        means++;
-        for (int i=0; i<64; i++) {
-            if (i != 63) {
-                table_trace << std::hex << mean[i] << " ";
-                if (enable_prints) cout << std::hex << mean[i] << " ";
+        if (enable_prints) std::cout << "Means:\n\n";
+        int means = 0;
+        for (const auto& mean : std::get<0>(cluster_data)) {
+            if (enable_prints) std::cout << "#" << means << ": (";
+            means++;
+            for (int i=0; i<64; i++) {
+                if (i != 63) {
+                    table_trace << std::hex << mean[i] << " ";
+                    if (enable_prints) cout << std::hex << mean[i] << " ";
+                }
+                else {
+                    table_trace << std::hex << mean[i];
+                    if (enable_prints) cout << std::hex << mean[i] << " ";
+                }
+                
             }
-            else {
-                table_trace << std::hex << mean[i];
-                if (enable_prints) cout << std::hex << mean[i] << " ";
-            }
-            
+            if (enable_prints) std::cout << ")\n\n";
+            table_trace << "\n";
         }
-        if (enable_prints) std::cout << ")\n\n";
-        table_trace << "\n";
-    }
 
-    if (enable_prints) std::cout << "\nCluster mapping:\n";
-    if (enable_prints) std::cout << "\tPoint:\n";
-    for (const auto& point : inputData) {
-        std::stringstream value;
-        std::stringstream value_file;
-        value << "\t(";
-        for (int i=0; i<64; i++) {
-            if (i != 63) {
-                value << std::hex << point[i] << " ";
-                value_file << std::hex << point[i] << " ";
+        if (enable_prints) std::cout << "\nCluster mapping:\n";
+        if (enable_prints) std::cout << "\tPoint:\n";
+        for (const auto& point : inputData) {
+            std::stringstream value;
+            std::stringstream value_file;
+            value << "\t(";
+            for (int i=0; i<64; i++) {
+                if (i != 63) {
+                    value << std::hex << point[i] << " ";
+                    value_file << std::hex << point[i] << " ";
+                }
+                else {
+                    value << std::hex << point[i];
+                    value_file << std::hex << point[i];
+                }
+                before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
+                // char endline = '\n';
+                // before_trace_binary.write((char*)&endline, sizeof(char));
+                // char space = ' ';
+                // before_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
             }
-            else {
-                value << std::hex << point[i];
-                value_file << std::hex << point[i];
-            }
-            before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
-            // char endline = '\n';
-            // before_trace_binary.write((char*)&endline, sizeof(char));
-            // char space = ' ';
-            // before_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
+            value << ")";
+            if (enable_prints) std::cout << value.str() << "\n";
+            before_trace << value_file.str() << "\n";
         }
-        value << ")";
-        if (enable_prints) std::cout << value.str() << "\n";
-        before_trace << value_file.str() << "\n";
-    }
 
-    if (enable_prints) std::cout << "\n\tLabel:";
-    std::stringstream labels;
-    labels << "(";
-    for (const auto& label : std::get<1>(cluster_data)) {
-        labels << label << ",";
-        mapping_trace << label << "\n";
+        if (enable_prints) std::cout << "\n\tLabel:";
+        std::stringstream labels;
+        labels << "(";
+        for (const auto& label : std::get<1>(cluster_data)) {
+            labels << label << ",";
+            mapping_trace << label << "\n";
+        }
+        labels << ")";
+        if (enable_prints) std::cout << labels.str() << "\n";
     }
-    labels << ")";
-    if (enable_prints) std::cout << labels.str() << "\n";
 
     before_trace.close();
     table_trace.close();

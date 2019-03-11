@@ -72,6 +72,7 @@ public:
    std::string infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, const int updates,\
      const std::string state, const int binary_file);
    void snapshot();
+   int cacheElements();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
    void printSimilarity(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored);
    // Kmeans
