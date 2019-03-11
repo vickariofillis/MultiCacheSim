@@ -29,11 +29,11 @@ freely, subject to the following restrictions:
 #include <sstream>
 #include <string>
 /* Cluster */
-// #include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
-// #include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
+#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
+#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 /* Local */
-#include "/home/vic/zstr/src/zstr.hpp"
-#include "/home/vic/zstr/src/strict_fstream.hpp"
+// #include "/home/vic/zstr/src/zstr.hpp"
+// #include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
@@ -155,9 +155,9 @@ int main(int argc, char* argv[])
    // cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
 
    /* Cluster */
-   // zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
+   zstr::ifstream infile("/aenao-99/karyofyl/results/pin/pinatrace/" + suite + "/" + benchmark + "/" + size + extra1 + type + extra2 + extra3 + "/trace.out.gz");
    /* Local */
-   zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
+   // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
    // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace_given_data.out.gz");
 
    // cout << "After infile\n";

@@ -31,9 +31,9 @@ freely, subject to the following restrictions:
 #include "cache.h"
 // Kmeans
 /* Cluster */
-// #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
+#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 /* Local */
-#include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 
 
 using namespace std;
@@ -42,7 +42,7 @@ bool enable_prints = 0;
 bool enable_prints_file = 0;
 
 /* Local */
-bool local = 1;
+bool local = 0;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
