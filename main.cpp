@@ -206,10 +206,10 @@ int main(int argc, char* argv[])
                 if ((writes % frequency) == 0 && writes != 0) {
                     // Kmeans
                     // cout << "Precompression Table Update #" << updates << "\n\n";
-                    sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
-                    sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
+                    bool kmeans_run = sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
+                    if (kmeans_run) sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
                     // sys.snapshot();
-                    updates++;
+                    if (kmeans_run) updates++;
                 }
                 writes++;
             }

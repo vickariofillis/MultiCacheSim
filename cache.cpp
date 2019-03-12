@@ -438,7 +438,7 @@ void Cache::printSimilarity(const int updates, const std::string benchmark, cons
 }
 
 // Kmeans
-void Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
+bool Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)
 {
     std::string function = "tableUpdate";
     std::string state;
@@ -472,27 +472,31 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
     //     }
     // }
 
-    /* Non-binary files */
-    // Before file (cache data before precompression)
-    state = "before";
-    std::string before_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
-    std::ofstream before_trace(before_outfile.c_str());
-    // Precompression table entries
-    state = "table";
-    std::string table_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
-    std::ofstream table_trace(table_outfile.c_str());
-    // Mapping between precompression table entries and cache lines
-    state = "mapping";
-    std::string mapping_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
-    std::ofstream mapping_trace(mapping_outfile.c_str());
-
-    /* Binary files */
-    state = "before";
-    std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
-    std::ofstream before_trace_binary(before_outfile_binary.c_str(), ios::binary);
-
     int cache_elements = cacheElements();
+    bool kmeans_run = false;
+
     if (cache_elements >= entries) {
+
+        /* Non-binary files */
+        // Before file (cache data before precompression)
+        state = "before";
+        std::string before_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::ofstream before_trace(before_outfile.c_str());
+        // Precompression table entries
+        state = "table";
+        std::string table_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::ofstream table_trace(table_outfile.c_str());
+        // Mapping between precompression table entries and cache lines
+        state = "mapping";
+        std::string mapping_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::ofstream mapping_trace(mapping_outfile.c_str());
+
+        /* Binary files */
+        state = "before";
+        std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
+        std::ofstream before_trace_binary(before_outfile_binary.c_str(), ios::binary);
+
+        // cout << "Cache Elements = " << cache_elements << "\n";
         auto cluster_data = dkm::kmeans_lloyd(inputData,entries);
 
         if (enable_prints) std::cout << "Means:\n\n";
@@ -550,13 +554,19 @@ void Cache::tableUpdate(const int updates, const std::string benchmark, const st
         }
         labels << ")";
         if (enable_prints) std::cout << labels.str() << "\n";
+
+
+        before_trace.close();
+        table_trace.close();
+        mapping_trace.close();
+
+        before_trace_binary.close();
+
+        kmeans_run = true;
     }
+    
+    return kmeans_run;
 
-    before_trace.close();
-    table_trace.close();
-    mapping_trace.close();
-
-    before_trace_binary.close();
 }
 
 void Cache::modifyData(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)

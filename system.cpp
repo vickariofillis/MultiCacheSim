@@ -24,6 +24,7 @@ freely, subject to the following restrictions:
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 #include "misc.h"
 #include "cache.h"
@@ -407,9 +408,11 @@ void SingleCacheSystem::printSimilarity(int updates, std::string benchmark, std:
 }
 
 // Kmeans
-void SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
+bool SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
 {
-    cache->tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
+    bool kmeans_run = false; 
+    kmeans_run = cache->tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
+    return kmeans_run;
 }
 
 void SingleCacheSystem::modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
