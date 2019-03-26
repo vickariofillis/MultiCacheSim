@@ -30,6 +30,10 @@ freely, subject to the following restrictions:
 #include "cache.h"
 #include "system.h"
 
+bool system_debug = true;
+bool states = true;
+bool statistics = true;
+
 System::System(
             unsigned int line_size, unsigned int num_lines, unsigned int assoc,
             std::unique_ptr<Prefetch> prefetcher, 
@@ -350,51 +354,80 @@ void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::
       checkCompulsory(address & ~lineMask);
    }
 
-   // Handle hits 
-   if (accessType == AccessType::Write && hit) {  
-      cache->changeState(set, tag, CacheState::Modified);
-   }
+    // Handle hits 
+    if (accessType == AccessType::Write && hit) {  
+        cache->changeState(set, tag, CacheState::Modified);
+    }
 
-   if (hit) {
-      cache->updateLRU(set, tag);
+    if (hit) {
+        cache->updateLRU(set, tag);
+        cache->updateData(set, tag, data);
 
-      if (!is_prefetch) {
-         stats.hits++;
-         if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
-         }
-      }
+        if (!is_prefetch) {
+            stats.hits++;
+            if (prefetcher) {
+                stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
+            }
+        }
 
-      return;
-   }
+        // Debug
+        if (system_debug && states) {
+            std::cout << "Hit, Cache State: ";
+            if (state == CacheState::Modified) std::cout << "M\n";
+            if (state == CacheState::Owned) std::cout << "O\n";
+            if (state == CacheState::Exclusive) std::cout << "E\n";
+            if (state == CacheState::Shared) std::cout << "S\n";
+            if (state == CacheState::Invalid) std::cout << "I\n";
+        }
+        return;
+    }
 
-   CacheState new_state = CacheState::Invalid;
-   uint64_t evicted_tag;
-   bool writeback = cache->checkWriteback(set, evicted_tag);
+    CacheState new_state = CacheState::Invalid;
+    uint64_t evicted_tag;
+    bool writeback = cache->checkWriteback(set, evicted_tag);
 
-   if (writeback) {
-      stats.local_writes++;
-   }
+    if (writeback) {
+        stats.local_writes++;
+    }
 
-   if (accessType == AccessType::Read) {
-      new_state = CacheState::Exclusive;
-   } else {
-      new_state = CacheState::Modified;
-   }
+    if (accessType == AccessType::Read) {
+        new_state = CacheState::Exclusive;
+    } else {
+        new_state = CacheState::Modified;
+    }
 
-   if (!is_prefetch) {
-      stats.local_reads++;
-   }
+    if (!is_prefetch) {
+        stats.local_reads++;
+    }
 
-   cache->insertLine(set, tag, new_state, data);
-   if (!is_prefetch && prefetcher) {
-      stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
-   }
+    cache->insertLine(set, tag, new_state, data);
+    if (!is_prefetch && prefetcher) {
+        stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
+    }
+
+    // Debug
+    if (system_debug && states) {
+        std::cout << "Miss, Previous Cache State: ";
+        if (state == CacheState::Modified) std::cout << "M";
+        if (state == CacheState::Owned) std::cout << "O";
+        if (state == CacheState::Exclusive) std::cout << "E";
+        if (state == CacheState::Shared) std::cout << "S";
+        if (state == CacheState::Invalid) std::cout << "I";
+    }
+    if (system_debug && states) {
+        std::cout << ", Current Cache State: ";
+        if (new_state == CacheState::Modified) std::cout << "M\n";
+        if (new_state == CacheState::Owned) std::cout << "O\n";
+        if (new_state == CacheState::Exclusive) std::cout << "E\n";
+        if (new_state == CacheState::Shared) std::cout << "S\n";
+        if (new_state == CacheState::Invalid) std::cout << "I\n";
+    }
+
 }
 
-void SingleCacheSystem::snapshot()
+void SingleCacheSystem::snapshot(const std::string cacheState)
 {
-    cache->snapshot();
+    cache->snapshot(cacheState);
 }
 
 void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)

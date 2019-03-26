@@ -21,14 +21,15 @@ freely, subject to the following restrictions:
    distribution.
 */
 
+#include <bitset>
 #include <cassert>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <iterator>
-#include <fstream>
 
-#include "misc.h"
 #include "cache.h"
+#include "misc.h"
 // Kmeans
 /* Cluster */
 #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
@@ -42,7 +43,7 @@ bool enable_prints = 0;
 bool enable_prints_file = 0;
 
 /* Local */
-bool local = 0;
+bool local = false;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
@@ -133,6 +134,18 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
    // std::cout << "Max Set Size" << maxSetSize << "\n";
 
    sets[set].emplace_back(tag, state, data);
+}
+
+// Updating cache data in case of a hit
+void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data)
+{
+    for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
+        if (it->tag == tag) {
+            for (int j=0; j<64; j++) {
+                it->data[j] = data[j];
+            }
+        }
+   }
 }
 
 std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \
@@ -270,9 +283,10 @@ std::string Cache::infile_generation(std::string function, const std::string met
     return file_path;
 }
 
-void Cache::snapshot()
+void Cache::snapshot(const std::string cacheState)
 {
-    std::cout << "\nSnapshot\n\n";
+    if (cacheState == "before") std::cout << "\nBefore Snapshot\n\n";
+    if (cacheState == "after") std::cout << "\nAfter Snapshot\n\n";
     for (uint i=0; i<sets.size(); i++) {
         int way_count = 0;
         std::cout << "Cache Line #" << i << " \n";
@@ -287,10 +301,10 @@ void Cache::snapshot()
                 }
             }
             way_count++;
-            std::cout << "\n\n";
+            std::cout << "\n";
         }
     }
-    std::cout << "\n";
+    std::cout << "_________________\n\n";
 
 }
 
@@ -534,11 +548,9 @@ bool Cache::tableUpdate(const int updates, const std::string benchmark, const st
                     value << std::hex << point[i];
                     value_file << std::hex << point[i];
                 }
-                before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
-                // char endline = '\n';
-                // before_trace_binary.write((char*)&endline, sizeof(char));
-                // char space = ' ';
-                // before_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
+                // before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
+                std::string binary = std::bitset<8>(point[i]).to_string();
+                before_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
             }
             value << ")";
             if (enable_prints) std::cout << value.str() << "\n";
@@ -697,11 +709,10 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
                     abort();
                 }
             }
-            after_trace_binary.write(reinterpret_cast <const char *> (&afterData[i][j]), sizeof(char));
-            // char endline = '\n';
-            // after_trace_binary.write((char*)&endline, sizeof(char));
-            // char space = ' ';
-            // after_trace_binary.write(reinterpret_cast <const char *> (&space), sizeof(char));
+            // after_trace_binary.write(reinterpret_cast <const char *> (&afterData[i][j]), sizeof(char));
+            // std::string binary = std::bitset<8>(afterData[i][j]).to_string();
+            std::string binary = std::bitset<8>(afterData[i][j]).to_string();
+            after_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
         }
         after_trace << value_file.str() << "\n";
     }
