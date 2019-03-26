@@ -40,9 +40,9 @@ freely, subject to the following restrictions:
 using namespace std;
 
 // Flags for debug printouts;
-bool debug = true;
+bool debug = false;
 bool trace_accesses = false;
-bool snapshot = true;
+bool snapshot = false;
 
 std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size)
 {
