@@ -44,46 +44,58 @@ bool debug = false;
 bool trace_accesses = false;
 bool snapshot = false;
 
-std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size)
+/* Cluster */
+std::string machine = "cluster";
+/* Local */
+// std::string machine = "local";
+
+
+std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
 {
     std::string type;
     std:string file_path;
 
-    if (suite == "parsec") {
+    if (machine == "cluster") {
+        if (suite == "parsec") {
 
-        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
-            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            // cout << "Into apps\n";
-            type = "apps";
+            if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
+                benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
+                // cout << "Into apps\n";
+                type = "apps";
+            }
+            else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
+                // cout << "Into kernels\n";
+                type = "kernels";
+            }
+
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/" + size + "/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz";
+
         }
-        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            // cout << "Into kernels\n";
-            type = "kernels";
+        else if (suite == "perfect") {
+
+            if (benchmark == "2d_convolution" || benchmark == "dwt" || benchmark == "histogram_equalization") {
+                type = "pa1";
+            }
+            else if (benchmark == "interp1" || benchmark == "interp2" || benchmark == "backprojection") {
+                type = "sar";
+            }
+            else if (benchmark == "outer_product" || benchmark == "inner_product" || benchmark == "system_solve") {
+                type = "stap";
+            }
+            else if (benchmark == "app" || benchmark == "debayer" || benchmark == "lucas-kanade" || benchmark == "change-detection") {
+                type = "wami";
+            }
+
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+
         }
-
-        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/" + size + "/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz";
-
+        else if (suite == "phoenix") {
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace.out.gz";
+        }
     }
-    else if (suite == "perfect") {
-
-        if (benchmark == "2d_convolution" || benchmark == "dwt" || benchmark == "histogram_equalization") {
-            type = "pa1";
-        }
-        else if (benchmark == "interp1" || benchmark == "interp2" || benchmark == "backprojection") {
-            type = "sar";
-        }
-        else if (benchmark == "outer_product" || benchmark == "inner_product" || benchmark == "system_solve") {
-            type = "stap";
-        }
-        else if (benchmark == "app" || benchmark == "debayer" || benchmark == "lucas-kanade" || benchmark == "change-detection") {
-            type = "wami";
-        }
-
-        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
-
-    }
-    else if (suite == "phoenix") {
-        file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace.out.gz";
+    else if (machine == "local") {
+        // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
+        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
     }
 
     return file_path;
@@ -168,14 +180,9 @@ int main(int argc, char* argv[])
     unsigned long long lines = 0;
 
     // cout << "Before infile\n";
-    // cout << "/aenao-99/karyofyl/results/pin/pinatrace/" << suite << "/" << benchmark << "/" << size << extra1 << type << extra2 << extra3 << "/trace.out.gz\n";
 
-    /* Cluster */
-    std::string file_path = tracefile_generation(suite, benchmark, size);
+    std::string file_path = tracefile_generation(suite, benchmark, size, machine);
     zstr::ifstream infile(file_path.c_str());
-    /* Local */
-    // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz");
-    // zstr::ifstream infile("/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz");
 
     // cout << "After infile\n";
 
@@ -244,7 +251,7 @@ int main(int argc, char* argv[])
             if(address != 0) {
                 cacheState = "before";
                 if ((debug && snapshot) && lines == 0) sys.snapshot(cacheState);
-                cout << "Cache Access: #" << lines+1 << "\n";
+                if (debug) cout << "Cache Access: #" << lines+1 << "\n";
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
                 sys.memAccess(address, accessType, lineData, lines%2);

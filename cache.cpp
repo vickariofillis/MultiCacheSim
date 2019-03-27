@@ -42,8 +42,10 @@ using namespace std;
 bool enable_prints = 0;
 bool enable_prints_file = 0;
 
-/* Local */
+/* Cluster */
 bool local = false;
+/* Local */
+// bool local = true;
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {

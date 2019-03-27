@@ -1,4 +1,4 @@
-cscope 15 $HOME/Documents/MultiCacheSim               0000562210
+cscope 15 $HOME/Documents/MultiCacheSim               0000562484
 	@cache.cpp
 
 24 
@@ -61,7 +61,9 @@ boﬁ
 boﬁ
  
 	gloˇl
- = 1;
+ = 
+åue
+;
 
 48 
 	gCache
@@ -9624,7 +9626,7 @@ boﬁ
  
 	gdebug
  = 
-åue
+Ál£
 ;
 
 44 
@@ -9640,10 +9642,18 @@ boﬁ
  
 	g¢≠shŸ
  = 
-åue
+Ál£
 ;
 
-47 
+50 
+	g°d
+::
+°rög
+ 
+machöe
+ = "local";
+
+53 
 	g°d
 ::
 °rög
@@ -9659,9 +9669,11 @@ suôe
 bíchm¨k
 , c⁄° std::°rög 
 size
+, c⁄° std::°rög 
+machöe
 )
 
-49 
+55 
 °d
 ::
 °rög
@@ -9669,7 +9681,7 @@ size
 ty≥
 ;
 
-50 
+56 
 °d
 :
 °rög
@@ -9677,31 +9689,35 @@ ty≥
 fûe_∑th
 ;
 
-52 i‡(
+58 i‡(
+machöe
+ == "cluster") {
+
+59 i‡(
 suôe
  == "parsec") {
 
-54 i‡(
+61 i‡(
 bíchm¨k
  == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
 
-55 
+62 
 bíchm¨k
  == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
 
-57 
+64 
 ty≥
  = "apps";
 
-59 i‡(
+66 i‡(
 bíchm¨k
  == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
 
-61 
+68 
 ty≥
  = "kernels";
 
-64 
+71 
 fûe_∑th
  = "/´«o-99/k¨yofyl/ªsu…s/pö/pö©ø˚/∑r£c/" + 
 bíchm¨k
@@ -9711,43 +9727,43 @@ size
 ty≥
  + "/" + benchmark + "/run/trace.out.gz";
 
-67 i‡(
+74 i‡(
 suôe
  == "perfect") {
 
-69 i‡(
+76 i‡(
 bíchm¨k
  == "2d_convolution" || benchmark == "dwt" || benchmark == "histogram_equalization") {
 
-70 
+77 
 ty≥
  = "pa1";
 
-72 i‡(
+79 i‡(
 bíchm¨k
  == "interp1" || benchmark == "interp2" || benchmark == "backprojection") {
 
-73 
+80 
 ty≥
  = "sar";
 
-75 i‡(
+82 i‡(
 bíchm¨k
  == "outer_product" || benchmark == "inner_product" || benchmark == "system_solve") {
 
-76 
+83 
 ty≥
  = "stap";
 
-78 i‡(
+85 i‡(
 bíchm¨k
  == "app" || benchmark == "debayer" || benchmark == "lucas-kanade" || benchmark == "change-detection") {
 
-79 
+86 
 ty≥
  = "wami";
 
-82 
+89 
 fûe_∑th
  = "/´«o-99/k¨yofyl/ªsu…s/pö/pö©ø˚/≥r„˘/" + 
 ty≥
@@ -9757,11 +9773,11 @@ bíchm¨k
 size
  + "/trace.out.gz";
 
-85 i‡(
+92 i‡(
 suôe
  == "phoenix") {
 
-86 
+93 
 fûe_∑th
  = "/´«o-99/k¨yofyl/ªsu…s/pö/pö©ø˚/ph€nix/" + 
 bíchm¨k
@@ -9769,15 +9785,23 @@ bíchm¨k
 size
  + "/" + "/trace.out.gz";
 
-89  
+96 i‡(
+machöe
+ == "local") {
+
+98 
+fûe_∑th
+ = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+
+101  
 fûe_∑th
 ;
 
-90 
+102 
 	}
 }
 
-92 
+104 
 	$maö
 (
 ¨gc
@@ -9785,7 +9809,7 @@ fûe_∑th
 ¨gv
 [])
 
-94 
+106 
 °d
 ::
 °rög
@@ -9793,11 +9817,11 @@ fûe_∑th
 mëhod
 ;
 
-95 
+107 
 ‰equícy
  = 0;
 
-96 
+108 
 °d
 ::
 °rög
@@ -9805,11 +9829,11 @@ mëhod
 bíchm¨k
  = "test";
 
-97 
+109 
 bôs_ign‹ed
  = 0;
 
-98 
+110 
 °d
 ::
 °rög
@@ -9817,11 +9841,11 @@ bôs_ign‹ed
 suôe
  = "parsec";
 
-99 
+111 
 íåõs
  = 8;
 
-100 
+112 
 °d
 ::
 °rög
@@ -9829,11 +9853,11 @@ suôe
 size
  = "small";
 
-101 
+113 
 åa˚_ac˚s£s_°¨t
  = 0;
 
-102 
+114 
 åa˚_ac˚s£s_íd
  = 
 °d
@@ -9843,13 +9867,13 @@ numîic_limôs
 	`max
 ();
 
-104 
+116 
 i
 =0; i<
 ¨gc
 ; i++) {
 
-105 i‡(
+117 i‡(
 °d
 ::
 	`°rög
@@ -9859,84 +9883,8 @@ i
 i
 ]) == "-m") {
 
-106 
-mëhod
- = 
-¨gv
-[
-i
-+1];
-
-108 i‡(
-°d
-::
-	`°rög
-(
-¨gv
-[
-i
-]) == "-f") {
-
-109 
-‰equícy
- = 
-	`©oi
-(
-¨gv
-[
-i
-+1]);
-
-111 i‡(
-°d
-::
-	`°rög
-(
-¨gv
-[
-i
-]) == "-b") {
-
-112 
-bíchm¨k
- = 
-¨gv
-[
-i
-+1];
-
-114 i‡(
-°d
-::
-	`°rög
-(
-¨gv
-[
-i
-]) == "-i") {
-
-115 
-bôs_ign‹ed
- = 
-	`©oi
-(
-¨gv
-[
-i
-+1]);
-
-117 i‡(
-°d
-::
-	`°rög
-(
-¨gv
-[
-i
-]) == "-s") {
-
 118 
-suôe
+mëhod
  = 
 ¨gv
 [
@@ -9951,10 +9899,10 @@ i
 ¨gv
 [
 i
-]) == "-x") {
+]) == "-f") {
 
 121 
-íåõs
+‰equícy
  = 
 	`©oi
 (
@@ -9971,10 +9919,10 @@ i
 ¨gv
 [
 i
-]) == "-t") {
+]) == "-b") {
 
 124 
-size
+bíchm¨k
  = 
 ¨gv
 [
@@ -9989,9 +9937,85 @@ i
 ¨gv
 [
 i
-]) == "-l") {
+]) == "-i") {
 
 127 
+bôs_ign‹ed
+ = 
+	`©oi
+(
+¨gv
+[
+i
++1]);
+
+129 i‡(
+°d
+::
+	`°rög
+(
+¨gv
+[
+i
+]) == "-s") {
+
+130 
+suôe
+ = 
+¨gv
+[
+i
++1];
+
+132 i‡(
+°d
+::
+	`°rög
+(
+¨gv
+[
+i
+]) == "-x") {
+
+133 
+íåõs
+ = 
+	`©oi
+(
+¨gv
+[
+i
++1]);
+
+135 i‡(
+°d
+::
+	`°rög
+(
+¨gv
+[
+i
+]) == "-t") {
+
+136 
+size
+ = 
+¨gv
+[
+i
++1];
+
+138 i‡(
+°d
+::
+	`°rög
+(
+¨gv
+[
+i
+]) == "-l") {
+
+139 
 åa˚_ac˚s£s_°¨t
  = 
 	`©oi
@@ -10001,7 +10025,7 @@ i
 i
 +1]);
 
-128 
+140 
 åa˚_ac˚s£s_íd
  = 
 	`©oi
@@ -10011,17 +10035,17 @@ i
 i
 +2]);
 
-132 i‡(
+144 i‡(
 åa˚_ac˚s£s_íd
  <
 åa˚_ac˚s£s_°¨t
 ) {
 
-133 
+145 
 cout
  << "! TheÉnd ofÅhe simulation window isÉarlierÅhanÅhe start. ResetedÅoÅheÉnd ofÅheÅrace file.\n";
 
-134 
+146 
 åa˚_ac˚s£s_íd
  = 
 °d
@@ -10031,11 +10055,11 @@ numîic_limôs
 	`max
 ();
 
-137 
+149 
 cout
  << "\nInput Stats\n_________________\n\n";
 
-138 
+150 
 cout
  << "Suôe: " << 
 suôe
@@ -10051,11 +10075,11 @@ bôs_ign‹ed
 ‰equícy
 \
 
-144 
+156 
 ¨r_m≠
 [] = {0, 1};
 
-145 
+157 
 ve˘‹
 <> 
 	`tid_m≠
@@ -10063,11 +10087,11 @@ ve˘‹
 ¨r_m≠
 ,árr_map +
 
-146 (
+158 (
 ¨r_m≠
 ) / ());
 
-147 
+159 
 °d
 ::
 unique_±r
@@ -10079,7 +10103,7 @@ SeqPª„tch
 make_unique
 <SeqPrefetch>();
 
-158 
+170 
 SögÀCacheSy°em
  
 	`sys
@@ -10093,35 +10117,57 @@ SögÀCacheSy°em
 Ál£
 , false);
 
-165 
+177 
 uöt64_t
  
 pc
 ;
 
-166 
+178 
 rw
 ;
 
-167 
+179 
 uöt64_t
  
 addªss
 ;
 
-168 
+180 
 löes
  = 0;
 
-178 
+190 
+°d
+::
+°rög
+ 
+fûe_∑th
+ = 
+	`åa˚fûe_gíî©i⁄
+(
+suôe
+, 
+bíchm¨k
+, 
+size
+, 
+machöe
+);
+
+191 
 z°r
 ::
 if°ªam
  
 	`öfûe
-("/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz");
+(
+fûe_∑th
+.
+	`c_°r
+());
 
-187 
+200 
 °d
 ::
 °rög
@@ -10129,13 +10175,13 @@ if°ªam
 löe
 ;
 
-188 
+201 
 wrôes
  = 0, 
 upd©es
  = 0;
 
-191 i‡(
+204 i‡(
 debug
  && 
 åa˚_ac˚s£s
@@ -10143,7 +10189,7 @@ debug
 cout
  << "Accesses going intoÅhe simulator:\n";
 
-193 
+206 
 	`gëlöe
 (
 öfûe
@@ -10151,7 +10197,7 @@ cout
 löe
 ))
 
-195 
+208 
 i°rög°ªam
  
 	`iss
@@ -10159,35 +10205,35 @@ i°rög°ªam
 löe
 );
 
-196 
+209 
 iss
 .
 	`ign‹e
 (256, ':');
 
-198 
+211 
 iss
  >> 
 rw
 ;
 
-199 
+212 
 	`as£π
 (
 rw
  == 'R' ||Ñw == 'W');
 
-200 
+213 
 Ac˚ssTy≥
  
 ac˚ssTy≥
 ;
 
-201 i‡(
+214 i‡(
 rw
  == 'R') {
 
-202 
+215 
 ac˚ssTy≥
  = 
 Ac˚ssTy≥
@@ -10195,7 +10241,7 @@ Ac˚ssTy≥
 Ród
 ;
 
-205 
+218 
 ac˚ssTy≥
  = 
 Ac˚ssTy≥
@@ -10203,7 +10249,7 @@ Ac˚ssTy≥
 Wrôe
 ;
 
-208 
+221 
 iss
  >> 
 hex
@@ -10211,7 +10257,7 @@ hex
 addªss
 ;
 
-210 
+223 
 °d
 ::
 ¨øy
@@ -10219,15 +10265,15 @@ addªss
 löeD©a
  = {0};
 
-211 
+224 
 vÆue
 ;
 
-213 
+226 
 i
 =0; i<64; i++) {
 
-214 
+227 
 iss
  >> 
 hex
@@ -10235,7 +10281,7 @@ hex
 vÆue
 ;
 
-215 
+228 
 löeD©a
 [
 i
@@ -10243,13 +10289,13 @@ i
 vÆue
 ;
 
-240 
+253 
 °rög
  
 ˇcheSèã
 ;
 
-243 i‡(
+256 i‡(
 löes
  >
 åa˚_ac˚s£s_°¨t
@@ -10257,15 +10303,15 @@ löes
 åa˚_ac˚s£s_íd
 ) {
 
-244 if(
+257 if(
 addªss
  != 0) {
 
-245 
+258 
 ˇcheSèã
  = "before";
 
-246 i‡((
+259 i‡((
 debug
  && 
 ¢≠shŸ
@@ -10279,13 +10325,15 @@ sys
 ˇcheSèã
 );
 
-247 
+260 i‡(
+debug
+Ë
 cout
  << "CachêAc˚ss: #" << 
 löes
 +1 << "\n";
 
-250 
+263 
 sys
 .
 	`memAc˚ss
@@ -10299,13 +10347,13 @@ löeD©a
 löes
 %2);
 
-253 i‡(
+266 i‡(
 debug
  && 
 åa˚_ac˚s£s
 ) {
 
-254 
+267 
 cout
  << 
 °d
@@ -10317,11 +10365,11 @@ addªss
 rw
  << ", ";
 
-255 
+268 
 i
 =0; i<64; i++) {
 
-256 
+269 
 cout
  << 
 löeD©a
@@ -10329,25 +10377,25 @@ löeD©a
 i
 ] << " ";
 
-258 
+271 
 cout
  << "\n";
 
-262 i‡(
+275 i‡(
 rw
  == 'W') {
 
-264 
+277 
 wrôes
 ++;
 
-265 i‡((
+278 i‡((
 wrôes
  % 
 ‰equícy
 ) == 0 && writes != 0) {
 
-268 
+281 
 boﬁ
  
 kmóns_run
@@ -10371,7 +10419,7 @@ mëhod
 bôs_ign‹ed
 );
 
-269 i‡(
+282 i‡(
 kmóns_run
 Ë
 sys
@@ -10393,11 +10441,11 @@ mëhod
 bôs_ign‹ed
 );
 
-270 
+283 
 ˇcheSèã
  = "after";
 
-271 i‡(
+284 i‡(
 debug
  && 
 ¢≠shŸ
@@ -10409,7 +10457,7 @@ sys
 ˇcheSèã
 );
 
-272 i‡(
+285 i‡(
 debug
  && 
 åa˚_ac˚s£s
@@ -10419,27 +10467,27 @@ cout
 upd©es
 +1 << "\n\n";
 
-273 i‡(
+286 i‡(
 kmóns_run
 Ë
 upd©es
 ++;
 
-279 ++
+292 ++
 löes
 ;
 
-282 
+295 
 cout
  << "Upd©es: " << 
 upd©es
  << "\n_________________\n\n";
 
-283 
+296 
 cout
  << "Traditional Stats\n_________________\n\n";
 
-285 
+298 
 cout
  << "Ac˚s£s: " << 
 löes
@@ -10447,7 +10495,7 @@ löes
 ídl
 ;
 
-286 
+299 
 cout
  << "Hôs: " << 
 sys
@@ -10459,7 +10507,7 @@ hôs
 ídl
 ;
 
-287 
+300 
 cout
  << "Mis£s: " << 
 löes
@@ -10473,7 +10521,7 @@ hôs
 ídl
 ;
 
-288 
+301 
 cout
  << "Loˇ»ªads: " << 
 sys
@@ -10485,7 +10533,7 @@ loˇl_ªads
 ídl
 ;
 
-289 
+302 
 cout
  << "Loˇ»wrôes: " << 
 sys
@@ -10497,7 +10545,7 @@ loˇl_wrôes
 ídl
 ;
 
-290 
+303 
 cout
  << "RemŸêªads: " << 
 sys
@@ -10509,7 +10557,7 @@ sys
 ídl
 ;
 
-291 
+304 
 cout
  << "RemŸêwrôes: " << 
 sys
@@ -10521,7 +10569,7 @@ sys
 ídl
 ;
 
-292 
+305 
 cout
  << "Othî-ˇchêªads: " << 
 sys
@@ -10533,7 +10581,7 @@ sys
 ídl
 ;
 
-300 
+313 
 	}
 }
 
@@ -11310,7 +11358,7 @@ boﬁ
  
 	gsy°em_debug
  = 
-åue
+Ál£
 ;
 
 34 

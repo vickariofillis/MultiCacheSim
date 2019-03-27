@@ -91,7 +91,8 @@ infile_generation	cc_functions.cpp	/^string infile_generation(const std::string 
 insertLine	cache.cpp	/^void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data)$/;"	f	class:Cache
 isLocal	system.cpp	/^bool MultiCacheSystem::isLocal(uint64_t address, unsigned int local)$/;"	f	class:MultiCacheSystem
 lineMask	system.h	/^   uint64_t lineMask;$/;"	m	class:System
-local	cache.cpp	/^bool local = 1;$/;"	v
+local	cache.cpp	/^bool local = true;$/;"	v
+machine	main.cpp	/^std::string machine = "local";$/;"	v
 main	cc_functions.cpp	/^int main(int argc, char *argv[]){$/;"	f
 main	get_sizes.cpp	/^int main(){$/;"	f
 main	main.cpp	/^int main(int argc, char* argv[])$/;"	f
@@ -142,13 +143,13 @@ setRemoteStates	system.cpp	/^void MultiCacheSystem::setRemoteStates(uint64_t set
 setShift	system.h	/^   uint32_t setShift;$/;"	m	class:System
 sets	cache.h	/^   std::vector<std::deque<CacheLine>> sets;$/;"	m	class:Cache
 snapshot	cache.cpp	/^void Cache::snapshot(const std::string cacheState)$/;"	f	class:Cache
-snapshot	main.cpp	/^bool snapshot = true;$/;"	v
+snapshot	main.cpp	/^bool snapshot = false;$/;"	v
 snapshot	system.cpp	/^void SingleCacheSystem::snapshot(const std::string cacheState)$/;"	f	class:SingleCacheSystem
 states	system.cpp	/^bool states = true;$/;"	v
 statistics	system.cpp	/^bool statistics = true;$/;"	v
 stats	system.h	/^   SystemStats stats;$/;"	m	class:System
 std	cache.h	/^namespace std$/;"	n
-system_debug	system.cpp	/^bool system_debug = true;$/;"	v
+system_debug	system.cpp	/^bool system_debug = false;$/;"	v
 tableUpdate	cache.cpp	/^bool Cache::tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored)$/;"	f	class:Cache
 tableUpdate	system.cpp	/^bool SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)$/;"	f	class:SingleCacheSystem
 tagMask	system.h	/^   uint64_t tagMask;$/;"	m	class:System
@@ -160,7 +161,7 @@ total_values	kmeans.h	/^    int total_points, total_values, max_iterations;$/;"	
 total_values	kmeans.h	/^    int total_values, total_points, max_iterations;$/;"	m	class:KMeans
 total_values	kmeans.h	/^    int total_values;$/;"	m	class:Point
 trace_accesses	main.cpp	/^bool trace_accesses = false;$/;"	v
-tracefile_generation	main.cpp	/^std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size)$/;"	f
+tracefile_generation	main.cpp	/^std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size, const std::string machine)$/;"	f
 updateData	cache.cpp	/^void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data)$/;"	f	class:Cache
 updateLRU	cache.cpp	/^void Cache::updateLRU(uint64_t set, uint64_t tag)$/;"	f	class:Cache
 updatePageToDomain	system.cpp	/^void MultiCacheSystem::updatePageToDomain(uint64_t address, $/;"	f	class:MultiCacheSystem

@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 #include "cache.h"
 #include "system.h"
 
-bool system_debug = true;
+bool system_debug = false;
 bool states = true;
 bool statistics = true;
 
