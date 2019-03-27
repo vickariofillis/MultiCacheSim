@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 1, 1, std::move(prefetch), false, false);
+    SingleCacheSystem sys(64, 131072, 16, std::move(prefetch), false, false);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
     2MB -> 32768 lines
