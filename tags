@@ -86,8 +86,8 @@ hash	cache.h	/^    struct hash<array<T, N> >$/;"	s	namespace:std
 id_cluster	kmeans.h	/^    int id_cluster;$/;"	m	class:Cluster
 id_cluster	kmeans.h	/^    int id_point, id_cluster;$/;"	m	class:Point
 id_point	kmeans.h	/^    int id_point, id_cluster;$/;"	m	class:Point
-infile_generation	cache.cpp	/^std::string Cache::infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \\$/;"	f	class:Cache
-infile_generation	cc_functions.cpp	/^string infile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int updates, const std::string state)$/;"	f
+infile_generation	cache.cpp	/^std::string Cache::infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, \\$/;"	f	class:Cache
+infile_generation	cc_functions.cpp	/^string infile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int updates, const std::string state)$/;"	f
 insertLine	cache.cpp	/^void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data)$/;"	f	class:Cache
 isLocal	system.cpp	/^bool MultiCacheSystem::isLocal(uint64_t address, unsigned int local)$/;"	f	class:MultiCacheSystem
 lineMask	system.h	/^   uint64_t lineMask;$/;"	m	class:System
@@ -109,8 +109,8 @@ occurence	cache.h	/^   std::unordered_map<std::array<int,64>, int> occurence;$/;
 operator ()	cache.h	/^        result_type operator()(const argument_type& a) const$/;"	f	struct:std::hash
 operator <	misc.h	/^   bool operator<(const CacheLine& rhs) const$/;"	f	struct:CacheLine
 operator ==	misc.h	/^   bool operator==(const CacheLine& rhs) const$/;"	f	struct:CacheLine
-outfile_generation	cache.cpp	/^std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \\$/;"	f	class:Cache
-outfile_generation	cc_functions.cpp	/^string outfile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int updates, const std::string state, const std::string technique)$/;"	f
+outfile_generation	cache.cpp	/^std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, \\$/;"	f	class:Cache
+outfile_generation	cc_functions.cpp	/^string outfile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int updates, const std::string state, const std::string technique)$/;"	f
 override	prefetch.h	/^   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:AdjPrefetch
 override	prefetch.h	/^   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:SeqPrefetch
 override	prefetch.h	/^   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;$/;"	m	class:AdjPrefetch

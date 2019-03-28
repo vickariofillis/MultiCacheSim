@@ -95,7 +95,8 @@ std::string tracefile_generation(const std::string suite, const std::string benc
     }
     else if (machine == "local") {
         // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
-        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+        // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+        file_path = "/home/vic/Downloads/trace.out.gz";
     }
 
     return file_path;

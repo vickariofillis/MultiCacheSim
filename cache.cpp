@@ -150,57 +150,29 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data)
    }
 }
 
-std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \
-    const int updates, const std::string state, const int binary_file)
+std::string Cache::outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, \
+    const int bits_ignored, const int updates, const std::string state, const int binary_file)
 {
-
     std::string file_path;
-    std::string type = "apps";
-    std::string extra1 = "/pkgs/";
-    std::string extra2 = "/test";
-    std::string extra3 = "/run";
-
-    if (suite == "parsec") {
-        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
-            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            type = "apps";
-        }
-        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            type = "kernels";
-        }
-        extra1 = "/pkgs/";
-        extra2 = "/" + benchmark;
-    }
-    else if (suite == "perfect") {
-        type = "";
-        extra1 = "";
-        extra2 = "";
-        extra3 = "";
-    }
-    else if (suite == "phoenix") {
-        type = "";
-        extra1 = "";
-        extra2 = "";
-        extra3 = "";
-    }
 
     auto updates_str = std::to_string(updates);
+    auto entries_str = std::to_string(entries);
     auto bits_ignored_str = std::to_string(bits_ignored);
 
     if (function == "tableUpdate") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + updates_str + ".out";
         }
     }
     else if (function == "modifyData") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + method + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + method + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + method + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + method + "_" + updates_str + ".out";
         }
     }
     else if (function == "printSimilarity") {
@@ -209,75 +181,48 @@ std::string Cache::outfile_generation(std::string function, const std::string me
 
     if ((function == "tableUpdate") && local) {
         if (binary_file) {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + updates_str + ".out";
         }
     }
     else if ((function == "modifyData") && local) {
         if (binary_file) {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + method + "_" + updates_str + "_binary.out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + method + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + method + "_" + updates_str + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + method + "_" + updates_str + ".out";
         }
     }
 
     return file_path;
 }
 
-std::string Cache::infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored, \
-    const int updates, const std::string state, const int binary_file)
+std::string Cache::infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, \
+    const int bits_ignored, const int updates, const std::string state, const int binary_file)
 {
     std::string file_path;
-    std::string type = "apps";
-    std::string extra1 = "/pkgs/";
-    std::string extra2 = "/test";
-    std::string extra3 = "/run";
-
-    if (suite == "parsec") {
-        if (benchmark == "blackscholes" || benchmark == "bodytrack" || benchmark == "facesim" || benchmark == "ferret" || benchmark == "fluidanimate" || benchmark == "freqmine" ||
-            benchmark == "raytrace" || benchmark == "swaptions" || benchmark == "vips" || benchmark == "x264" || benchmark == "test") {
-            type = "apps";
-        }
-        else if (benchmark == "canneal" || benchmark == "dedup" || benchmark == "streamcluster") {
-            type = "kernels";
-        }
-        extra1 = "/pkgs/";
-        extra2 = "/" + benchmark;
-    }
-    else if (suite == "perfect") {
-        type = "";
-        extra1 = "";
-        extra2 = "";
-        extra3 = "";
-    }
-    else if (suite == "phoenix") {
-        type = "";
-        extra1 = "";
-        extra2 = "";
-        extra3 = "";
-    }
 
     auto updates_str = std::to_string(updates);
+    auto entries_str = std::to_string(entries);
     auto bits_ignored_str = std::to_string(bits_ignored);
 
     if (function == "modifyData") {
         if (binary_file) {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + updates_str + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + entries_str + ")" + state + "_" + updates_str + ".out";
         }
     }
 
     if ((function == "modifyData") && local) {
         if (binary_file) {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + "_binary.out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + updates_str + "_binary.out";
         }
         else {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + updates_str + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + entries_str + ")" + state + "_" + updates_str + ".out";
         }
         
     }
@@ -427,7 +372,7 @@ void Cache::printSimilarity(const int updates, const std::string benchmark, cons
     std::string function = "printSimilarity";
     // State is irrelevant in this function
     string state = "after";
-    std::string similarity_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::string similarity_outfile = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
     std::ofstream similarity_trace(similarity_outfile.c_str());
 
     int all_reads = 0;
@@ -496,20 +441,20 @@ bool Cache::tableUpdate(const int updates, const std::string benchmark, const st
         /* Non-binary files */
         // Before file (cache data before precompression)
         state = "before";
-        std::string before_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::string before_outfile = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
         std::ofstream before_trace(before_outfile.c_str());
         // Precompression table entries
         state = "table";
-        std::string table_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::string table_outfile = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
         std::ofstream table_trace(table_outfile.c_str());
         // Mapping between precompression table entries and cache lines
         state = "mapping";
-        std::string mapping_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+        std::string mapping_outfile = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
         std::ofstream mapping_trace(mapping_outfile.c_str());
 
         /* Binary files */
         state = "before";
-        std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
+        std::string before_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 1);
         std::ofstream before_trace_binary(before_outfile_binary.c_str(), ios::binary);
 
         // cout << "Cache Elements = " << cache_elements << "\n";
@@ -550,9 +495,9 @@ bool Cache::tableUpdate(const int updates, const std::string benchmark, const st
                     value << std::hex << point[i];
                     value_file << std::hex << point[i];
                 }
-                // before_trace_binary.write(reinterpret_cast <const char *> (&point[i]), sizeof(char));
-                std::string binary = std::bitset<8>(point[i]).to_string();
-                before_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
+                // Binary File Writing
+                // std::string binary = std::bitset<8>(point[i]).to_string();
+                // before_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
             }
             value << ")";
             if (enable_prints) std::cout << value.str() << "\n";
@@ -591,12 +536,12 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
     /* Non-binary files */
     // After file (cache data after precompression)
     std::string state = "after";
-    std::string after_outfile = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::string after_outfile = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
     std::ofstream after_trace(after_outfile.c_str());
 
     /* Binary files */
     state = "after";
-    std::string after_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 1);
+    std::string after_outfile_binary = this->outfile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 1);
     std::ofstream after_trace_binary(after_outfile_binary.c_str(), ios::binary);
 
     int lines = 1;
@@ -604,7 +549,7 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Read data from before file
     state = "before";
-    std::string before_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::string before_infile = this->infile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
     std::ifstream before_trace(before_infile.c_str());
 
     std::vector<std::array<int,64>> beforeData;
@@ -626,7 +571,7 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Read data from mapping file
     state = "mapping";
-    std::string mapping_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::string mapping_infile = this->infile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
     std::ifstream mapping_trace(mapping_infile.c_str());
 
     std::vector<int> mappingData;
@@ -644,7 +589,7 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
 
     // Read data from table file
     state = "table";
-    std::string table_infile = this->infile_generation(function, method, suite, benchmark, size, bits_ignored, updates, state, 0);
+    std::string table_infile = this->infile_generation(function, method, suite, benchmark, size, entries, bits_ignored, updates, state, 0);
     std::ifstream table_trace(table_infile.c_str());
 
     std::vector<std::array<int,64>> tableEntries;
@@ -711,10 +656,9 @@ void Cache::modifyData(const int updates, const std::string benchmark, const std
                     abort();
                 }
             }
-            // after_trace_binary.write(reinterpret_cast <const char *> (&afterData[i][j]), sizeof(char));
+            // Binary File Writing
             // std::string binary = std::bitset<8>(afterData[i][j]).to_string();
-            std::string binary = std::bitset<8>(afterData[i][j]).to_string();
-            after_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
+            // after_trace_binary.write(binary.c_str(), sizeof(std::bitset<8>));
         }
         after_trace << value_file.str() << "\n";
     }

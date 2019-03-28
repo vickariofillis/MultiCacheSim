@@ -68,10 +68,10 @@ public:
    // if there is not enough space, so checkWriteback should be called before this
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
    void updateData(uint64_t set, uint64_t tag, std::array<int,64> data);
-   std::string outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored,\
-     const int updates, const std::string state, const int binary_file);
-   std::string infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int bits_ignored,\
-     const int updates, const std::string state, const int binary_file);
+   std::string outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries,\
+     const int bits_ignored, const int updates, const std::string state, const int binary_file);
+   std::string infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries,\
+     const int bits_ignored, const int updates, const std::string state, const int binary_file);
    void snapshot(const std::string cacheState);
    int cacheElements();
    void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);

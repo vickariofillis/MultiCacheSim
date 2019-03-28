@@ -7,7 +7,11 @@
 
 using namespace std;
 
-bool local = true;
+/* Cluster */
+bool local = false;
+/* Local */
+// bool local = true;
+
 bool debug = true;
 bool files = true;
 bool bd_debug = false;
@@ -18,44 +22,44 @@ inline bool file_exists (const std::string& name) {
     return f.good();
 }
 
-string infile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int updates, const std::string state)
+string infile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int updates, const std::string state)
 {
 
     string file_path;
 
     if (local) {
         if (state == "before") {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + std::to_string(updates) + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + std::to_string(entries) + ")" + state + "_" + std::to_string(updates) + ".out";
         }
         else if (state == "after") {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + state + "_" + method + "_" + std::to_string(updates) + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/(" + std::to_string(entries) + ")" + state + "_" + method + "_" + std::to_string(updates) + ".out";
         }
     }
     else {
         if (state == "before") {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + std::to_string(updates) + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + std::to_string(entries) + ")" + state + "_" + std::to_string(updates) + ".out";
         }
         else if (state == "after") {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + state + "_" + method + "_" + std::to_string(updates) + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/(" + std::to_string(entries) + ")" + state + "_" + method + "_" + std::to_string(updates) + ".out";
         }
     }
 
     return file_path;
 }
 
-string outfile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int updates, const std::string state, const std::string technique)
+string outfile_generation(const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int updates, const std::string state, const std::string technique)
 {
 
     string file_path;
 
     if (local) {
         if (state == "size") {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + technique + "/" + technique + "_" + state + "_" + method + ".out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/data/" + technique + "/(" + std::to_string(entries) + ")" + technique + "_" + state + "_" + method + ".out";
         }
     }
     else {
         if (state == "size") {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + technique + "/" + technique + "_" + state + "_" + method + ".out";
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + technique + "/(" + std::to_string(entries) + ")"  + technique + "_" + state + "_" + method + ".out";
         }
     }
 
@@ -1176,6 +1180,7 @@ int main(int argc, char *argv[]){
     string suite = "parsec";
     string size = "small";
     string technique = "bd";
+    int entries;
 
     for (int i=0; i<argc; i++) {
         if (std::string(argv[i]) == "-m") {
@@ -1190,6 +1195,9 @@ int main(int argc, char *argv[]){
         else if (std::string(argv[i]) == "-t") {
             size = argv[i+1];
         }
+        else if (std::string(argv[i]) == "-x") {
+            entries = atoi(argv[i+1]);
+        }
         else if (std::string(argv[i]) == "-c") {
             technique = argv[i+1];
         }
@@ -1200,11 +1208,11 @@ int main(int argc, char *argv[]){
 
     // Before
     state = "before";
-    string before_path = infile_generation(method, suite, benchmark, size, updates, state);
+    string before_path = infile_generation(method, suite, benchmark, size, entries, updates, state);
 
     // After
     state = "after";
-    string after_path = infile_generation(method, suite, benchmark, size, updates, state);
+    string after_path = infile_generation(method, suite, benchmark, size, entries, updates, state);
 
     std::vector<int> beforeCompressedSpace;
     std::vector<int> afterCompressedSpace;
@@ -1238,16 +1246,16 @@ int main(int argc, char *argv[]){
         updates++;
 
         state = "before";
-        before_path = infile_generation(method, suite, benchmark, size, updates, state);
+        before_path = infile_generation(method, suite, benchmark, size, entries, updates, state);
 
         state = "after";
-        after_path = infile_generation(method, suite, benchmark, size, updates, state);
+        after_path = infile_generation(method, suite, benchmark, size, entries, updates, state);
 
     }
 
     // Compresion technique output (size)
     state = "size";
-    string technique_size_path = outfile_generation(method, suite, benchmark, size, updates, state, technique);
+    string technique_size_path = outfile_generation(method, suite, benchmark, size, entries, updates, state, technique);
     std::ofstream technique_size_trace(technique_size_path.c_str());
 
     technique_size_trace << "Before After\n";
