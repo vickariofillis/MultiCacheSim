@@ -92,11 +92,34 @@ std::string tracefile_generation(const std::string suite, const std::string benc
         else if (suite == "phoenix") {
             file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace.out.gz";
         }
+        else if (suite == "polybench") {
+            if (benchmark == "correlation" || benchmark == "covariance") {
+                type = "datamining";
+            }
+            else if (benchmark == "gemm" || benchmark == "gemver" || benchmark == "gesummv" || benchmark == "symm" || benchmark == "syr2k" || benchmark == "syrk" || benchmark == "trmm") {
+                type = "linear-algebra/blas";
+            }
+            else if (benchmark == "2mm" || benchmark == "3mm" || benchmark == "atax" || benchmark == "bicg" || benchmark == "doitgen" || benchmark == "mvt") {
+                type = "linear-algebra/kernels";
+            }
+            else if (benchmark == "cholesky" || benchmark == "durbin" || benchmark == "gramschmidt" || benchmark == "lu" || benchmark == "ludcmp" || benchmark == "trisolv" ) {
+                type = "linear-algebra/solvers";
+            }
+            else if (benchmark == "deriche" || benchmark == "floyd-warshall" || benchmark == "nussinov") {
+                type = "medley";
+            }
+            else if (benchmark == "adi" || benchmark == "fdtd-2d" || benchmark == "heat-3d" || benchmark == "jacobi-1d" || benchmark == "jacobi-2d" || benchmark == "seidel-2d") {
+                type = "stencils";
+            }
+
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+        }
     }
     else if (machine == "local") {
         // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
         // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
-        file_path = "/home/vic/Downloads/trace.out.gz";
+        // file_path = "/home/vic/Downloads/trace.out.gz";
+        file_path = "/home/vic/Documents/trace_roi.out.gz";
     }
 
     return file_path;
@@ -168,9 +191,10 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 131072, 16, std::move(prefetch), false, false);
+    SingleCacheSystem sys(64, 16384, 16, std::move(prefetch), false, false);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
+    1MB -> 16384 lines
     2MB -> 32768 lines
     4MB -> 65536 lines
     8MB -> 131072 lines

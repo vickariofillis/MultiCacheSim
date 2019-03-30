@@ -8,9 +8,9 @@
 using namespace std;
 
 /* Cluster */
-bool local = false;
+// bool local = false;
 /* Local */
-// bool local = true;
+bool local = true;
 
 bool debug = true;
 bool files = true;
