@@ -112,7 +112,7 @@ std::string tracefile_generation(const std::string suite, const std::string benc
                 type = "stencils";
             }
 
-            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
         }
     }
     else if (machine == "local") {
