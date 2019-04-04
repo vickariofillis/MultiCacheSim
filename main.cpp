@@ -129,6 +129,7 @@ int main(int argc, char* argv[])
 {
     std::string method;
     int frequency = 0;
+    int files = 0;
     std::string benchmark = "test";
     int bits_ignored = 0;
     std::string suite = "parsec";
@@ -142,7 +143,7 @@ int main(int argc, char* argv[])
             method = argv[i+1];
         }
         else if (std::string(argv[i]) == "-f") {
-            frequency = atoi(argv[i+1]);
+            files = atoi(argv[i+1]);
         }
         else if (std::string(argv[i]) == "-b") {
             benchmark = argv[i+1];
@@ -171,7 +172,7 @@ int main(int argc, char* argv[])
     }
 
     cout << "\nInput Stats\n_________________\n\n";
-    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency\
+    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFiles: " << files\
      << "\n" << "_________________" << "\n\n";
 
     // tid_map is used to inform the simulator how
@@ -217,10 +218,34 @@ int main(int argc, char* argv[])
     // assert(infile.is_open());
 
     std::string line;
-    int writes = 0, updates = 0;
+    int writes = 0, updates = 0, total_writes = 0;
 
     // Debug 
     if (debug && trace_accesses) cout << "Accesses going into the simulator:\n";
+
+    while(getline(infile,line))
+    {
+        istringstream iss(line);
+        iss.ignore(256, ':');
+        // Reading access
+        iss >> rw;
+        assert(rw == 'R' || rw == 'W');
+        AccessType accessType;
+        if (rw == 'W') {
+            total_writes++
+        }
+        // Reading address
+        iss >> hex >> address;
+
+        int value;
+        // Reading 64 values (64 bytes)
+        for (int i=0; i<64; i++) {
+            iss >> hex >> value;
+        }
+    }
+
+    frequency = (total_writes / files);
+    if (frequency < 1) frequency = 1;
 
    while(getline(infile,line))
    {
@@ -246,28 +271,6 @@ int main(int argc, char* argv[])
             iss >> hex >> value;
             lineData[i] = value;
         }
-
-        // infile.ignore(256, ':');
-        // // Reading access
-        // infile >> rw;
-        // assert(rw == 'R' || rw == 'W');
-        // AccessType accessType;
-        // if (rw == 'R') {
-        //     accessType = AccessType::Read;
-        // } 
-        // else {
-        //     accessType = AccessType::Write;
-        // }
-        // // Reading address
-        // infile >> hex >> address;
-
-        // std::array<int,64> lineData = {0};
-        // int value;
-        // // Reading 64 values (64 bytes)
-        // for (int i=0; i<64; i++) {
-        //     infile >> hex >> value;
-        //     lineData[i] = value;
-        // }
 
         string cacheState;
 
