@@ -74,7 +74,9 @@ public:
    System(unsigned int line_size, unsigned int num_lines, unsigned int assoc,
           std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
           bool do_addr_trans=false);
-   virtual void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) = 0;
+   virtual void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) = 0;
+   virtual void precompress(std::string method, int entries) = 0;
+   virtual void snapshot() = 0;
    SystemStats stats;
 };
 
@@ -103,7 +105,9 @@ public:
             std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
             bool do_addr_trans=false, unsigned int num_domains=1);
 
-   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
+   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
+   void precompress(std::string method, int entries) override;
+   void snapshot() override;
 };
 
 // For a system containing a sinle cache
@@ -114,13 +118,9 @@ public:
                std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
                bool do_addr_trans=false);
 
-   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid) override;
-   void snapshot(const std::string cacheState);
-   void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
-   void printSimilarity(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
-   // Kmeans
-   bool tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
-   void modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored);
+   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
+   void precompress(std::string method, int entries) override;
+   void snapshot() override;
 private:
    std::unique_ptr<Cache> cache;
 };

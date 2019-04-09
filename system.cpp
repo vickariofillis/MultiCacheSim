@@ -30,10 +30,6 @@ freely, subject to the following restrictions:
 #include "cache.h"
 #include "system.h"
 
-bool system_debug = false;
-bool states = true;
-bool statistics = true;
-
 System::System(
             unsigned int line_size, unsigned int num_lines, unsigned int assoc,
             std::unique_ptr<Prefetch> prefetcher, 
@@ -243,7 +239,7 @@ CacheState MultiCacheSystem::processMOESI(uint64_t set,
    return new_state;
 }
 
-void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)
+void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
    if (doAddrTrans) {
       address = virtToPhys(address);
@@ -273,11 +269,12 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::a
 
    if (hit) {
       caches[local]->updateLRU(set, tag);
+      caches[local]->updateData(set, tag, data, method, hit_update);
 
       if (accessType != AccessType::Prefetch) {
          stats.hits++;
          if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
+            stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
          }
       }
    }
@@ -300,9 +297,23 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::a
       caches[local]->insertLine(set, tag, new_state, data);
 
       if (accessType == AccessType::Prefetch && prefetcher) {
-         stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
+         stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
       }
    }
+}
+
+void MultiCacheSystem::precompress(std::string method, int entries)
+{
+    for (uint i=0; i<caches.size(); i++) {
+        caches[i]->precompress(method, entries);
+    }
+}
+
+void MultiCacheSystem::snapshot()
+{
+    for (uint i=0; i<caches.size(); i++) {
+        caches[i]->snapshot(i);
+    }
 }
 
 // Keeps track of which NUMA domain each memory page is in,
@@ -333,7 +344,7 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
    }
 }
 
-void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid)
+void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
    bool is_prefetch = (accessType == AccessType::Prefetch);
 
@@ -354,103 +365,57 @@ void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::
       checkCompulsory(address & ~lineMask);
    }
 
-    // Handle hits 
-    if (accessType == AccessType::Write && hit) {  
-        cache->changeState(set, tag, CacheState::Modified);
-    }
+   // Handle hits 
+   if (accessType == AccessType::Write && hit) {  
+      cache->changeState(set, tag, CacheState::Modified);
+   }
 
-    if (hit) {
-        cache->updateLRU(set, tag);
-        cache->updateData(set, tag, data);
+   if (hit) {
+      cache->updateLRU(set, tag);
+      cache->updateData(set, tag, data, method, hit_update);
 
-        if (!is_prefetch) {
-            stats.hits++;
-            if (prefetcher) {
-                stats.prefetched += prefetcher->prefetchHit(address, tid, data, *this);
-            }
-        }
+      if (!is_prefetch) {
+         stats.hits++;
+         if (prefetcher) {
+            stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
+         }
+      }
 
-        // Debug
-        if (system_debug && states) {
-            std::cout << "Hit, Cache State: ";
-            if (state == CacheState::Modified) std::cout << "M\n";
-            if (state == CacheState::Owned) std::cout << "O\n";
-            if (state == CacheState::Exclusive) std::cout << "E\n";
-            if (state == CacheState::Shared) std::cout << "S\n";
-            if (state == CacheState::Invalid) std::cout << "I\n";
-        }
-        return;
-    }
+      return;
+   }
 
-    CacheState new_state = CacheState::Invalid;
-    uint64_t evicted_tag;
-    bool writeback = cache->checkWriteback(set, evicted_tag);
+   CacheState new_state = CacheState::Invalid;
+   uint64_t evicted_tag;
+   bool writeback = cache->checkWriteback(set, evicted_tag);
 
-    if (writeback) {
-        stats.local_writes++;
-    }
+   if (writeback) {
+      stats.local_writes++;
+   }
 
-    if (accessType == AccessType::Read) {
-        new_state = CacheState::Exclusive;
-    } else {
-        new_state = CacheState::Modified;
-    }
+   if (accessType == AccessType::Read) {
+      new_state = CacheState::Exclusive;
+   } else {
+      new_state = CacheState::Modified;
+   }
 
-    if (!is_prefetch) {
-        stats.local_reads++;
-    }
+   if (!is_prefetch) {
+      stats.local_reads++;
+   }
 
-    cache->insertLine(set, tag, new_state, data);
-    if (!is_prefetch && prefetcher) {
-        stats.prefetched += prefetcher->prefetchMiss(address, tid, data, *this);
-    }
-
-    // Debug
-    if (system_debug && states) {
-        std::cout << "Miss, Previous Cache State: ";
-        if (state == CacheState::Modified) std::cout << "M";
-        if (state == CacheState::Owned) std::cout << "O";
-        if (state == CacheState::Exclusive) std::cout << "E";
-        if (state == CacheState::Shared) std::cout << "S";
-        if (state == CacheState::Invalid) std::cout << "I";
-    }
-    if (system_debug && states) {
-        std::cout << ", Current Cache State: ";
-        if (new_state == CacheState::Modified) std::cout << "M\n";
-        if (new_state == CacheState::Owned) std::cout << "O\n";
-        if (new_state == CacheState::Exclusive) std::cout << "E\n";
-        if (new_state == CacheState::Shared) std::cout << "S\n";
-        if (new_state == CacheState::Invalid) std::cout << "I\n";
-    }
-
+   cache->insertLine(set, tag, new_state, data);
+   if (!is_prefetch && prefetcher) {
+      stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
+   }
 }
 
-void SingleCacheSystem::snapshot(const std::string cacheState)
+void SingleCacheSystem::precompress(std::string method, int entries)
 {
-    cache->snapshot(cacheState);
+    cache->precompress(method, entries);
 }
 
-void SingleCacheSystem::checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw)
+void SingleCacheSystem::snapshot()
 {
-    cache->checkSimilarity(lineData, maskedBits, rw);
-}
-
-void SingleCacheSystem::printSimilarity(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
-{
-    cache->printSimilarity(updates, benchmark, suite, size, entries, method, bits_ignored);
-}
-
-// Kmeans
-bool SingleCacheSystem::tableUpdate(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
-{
-    bool kmeans_run = false; 
-    kmeans_run = cache->tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
-    return kmeans_run;
-}
-
-void SingleCacheSystem::modifyData(int updates, std::string benchmark, std::string suite, std::string size, int entries, std::string method, int bits_ignored)
-{
-    cache->modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
+    cache->snapshot(0);
 }
 
 SingleCacheSystem::SingleCacheSystem( 

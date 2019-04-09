@@ -21,34 +21,27 @@ freely, subject to the following restrictions:
    distribution.
 */
 
-#include <iostream>
-#include <iosfwd>
-#include <fstream>
 #include <cassert>
+#include <fstream>
+#include <iostream>
 #include <limits>
 #include <sstream>
 #include <string>
-/* Cluster */
-#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
-#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 /* Local */
-// #include "/home/vic/zstr/src/zstr.hpp"
-// #include "/home/vic/zstr/src/strict_fstream.hpp"
+#include "/home/vic/zstr/src/zstr.hpp"
+#include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
 using namespace std;
 
 // Flags for debug printouts;
-bool debug = false;
+bool debug = true;
 bool trace_accesses = false;
-bool snapshot = false;
+bool snapshot = true;
 
-/* Cluster */
-std::string machine = "cluster";
 /* Local */
-// std::string machine = "local";
-
+std::string machine = "local";
 
 std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
 {
@@ -117,9 +110,8 @@ std::string tracefile_generation(const std::string suite, const std::string benc
     }
     else if (machine == "local") {
         // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
+        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
         // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
-        // file_path = "/home/vic/Downloads/trace.out.gz";
-        file_path = "/home/vic/Documents/trace_roi.out.gz";
     }
 
     return file_path;
@@ -127,14 +119,15 @@ std::string tracefile_generation(const std::string suite, const std::string benc
 
 int main(int argc, char* argv[])
 {
+
     std::string method;
     int frequency = 0;
-    int files = 0;
     std::string benchmark = "test";
     int bits_ignored = 0;
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
+    std::string hit_update = "n";
     unsigned int trace_accesses_start = 0;
     unsigned long long trace_accesses_end = std::numeric_limits<unsigned long long>::max();
 
@@ -143,7 +136,7 @@ int main(int argc, char* argv[])
             method = argv[i+1];
         }
         else if (std::string(argv[i]) == "-f") {
-            files = atoi(argv[i+1]);
+            frequency = atoi(argv[i+1]);
         }
         else if (std::string(argv[i]) == "-b") {
             benchmark = argv[i+1];
@@ -160,10 +153,18 @@ int main(int argc, char* argv[])
         else if (std::string(argv[i]) == "-t") {
             size = argv[i+1];
         }
+        else if (std::string(argv[i]) == "-u") {
+            hit_update = argv[i+1];
+        }
         else if (std::string(argv[i]) == "-l") {
             trace_accesses_start = atoi(argv[i+1]);
             trace_accesses_end = atoi(argv[i+2]);
         }
+    }
+
+    if (hit_update != "n" || hit_update != "y"){
+        cout << "Update of mapping on a cache write hit is a yes or no argument. Reverted to no.\n";
+        hit_update = "n";
     }
 
     if (trace_accesses_end <= trace_accesses_start) {
@@ -171,9 +172,27 @@ int main(int argc, char* argv[])
         trace_accesses_end = std::numeric_limits<unsigned long long>::max();
     }
 
+    if (method != "xor" && method != "add") {
+        cout << "! Precompression method chosen is wrong. Reverted to xor.\n";
+        method = "xor";
+    }
+    if (!(entries && !(entries & (entries - 1)))) {
+        int old_entries = entries;
+        entries--;
+        entries |= entries >> 1;
+        entries |= entries >> 2;
+        entries |= entries >> 4;
+        entries |= entries >> 8;
+        entries |= entries >> 16;
+        entries++;
+        cout << "The number of precompression table entries (" << old_entries << ") is not a power of two. It has been increased to " << entries << ".\n";
+    }
+    
+
     cout << "\nInput Stats\n_________________\n\n";
-    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFiles: " << files\
-     << "\n" << "_________________" << "\n\n";
+    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency \
+        << "\n" << "___________________________________________________" << "\n\n";
+
 
     // tid_map is used to inform the simulator how
     // thread ids map to NUMA/cache domains. Using
@@ -192,7 +211,8 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 16384, 16, std::move(prefetch), false, false);
+    SingleCacheSystem sys(64, 2, 2, std::move(prefetch), false, false);
+    // MultiCacheSystem sys(tid_map, 64, 2, 2, std::move(prefetch), false, false, 2);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
     1MB -> 16384 lines
@@ -204,62 +224,26 @@ int main(int argc, char* argv[])
     char rw;
     uint64_t address;
     unsigned long long lines = 0;
-
-    // cout << "Before infile\n";
-
+    
     std::string file_path = tracefile_generation(suite, benchmark, size, machine);
     zstr::ifstream infile(file_path.c_str());
 
-    // cout << "After infile\n";
-
-    // This code works with the output from the 
-    // ManualExamples/pinatrace pin tool
-    // infile.open("trace.out", ifstream::in);
-    // assert(infile.is_open());
-
     std::string line;
-    int writes = 0, updates = 0, total_writes = 0;
-
-    // Debug 
-    if (debug && trace_accesses) cout << "Accesses going into the simulator:\n";
+    int writes = 0;
 
     while(getline(infile,line))
     {
         istringstream iss(line);
         iss.ignore(256, ':');
-        // Reading access
-        iss >> rw;
-        assert(rw == 'R' || rw == 'W');
-        AccessType accessType;
-        if (rw == 'W') {
-            total_writes++
-        }
-        // Reading address
-        iss >> hex >> address;
 
-        int value;
-        // Reading 64 values (64 bytes)
-        for (int i=0; i<64; i++) {
-            iss >> hex >> value;
-        }
-    }
-
-    frequency = (total_writes / files);
-    if (frequency < 1) frequency = 1;
-
-   while(getline(infile,line))
-   {
-        istringstream iss(line);
-        iss.ignore(256, ':');
-        // Reading access
         iss >> rw;
         assert(rw == 'R' || rw == 'W');
         AccessType accessType;
         if (rw == 'R') {
             accessType = AccessType::Read;
-        } 
-        else {
+        } else {
             accessType = AccessType::Write;
+            writes++;
         }
         // Reading address
         iss >> hex >> address;
@@ -272,64 +256,34 @@ int main(int argc, char* argv[])
             lineData[i] = value;
         }
 
-        string cacheState;
-
         // Restrictring the part of the trace that is being simulated
         if (lines >= trace_accesses_start && lines <= trace_accesses_end) {
             if(address != 0) {
-                cacheState = "before";
-                if ((debug && snapshot) && lines == 0) sys.snapshot(cacheState);
-                if (debug) cout << "Cache Access: #" << lines+1 << "\n";
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
-                sys.memAccess(address, accessType, lineData, lines%2);
-
-                // Debug
-                if (debug && trace_accesses) {
-                    cout << std::hex << address << ", " << rw << ", ";
-                    for (int i=0; i<64; i++) {
-                        cout << lineData[i] << " ";
-                    }
-                    cout << "\n";
-                }
-            }
-
-            if (rw == 'W') {
-
-                writes++;
+                sys.memAccess(address, accessType, lineData, lines%2, method, hit_update);
                 if ((writes % frequency) == 0 && writes != 0) {
-                    // Kmeans
-                    // cout << "Precompression Table Update #" << updates << "\n\n";
-                    bool kmeans_run = sys.tableUpdate(updates, benchmark, suite, size, entries, method, bits_ignored);
-                    if (kmeans_run) sys.modifyData(updates, benchmark, suite, size, entries, method, bits_ignored);
-                    cacheState = "after";
-                    if (debug && snapshot) sys.snapshot(cacheState);
-                    if (debug && trace_accesses) cout << "Update #" << updates+1 << "\n\n";
-                    if (kmeans_run) updates++;
+                    sys.precompress(method, entries);
+                    if (debug && snapshot) {
+                        cout << "\n";
+                        sys.snapshot();
+                    }
                 }
             }
-            // sys.checkSimilarity(lineData,bits_ignored,rw);
         }
 
         ++lines;
-   }
+    }
 
-   cout << "Updates: " << updates << "\n_________________\n\n";
-   cout << "Traditional Stats\n_________________\n\n";
+    cout << "Accesses: " << lines << endl;
+    cout << "Hits: " << sys.stats.hits << endl;
+    cout << "Misses: " << lines - sys.stats.hits << endl;
+    cout << "Local reads: " << sys.stats.local_reads << endl;
+    cout << "Local writes: " << sys.stats.local_writes << endl;
+    cout << "Remote reads: " << sys.stats.remote_reads << endl;
+    cout << "Remote writes: " << sys.stats.remote_writes << endl;
+    cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
+    //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
 
-   cout << "Accesses: " << lines << endl;
-   cout << "Hits: " << sys.stats.hits << endl;
-   cout << "Misses: " << lines - sys.stats.hits << endl;
-   cout << "Local reads: " << sys.stats.local_reads << endl;
-   cout << "Local writes: " << sys.stats.local_writes << endl;
-   cout << "Remote reads: " << sys.stats.remote_reads << endl;
-   cout << "Remote writes: " << sys.stats.remote_writes << endl;
-   cout << "Other-cache reads: " << sys.stats.othercache_reads << endl;
-   //cout << "Compulsory Misses: " << sys.stats.compulsory << endl;
-   
-   // sys.printSimilarity(bits_ignored, benchmark);
-
-   // infile.close();
-
-   return 0;
+    return 0;
 }

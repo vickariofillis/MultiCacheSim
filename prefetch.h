@@ -30,8 +30,8 @@ class System;
 
 class Prefetch {
 public:
-   virtual int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) = 0;
-   virtual int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) = 0;
+   virtual int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) = 0;
+   virtual int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) = 0;
 };
 
 // Modeling AMD's L1 prefetcher, a sequential
@@ -39,8 +39,8 @@ public:
 // the real prefetcher has a dynamic prefetch width.
 class SeqPrefetch : public Prefetch {
 public:
-   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;
-   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;
+   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) override;
+   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) override;
 private:
    uint64_t lastMiss{0};
    uint64_t lastPrefetch{0};
@@ -50,6 +50,6 @@ private:
 // A simple adjacent line prefetcher. Always fetches the next line
 class AdjPrefetch : public Prefetch {
 public:
-   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;
-   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, System& sys) override;
+   int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) override;
+   int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys) override;
 };

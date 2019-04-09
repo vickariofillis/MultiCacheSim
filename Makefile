@@ -5,40 +5,26 @@ CXXFLAGS=$(RELEASE_FLAGS)
 DEPS=$(wildcard *.h) Makefile
 OBJ=system.o cache.o prefetch.o
 BUILD_DIR=$(shell pwd)
-# Cluster
-ZSTR_DIR=/aenao-99/karyofyl/zstr/src/
 # Local
-# ZSTR_DIR=/home/vic/zstr/src
+ZSTR_DIR=/home/vic/zstr/src
 
-all: cache tags check tests/random tests/unit cscope.out 
+all: cache tags check cscope.out 
 
 cache: main.cpp $(DEPS) $(OBJ)
 	$(CXX) $(CXXFLAGS) -I$(ZSTR_DIR) -o cache main.cpp $(OBJ) -lz
-
-tests/random: tests/random.cpp $(DEPS) $(OBJ)
-	$(CXX) $(CXXFLAGS) -I$(BUILD_DIR) -o tests/random tests/random.cpp $(OBJ)
-
-tests/unit: tests/unit.cpp $(DEPS) $(OBJ)
-	$(CXX) $(DEBUG_FLAGS) -I$(BUILD_DIR) -o tests/unit tests/unit.cpp $(OBJ)
 
 %.o: %.cpp $(DEPS)
 	$(CXX) $(CXXFLAGS) -o $@ -c $< 
 
 tags: *.cpp *.h
-	ctags *.cpp *.h tests/*.cpp
+	ctags *.cpp *.h
 
 cscope.out: *.cpp *.h
 	cscope -Rb
 
-# Cluster
 .PHONY: check
 check:
-	/aenao-99/karyofyl/cppcheck-1.85/cppcheck --enable=all .
-
-# Local
-# .PHONY: check
-# check:
-# 	cppcheck --enable=all .
+	cppcheck --enable=all .
 
 .PHONY: clean
 clean:

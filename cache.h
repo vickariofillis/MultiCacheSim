@@ -30,27 +30,6 @@ freely, subject to the following restrictions:
 
 #include "misc.h"
 
-namespace std
-{
-    template<typename T, size_t N>
-    struct hash<array<T, N> >
-    {
-        typedef array<T, N> argument_type;
-        typedef size_t result_type;
-
-        result_type operator()(const argument_type& a) const
-        {
-            hash<T> hasher;
-            result_type h = 0;
-            for (result_type i = 0; i < N; ++i)
-            {
-                h = h * 31 + hasher(a[i]);
-            }
-            return h;
-        }
-    };
-}
-
 // Represents a single cache
 class Cache {
 public:
@@ -67,21 +46,17 @@ public:
    // Line should not already exist in cache. Will remove the LRU line in set
    // if there is not enough space, so checkWriteback should be called before this
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
-   void updateData(uint64_t set, uint64_t tag, std::array<int,64> data);
-   std::string outfile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries,\
-     const int bits_ignored, const int updates, const std::string state, const int binary_file);
-   std::string infile_generation(std::string function, const std::string method, const std::string suite, const std::string benchmark, const std::string size, const int entries,\
-     const int bits_ignored, const int updates, const std::string state, const int binary_file);
-   void snapshot(const std::string cacheState);
-   int cacheElements();
-   void checkSimilarity(std::array<int,64> lineData, int maskedBits, char rw);
-   void printSimilarity(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored);
-   // Kmeans
-   bool tableUpdate(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored);
-   void modifyData(const int updates, const std::string benchmark, const std::string suite, const std::string size, const int entries, const std::string method, const int bits_ignored);
+   // Updating cache on a write hit
+   void updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string method, std::string hit_update);
+   // Computing data after precompression is applied
+   void precompress(std::string method, int entries);
+   // Precompression technique (xor)
+   // void xorData(uint64_t set);   //FIXME
+   // Printing cache data 
+   void snapshot(int cache_num);
 private:
    std::vector<std::deque<CacheLine>> sets;
    unsigned int maxSetSize;
-   std::unordered_map<std::array<int,64>, int> occurence;
+   std::vector<std::array<int,64>> clusterData;
 };
 
