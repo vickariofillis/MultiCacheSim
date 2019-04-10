@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include <unordered_set>
 #include <unordered_map>
 #include <memory>
+#include <tuple>
 #include <cstdint>
 
 #include "misc.h"
@@ -66,6 +67,8 @@ protected:
    uint64_t nextPage{0};
    bool countCompulsory;
    bool doAddrTrans;
+   // Tuple for returning set and tag from memAccess
+   std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> trace_info;
 
    uint64_t virtToPhys(uint64_t address);
    void checkCompulsory(uint64_t line);
@@ -74,7 +77,7 @@ public:
    System(unsigned int line_size, unsigned int num_lines, unsigned int assoc,
           std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
           bool do_addr_trans=false);
-   virtual void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) = 0;
+   virtual std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) = 0;
    virtual void precompress(std::string method, int entries) = 0;
    virtual void snapshot() = 0;
    SystemStats stats;
@@ -105,7 +108,7 @@ public:
             std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
             bool do_addr_trans=false, unsigned int num_domains=1);
 
-   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
+   std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
    void precompress(std::string method, int entries) override;
    void snapshot() override;
 };
@@ -118,7 +121,7 @@ public:
                std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
                bool do_addr_trans=false);
 
-   void memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
+   std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update) override;
    void precompress(std::string method, int entries) override;
    void snapshot() override;
 private:

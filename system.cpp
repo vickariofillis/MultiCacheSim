@@ -239,35 +239,44 @@ CacheState MultiCacheSystem::processMOESI(uint64_t set,
    return new_state;
 }
 
-void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
-   if (doAddrTrans) {
+
+    std::string type;
+    if (accessType == AccessType::Read) {
+        type = 'R';
+    }
+    else if (accessType == AccessType::Write) {
+        type = 'W';
+    }
+
+    if (doAddrTrans) {
       address = virtToPhys(address);
-   }
+    }
 
-   if (accessType != AccessType::Prefetch) {
+    if (accessType != AccessType::Prefetch) {
       stats.accesses++;
-   }
+    }
 
-   unsigned int local = tidToDomain[tid];
-   updatePageToDomain(address, local);
+    unsigned int local = tidToDomain[tid];
+    updatePageToDomain(address, local);
 
-   uint64_t set = (address & setMask) >> setShift;
-   uint64_t tag = address & tagMask;
-   CacheState state = caches[local]->findTag(set, tag);
-   bool hit = (state != CacheState::Invalid);
+    uint64_t set = (address & setMask) >> setShift;
+    uint64_t tag = address & tagMask;
+    CacheState state = caches[local]->findTag(set, tag);
+    bool hit = (state != CacheState::Invalid);
 
-   if (countCompulsory && accessType != AccessType::Prefetch) {
+    if (countCompulsory && accessType != AccessType::Prefetch) {
       checkCompulsory(address & (~lineMask));
-   }
+    }
 
-   // Handle hits 
-   if (accessType == AccessType::Write && hit) { 
+    // Handle hits 
+    if (accessType == AccessType::Write && hit) { 
       caches[local]->changeState(set, tag, CacheState::Modified);
       setRemoteStates(set, tag, CacheState::Invalid, local);
-   }
+    }
 
-   if (hit) {
+    if (hit) {
       caches[local]->updateLRU(set, tag);
       caches[local]->updateData(set, tag, data, method, hit_update);
 
@@ -277,8 +286,8 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::a
             stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
          }
       }
-   }
-   else {
+    }
+    else {
       // Now handle miss cases
 
       CacheState remote_state;
@@ -286,6 +295,7 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::a
 
       uint64_t evicted_tag;
       bool writeback = caches[local]->checkWriteback(set, evicted_tag);
+      if (writeback) type = 'E';
       // TODO both evictTraffic and isLocal search the the pageToDomain map
       if (writeback) {
          evictTraffic(set, evicted_tag, local);
@@ -299,7 +309,11 @@ void MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::a
       if (accessType == AccessType::Prefetch && prefetcher) {
          stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
       }
-   }
+    }
+
+    trace_info = std::make_tuple(set, tag, type, data);
+    return trace_info;
+
 }
 
 void MultiCacheSystem::precompress(std::string method, int entries)
@@ -344,68 +358,83 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
    }
 }
 
-void SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
-   bool is_prefetch = (accessType == AccessType::Prefetch);
+    std::string type;
+    if (accessType == AccessType::Read) {
+            type = 'R';
+        }
+        else if (accessType == AccessType::Write) {
+            type = 'W';
+        }
+    bool is_prefetch = (accessType == AccessType::Prefetch);
 
-   if (doAddrTrans) {
+    if (doAddrTrans) {
       address = virtToPhys(address);
-   }
+    }
 
-   if (!is_prefetch) {
+    if (!is_prefetch) {
       stats.accesses++;
-   }
+    }
 
-   uint64_t set = (address & setMask) >> setShift;
-   uint64_t tag = address & tagMask;
-   CacheState state = cache->findTag(set, tag);
-   bool hit = (state != CacheState::Invalid);
+    uint64_t set = (address & setMask) >> setShift;
+    uint64_t tag = address & tagMask;
+    CacheState state = cache->findTag(set, tag);
+    bool hit = (state != CacheState::Invalid);
 
-   if (countCompulsory && !is_prefetch) {
+    if (countCompulsory && !is_prefetch) {
       checkCompulsory(address & ~lineMask);
-   }
+    }
 
-   // Handle hits 
-   if (accessType == AccessType::Write && hit) {  
+    // Handle hits 
+    if (accessType == AccessType::Write && hit) {  
       cache->changeState(set, tag, CacheState::Modified);
-   }
+    }
 
-   if (hit) {
-      cache->updateLRU(set, tag);
-      cache->updateData(set, tag, data, method, hit_update);
+    if (hit) {
+        cache->updateLRU(set, tag);
+        cache->updateData(set, tag, data, method, hit_update);
 
-      if (!is_prefetch) {
-         stats.hits++;
-         if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
-         }
-      }
+        if (!is_prefetch) {
+            stats.hits++;
+            if (prefetcher) {
+                stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
+            }
+        }
 
-      return;
-   }
+        trace_info = std::make_tuple(set, tag, type, data);
+        return trace_info;
+    }
 
-   CacheState new_state = CacheState::Invalid;
-   uint64_t evicted_tag;
-   bool writeback = cache->checkWriteback(set, evicted_tag);
+    CacheState new_state = CacheState::Invalid;
+    uint64_t evicted_tag;
+    bool writeback = cache->checkWriteback(set, evicted_tag);
 
-   if (writeback) {
+    if (writeback) {
       stats.local_writes++;
-   }
+    }
 
-   if (accessType == AccessType::Read) {
+    if (accessType == AccessType::Read) {
       new_state = CacheState::Exclusive;
-   } else {
+    } else {
       new_state = CacheState::Modified;
-   }
+    }
 
-   if (!is_prefetch) {
+    if (!is_prefetch) {
       stats.local_reads++;
-   }
+    }
 
-   cache->insertLine(set, tag, new_state, data);
-   if (!is_prefetch && prefetcher) {
+    cache->insertLine(set, tag, new_state, data);
+    if (!is_prefetch && prefetcher) {
       stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
-   }
+    }
+
+    if (writeback) {
+        type = 'E';
+    }
+
+    trace_info = std::make_tuple(set, tag, type, data);
+    return trace_info;
 }
 
 void SingleCacheSystem::precompress(std::string method, int entries)

@@ -27,9 +27,12 @@ freely, subject to the following restrictions:
 #include <limits>
 #include <sstream>
 #include <string>
+/* Cluster */
+#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
+#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 /* Local */
-#include "/home/vic/zstr/src/zstr.hpp"
-#include "/home/vic/zstr/src/strict_fstream.hpp"
+// #include "/home/vic/zstr/src/zstr.hpp"
+// #include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
@@ -40,13 +43,19 @@ bool debug = true;
 bool trace_accesses = false;
 bool snapshot = true;
 
+/* Cluster */
+std::string machine = "cluster";
 /* Local */
-std::string machine = "local";
+// std::string machine = "local";
 
-std::string tracefile_generation(const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
+std::string tracefile_generation(const std::string option, const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
 {
     std::string type;
     std:string file_path;
+
+    /* Options */
+    // Pre" is for simulating the cache - gets traces as inputs
+    // "Trace" is for generating smaller traces containing only useful accesses
 
     if (machine == "cluster") {
         if (suite == "parsec") {
@@ -61,7 +70,12 @@ std::string tracefile_generation(const std::string suite, const std::string benc
                 type = "kernels";
             }
 
-            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/" + size + "/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz";
+            if (option == "pre"){
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/" + size + "/pkgs/" + type + "/" + benchmark + "/run/trace.out.gz";
+            }
+            else if (option == "trace") {
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/parsec/" + benchmark + "/" + size + "/pkgs/" + type + "/" + benchmark + "/run/trace_min.out";
+            }
 
         }
         else if (suite == "perfect") {
@@ -79,11 +93,21 @@ std::string tracefile_generation(const std::string suite, const std::string benc
                 type = "wami";
             }
 
-            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+            if (option == "pre"){
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+            }
+            else if (option == "trace") {
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/perfect/" + type + "/" + benchmark + "/" + size + "/trace_min.out";
+            }
 
         }
         else if (suite == "phoenix") {
-            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace.out.gz";
+            if (option == "pre"){
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace.out.gz";
+            }
+            else if (option == "trace") {
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/phoenix/" + benchmark + "/" + size + "/" + "/trace_min.out";
+            }
         }
         else if (suite == "polybench") {
             if (benchmark == "correlation" || benchmark == "covariance") {
@@ -105,13 +129,25 @@ std::string tracefile_generation(const std::string suite, const std::string benc
                 type = "stencils";
             }
 
-            file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+            if (option == "pre"){
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench/" + type + "/" + benchmark + "/" + size + "/trace.out.gz";
+            }
+            else if (option == "trace") {
+                file_path = "/aenao-99/karyofyl/results/pin/pinatrace/polybench/" + type + "/" + benchmark + "/" + size + "/trace_min.out";
+            }
         }
     }
     else if (machine == "local") {
-        // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
-        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
-        // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+        if (option == "pre"){
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+        }
+        else if (option == "trace") {
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_min.out";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_min.out";
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old_min.out";
+        }
     }
 
     return file_path;
@@ -121,13 +157,14 @@ int main(int argc, char* argv[])
 {
 
     std::string method;
-    int frequency = 0;
+    int frequency = 1;
     std::string benchmark = "test";
     int bits_ignored = 0;
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
     std::string hit_update = "n";
+    std::string option = "pre";
     unsigned int trace_accesses_start = 0;
     unsigned long long trace_accesses_end = std::numeric_limits<unsigned long long>::max();
 
@@ -156,24 +193,29 @@ int main(int argc, char* argv[])
         else if (std::string(argv[i]) == "-u") {
             hit_update = argv[i+1];
         }
+        else if (std::string(argv[i]) == "-o") {
+            option = argv[i+1];
+        }
         else if (std::string(argv[i]) == "-l") {
             trace_accesses_start = atoi(argv[i+1]);
             trace_accesses_end = atoi(argv[i+2]);
         }
     }
 
-    if (hit_update != "n" || hit_update != "y"){
-        cout << "Update of mapping on a cache write hit is a yes or no argument. Reverted to no.\n";
+    if (option != "pre" && option != "trace"){
+        option = "pre";
+    }
+
+    if (hit_update != "n" && hit_update != "y"){
         hit_update = "n";
     }
 
     if (trace_accesses_end <= trace_accesses_start) {
-        cout << "! The end of the simulation window is earlier than the start. Reseted to the end of the trace file.\n";
+        cout << "Simulation Window:\n";
         trace_accesses_end = std::numeric_limits<unsigned long long>::max();
     }
 
     if (method != "xor" && method != "add") {
-        cout << "! Precompression method chosen is wrong. Reverted to xor.\n";
         method = "xor";
     }
     if (!(entries && !(entries & (entries - 1)))) {
@@ -190,8 +232,8 @@ int main(int argc, char* argv[])
     
 
     cout << "\nInput Stats\n_________________\n\n";
-    cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency \
-        << "\n" << "___________________________________________________" << "\n\n";
+    cout << "Precompression method: " << method << "\nSuite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency \
+        << "\nOption: " << option << "\nUpdate on write hit: " << hit_update << "\n" << "___________________________________________________" << "\n\n";
 
 
     // tid_map is used to inform the simulator how
@@ -211,7 +253,7 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 2, 2, std::move(prefetch), false, false);
+    SingleCacheSystem sys(64, 16384, 4, NULL, false, false);
     // MultiCacheSystem sys(tid_map, 64, 2, 2, std::move(prefetch), false, false, 2);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
@@ -225,11 +267,18 @@ int main(int argc, char* argv[])
     uint64_t address;
     unsigned long long lines = 0;
     
-    std::string file_path = tracefile_generation(suite, benchmark, size, machine);
-    zstr::ifstream infile(file_path.c_str());
+    std::string pre_option = "pre";
+    std::string trace_input = tracefile_generation(pre_option, suite, benchmark, size, machine);
+    zstr::ifstream infile(trace_input.c_str());
+
+    std::string trace_option = "trace";
+    std::string trace_min_output = tracefile_generation(trace_option, suite, benchmark, size, machine);
+    ofstream trace_outfile(trace_min_output.c_str());
 
     std::string line;
     int writes = 0;
+
+    std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> trace_info;
 
     while(getline(infile,line))
     {
@@ -261,14 +310,33 @@ int main(int argc, char* argv[])
             if(address != 0) {
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
-                sys.memAccess(address, accessType, lineData, lines%2, method, hit_update);
-                if ((writes % frequency) == 0 && writes != 0) {
-                    sys.precompress(method, entries);
-                    if (debug && snapshot) {
-                        cout << "\n";
-                        sys.snapshot();
+                trace_info = sys.memAccess(address, accessType, lineData, lines%2, method, hit_update);
+                // Precompression code
+                if (option == "pre") {
+                    if ((writes % frequency) == 0 && writes != 0) {
+                        sys.precompress(method, entries);
+                        if (debug && snapshot) {
+                            cout << "\n";
+                            sys.snapshot();
+                        }
                     }
                 }
+                if (option == "trace") {
+                    std::cout << "\n!!!Test!!!\n";  //debug
+                    std::stringstream output_value;
+                    output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " ";
+                    for (uint i=0; i<64; i++) {
+                        if (i!=63) {
+                            output_value << get<3>(trace_info)[i] << " ";
+                        }
+                        else {
+                            output_value << get<3>(trace_info)[i];
+                        }
+                    }
+                    trace_outfile << output_value.str() << "\n";
+                    std::cout << output_value.str() << "\n";    //debug
+                }
+                std::cout << "\n";  //debug
             }
         }
 

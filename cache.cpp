@@ -31,8 +31,11 @@ freely, subject to the following restrictions:
 #include "misc.h"
 #include "cache.h"
 
+// Kmeans
+/* Cluster */
+#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 /* Local */
-#include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
