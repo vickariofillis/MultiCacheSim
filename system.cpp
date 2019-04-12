@@ -362,7 +362,7 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
    }
 }
 
-std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
     std::string type;
     uint way;
