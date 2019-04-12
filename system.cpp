@@ -291,7 +291,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem
       }
     }
     else {
-        
+
       // Now handle miss cases
       CacheState remote_state;
       unsigned int remote = checkRemoteStates(set, tag, remote_state, local);
@@ -400,7 +400,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
     if (hit) {
         cache->updateLRU(set, tag);
         cache->updateData(set, tag, data, method, hit_update);
-        way = getWay(set, tag);
+        way = cache->getWay(set, tag);
 
         if (!is_prefetch) {
             stats.hits++;
@@ -433,7 +433,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
     }
 
     cache->insertLine(set, tag, new_state, data);
-    way = getWay(set, tag);
+    way = cache->getWay(set, tag);
 
     if (!is_prefetch && prefetcher) {
       stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
