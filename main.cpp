@@ -278,7 +278,8 @@ int main(int argc, char* argv[])
     std::string line;
     int writes = 0;
 
-    std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> trace_info;
+    // trace_info = (set, way, tag, access type, data)
+    std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> trace_info;
 
     while(getline(infile,line))
     {
@@ -323,13 +324,13 @@ int main(int argc, char* argv[])
                 }
                 if (option == "trace") {
                     std::stringstream output_value;
-                    output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " ";
+                    output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " " << get<3>(trace_info) << " ";
                     for (uint i=0; i<64; i++) {
                         if (i!=63) {
-                            output_value << get<3>(trace_info)[i] << " ";
+                            output_value << get<4>(trace_info)[i] << " ";
                         }
                         else {
-                            output_value << get<3>(trace_info)[i];
+                            output_value << get<4>(trace_info)[i];
                         }
                     }
                     trace_outfile << output_value.str() << "\n";
