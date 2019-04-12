@@ -67,8 +67,8 @@ protected:
    uint64_t nextPage{0};
    bool countCompulsory;
    bool doAddrTrans;
-   // Tuple for returning set and tag from memAccess
-   std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> trace_info;
+   // Tuple for returning set, way, tag, access type and data from memAccess
+   std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> trace_info;
 
    uint64_t virtToPhys(uint64_t address);
    void checkCompulsory(uint64_t line);
