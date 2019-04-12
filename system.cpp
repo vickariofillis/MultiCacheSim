@@ -239,7 +239,7 @@ CacheState MultiCacheSystem::processMOESI(uint64_t set,
    return new_state;
 }
 
-std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
 
     std::string type;
