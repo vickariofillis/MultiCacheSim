@@ -322,7 +322,6 @@ int main(int argc, char* argv[])
                     }
                 }
                 if (option == "trace") {
-                    std::cout << "\n!!!Test!!!\n";  //debug
                     std::stringstream output_value;
                     output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " ";
                     for (uint i=0; i<64; i++) {
@@ -334,9 +333,7 @@ int main(int argc, char* argv[])
                         }
                     }
                     trace_outfile << output_value.str() << "\n";
-                    std::cout << output_value.str() << "\n";    //debug
                 }
-                std::cout << "\n";  //debug
             }
         }
 

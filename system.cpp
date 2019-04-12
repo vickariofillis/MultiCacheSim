@@ -243,6 +243,8 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem
 {
 
     std::string type;
+    uint way;
+
     if (accessType == AccessType::Read) {
         type = 'R';
     }
@@ -279,6 +281,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem
     if (hit) {
       caches[local]->updateLRU(set, tag);
       caches[local]->updateData(set, tag, data, method, hit_update);
+      way = caches[local]->getWay(set, tag);
 
       if (accessType != AccessType::Prefetch) {
          stats.hits++;
@@ -288,8 +291,8 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem
       }
     }
     else {
+        
       // Now handle miss cases
-
       CacheState remote_state;
       unsigned int remote = checkRemoteStates(set, tag, remote_state, local);
 
@@ -305,13 +308,14 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> MultiCacheSystem
       CacheState new_state = processMOESI(set, tag, remote_state, accessType, 
                                  local_traffic, local, remote);
       caches[local]->insertLine(set, tag, new_state, data);
+      way = caches[local]->getWay(set, tag);
 
       if (accessType == AccessType::Prefetch && prefetcher) {
          stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
       }
     }
 
-    trace_info = std::make_tuple(set, tag, type, data);
+    trace_info = std::make_tuple(set, way, tag, type, data);
     return trace_info;
 
 }
@@ -361,6 +365,8 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
 std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
 {
     std::string type;
+    uint way;
+
     if (accessType == AccessType::Read) {
             type = 'R';
         }
@@ -394,6 +400,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
     if (hit) {
         cache->updateLRU(set, tag);
         cache->updateData(set, tag, data, method, hit_update);
+        way = getWay(set, tag);
 
         if (!is_prefetch) {
             stats.hits++;
@@ -402,10 +409,11 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
             }
         }
 
-        trace_info = std::make_tuple(set, tag, type, data);
+        trace_info = std::make_tuple(set, way, tag, type, data);
         return trace_info;
     }
 
+    // Now handle miss cases
     CacheState new_state = CacheState::Invalid;
     uint64_t evicted_tag;
     bool writeback = cache->checkWriteback(set, evicted_tag);
@@ -425,6 +433,8 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
     }
 
     cache->insertLine(set, tag, new_state, data);
+    way = getWay(set, tag);
+
     if (!is_prefetch && prefetcher) {
       stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
     }
@@ -433,7 +443,7 @@ std::tuple<uint64_t, uint64_t, std::string, std::array<int,64>> SingleCacheSyste
         type = 'E';
     }
 
-    trace_info = std::make_tuple(set, tag, type, data);
+    trace_info = std::make_tuple(set, way, tag, type, data);
     return trace_info;
 }
 

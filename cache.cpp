@@ -153,6 +153,18 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
     }
 }
 
+// Returns the way number of the specified cache line
+uint Cache::getWay(uint64_t set, uint64_t tag) const
+{
+    int way_count = 0;
+    for (auto it = sets[set].cbegin(); it != sets[set].cend(); ++it) {
+        if (it->tag == tag) {
+            return way_count;
+        }
+        way_count++;
+    }
+}
+
 // Kmeans
 void Cache::precompress(std::string method, int entries)
 {

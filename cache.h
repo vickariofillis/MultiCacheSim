@@ -48,6 +48,8 @@ public:
    void insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data);
    // Updating cache on a write hit
    void updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string method, std::string hit_update);
+   // Returns the way number of the specified cache line
+   uint getWay(uint64_t set, uint64_t tag) const;
    // Computing data after precompression is applied
    void precompress(std::string method, int entries);
    // Precompression technique (xor)
