@@ -24,14 +24,16 @@ freely, subject to the following restrictions:
 #include "prefetch.h"
 #include "system.h"
 
-int AdjPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys)
+int AdjPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
+    std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, System& sys)
 {
-   sys.memAccess(address + (1 << sys.setShift), AccessType::Prefetch, data, tid, method, hit_update);
+   sys.memAccess(address + (1 << sys.setShift), AccessType::Prefetch, data, tid, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
    return 1;
 }
 
 // Called to check for prefetches in the case of a cache miss.
-int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys)
+int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
+    std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, System& sys)
 {
    uint64_t set = (address & sys.setMask) >> sys.setShift;
    uint64_t tag = address & sys.tagMask;
@@ -45,7 +47,7 @@ int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int
          // Call memAccess to resolve the prefetch. The address is 
          // incremented in the set portion of its bits (least
          // significant bits not in the cache line offset portion)
-         sys.memAccess(address + ((1 << sys.setShift) * (i+1)), AccessType::Prefetch, data, tid, method, hit_update);
+         sys.memAccess(address + ((1 << sys.setShift) * (i+1)), AccessType::Prefetch, data, tid, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
       }
       
       lastPrefetch = address + (1 << sys.setShift);
@@ -55,14 +57,16 @@ int SeqPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int
    return prefetched;
 }
 
-int AdjPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys)
+int AdjPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
+    std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, System& sys)
 {
-   sys.memAccess(address + (1 << sys.setShift), AccessType::Prefetch, data, tid, method, hit_update);
+   sys.memAccess(address + (1 << sys.setShift), AccessType::Prefetch, data, tid, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
    return 1;
 }
 
 // Called to check for prefetches in the case of a cache hit.
-int SeqPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string method, std::string hit_update, System& sys)
+int SeqPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
+    std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, System& sys)
 {
    uint64_t set = (address & sys.setShift) >> sys.setShift;
    uint64_t tag = address & sys.tagMask;
@@ -74,7 +78,7 @@ int SeqPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,
       // Call memAccess to resolve the prefetch. The address is 
       // incremented in the set portion of its bits (least
       // significant bits not in the cache line offset portion)
-      sys.memAccess(address + ((1 << sys.setShift) * prefetchNum), AccessType::Prefetch, data, tid, method, hit_update);
+      sys.memAccess(address + ((1 << sys.setShift) * prefetchNum), AccessType::Prefetch, data, tid, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
       lastPrefetch = lastPrefetch + (1 << sys.setShift);
    }
 

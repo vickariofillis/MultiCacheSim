@@ -239,7 +239,8 @@ CacheState MultiCacheSystem::processMOESI(uint64_t set,
    return new_state;
 }
 
-std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, \
+    std::string precomp_method, std::string precomp_update_method, std::string comp_method, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored)
 {
 
     std::string type;
@@ -280,13 +281,13 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
 
     if (hit) {
       caches[local]->updateLRU(set, tag);
-      caches[local]->updateData(set, tag, data, method, hit_update);
+      caches[local]->updateData(set, tag, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
       way = caches[local]->getWay(set, tag);
 
       if (accessType != AccessType::Prefetch) {
          stats.hits++;
          if (prefetcher) {
-            stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
+            stats.prefetched += prefetcher->prefetchHit(address, tid, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored, *this);
          }
       }
     }
@@ -307,11 +308,11 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
       bool local_traffic = isLocal(address, local);
       CacheState new_state = processMOESI(set, tag, remote_state, accessType, 
                                  local_traffic, local, remote);
-      caches[local]->insertLine(set, tag, new_state, data);
+      caches[local]->insertLine(set, tag, new_state, data, precomp_method, precomp_update_method, comp_method, ignore_i_bytes, data_type, bytes_ignored);
       way = caches[local]->getWay(set, tag);
 
       if (accessType == AccessType::Prefetch && prefetcher) {
-         stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
+         stats.prefetched += prefetcher->prefetchMiss(address, tid, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored, *this);
       }
     }
 
@@ -320,11 +321,20 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
 
 }
 
-void MultiCacheSystem::precompress(std::string method, int entries)
+void MultiCacheSystem::precompress(int entries, std::string precomp_method, std::string precomp_update_method, std::string ignore_i_bytes, int data_type, int bytes_ignored)
 {
     for (uint i=0; i<caches.size(); i++) {
-        caches[i]->precompress(method, entries);
+        caches[i]->updatePrecompressTable(entries, precomp_method, precomp_update_method, ignore_i_bytes, data_type, bytes_ignored);
     }
+}
+
+std::vector<std::tuple<int, int>> MultiCacheSystem::compressStats(std::string comp_method)
+{
+    std::vector<std::tuple<int, int>> compressionStats;
+    for (uint i=0; i<caches.size(); i++) {
+        compressionStats.push_back(caches[i]->compressionStats(i, comp_method));
+    }
+    return compressionStats;
 }
 
 void MultiCacheSystem::snapshot()
@@ -362,7 +372,8 @@ MultiCacheSystem::MultiCacheSystem(std::vector<unsigned int>& tid_to_domain,
    }
 }
 
-std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, std::string method, std::string hit_update)
+std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCacheSystem::memAccess(uint64_t address, AccessType accessType, std::array<int,64> data, unsigned int tid, \
+    std::string precomp_method, std::string precomp_update_method, std::string comp_method, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored)
 {
     std::string type;
     uint way;
@@ -399,13 +410,13 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
 
     if (hit) {
         cache->updateLRU(set, tag);
-        cache->updateData(set, tag, data, method, hit_update);
+        cache->updateData(set, tag, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
         way = cache->getWay(set, tag);
 
         if (!is_prefetch) {
             stats.hits++;
             if (prefetcher) {
-                stats.prefetched += prefetcher->prefetchHit(address, tid, data, method, hit_update, *this);
+                stats.prefetched += prefetcher->prefetchHit(address, tid, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored, *this);
             }
         }
 
@@ -432,11 +443,11 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
       stats.local_reads++;
     }
 
-    cache->insertLine(set, tag, new_state, data);
+    cache->insertLine(set, tag, new_state, data, precomp_method, precomp_update_method, comp_method, ignore_i_bytes, data_type, bytes_ignored);
     way = cache->getWay(set, tag);
 
     if (!is_prefetch && prefetcher) {
-      stats.prefetched += prefetcher->prefetchMiss(address, tid, data, method, hit_update, *this);
+      stats.prefetched += prefetcher->prefetchMiss(address, tid, data, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored, *this);
     }
 
     if (writeback) {
@@ -447,9 +458,16 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
     return trace_info;
 }
 
-void SingleCacheSystem::precompress(std::string method, int entries)
+void SingleCacheSystem::precompress(int entries, std::string precomp_method, std::string precomp_update_method, std::string ignore_i_bytes, int data_type, int bytes_ignored)
 {
-    cache->precompress(method, entries);
+    cache->updatePrecompressTable(entries, precomp_method, precomp_update_method, ignore_i_bytes, data_type, bytes_ignored);
+}
+
+std::vector<std::tuple<int, int>> SingleCacheSystem::compressStats(std::string comp_method)
+{
+    std::vector<std::tuple<int, int>> compressionStats;
+    compressionStats.push_back(cache->compressionStats(0, comp_method));
+    return compressionStats;
 }
 
 void SingleCacheSystem::snapshot()

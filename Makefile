@@ -3,7 +3,7 @@ DEBUG_FLAGS = -O2 -g -Wall -Wextra -DDEBUG -std=gnu++14
 RELEASE_FLAGS= -O3 -march=native -Wall -Wextra -std=gnu++14 -flto #-static
 CXXFLAGS=$(RELEASE_FLAGS)
 DEPS=$(wildcard *.h) Makefile
-OBJ=system.o cache.o prefetch.o
+OBJ=system.o cache.o prefetch.o compression.o
 BUILD_DIR=$(shell pwd)
 # Cluster
 ZSTR_DIR=/aenao-99/karyofyl/zstr/src/

@@ -139,13 +139,13 @@ std::string tracefile_generation(const std::string option, const std::string sui
     }
     else if (machine == "local") {
         if (option == "pre"){
-            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
         }
         else if (option == "trace") {
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_min.out";
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_min.out";
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_min.out";
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old_min.out";
         }
     }
@@ -153,13 +153,29 @@ std::string tracefile_generation(const std::string option, const std::string sui
     return file_path;
 }
 
+// File generation for printing compression stats
+std::string outfile_generation(const std::string precomp_method, const std::string precomp_update_method, const std::string comp_method, const int entries, \
+    const std::string suite, const std::string benchmark, const std::string size, const std::string hit_update, const std::string ignore_i_bytes, const int data_type, const int bytes_ignored)
+{
+    std::string file_path;
+
+    file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + comp_method + "/" + precomp_update_method + "_" + \
+        std::to_string(entries) + "_" + std::to_string(data_type) + "_" + std::to_string(bytes_ignored) + ".out";
+
+    return file_path;
+}
+
 int main(int argc, char* argv[])
 {
 
-    std::string method;
+    std::string precomp_method;
+    std::string precomp_update_method;
+    std::string comp_method;
+    std::string ignore_i_bytes;
     int frequency = 1;
     std::string benchmark = "test";
-    int bits_ignored = 0;
+    int data_type = 32;
+    int bytes_ignored = 0;
     std::string suite = "parsec";
     int entries = 8;
     std::string size = "small";
@@ -169,38 +185,67 @@ int main(int argc, char* argv[])
     unsigned long long trace_accesses_end = std::numeric_limits<unsigned long long>::max();
 
     for (int i=0; i<argc; i++) {
+        // Precompress data method (i.e., xor)
         if (std::string(argv[i]) == "-m") {
-            method = argv[i+1];
+            precomp_method = argv[i+1];
         }
+        // Precompression table update method (i.e., frequency of cache block data)
+        else if (std::string(argv[i]) == "-um") {
+            precomp_update_method = argv[i+1];
+        }
+        // Compression method (i.e., bdi)
+        else if (std::string(argv[i]) == "-cm") {
+            comp_method = argv[i+1];
+        }
+        // Compute precompressed version of data (i.e., datax) for ignored bytes
+        else if (std::string(argv[i]) == "-c") {
+            ignore_i_bytes = argv[i+1];
+        }
+        // Frequency of updating the precompression table
         else if (std::string(argv[i]) == "-f") {
             frequency = atoi(argv[i+1]);
         }
-        else if (std::string(argv[i]) == "-b") {
-            benchmark = argv[i+1];
-        }
-        else if (std::string(argv[i]) == "-i") {
-            bits_ignored = atoi(argv[i+1]);
-        }
-        else if (std::string(argv[i]) == "-s") {
-            suite = argv[i+1];
-        }
+        // Entries of precompression table
         else if (std::string(argv[i]) == "-x") {
             entries = atoi(argv[i+1]);
         }
+        // Suite the benchmark belongs to
+        else if (std::string(argv[i]) == "-s") {
+            suite = argv[i+1];
+        }
+        // Benchmark to be executed
+        else if (std::string(argv[i]) == "-b") {
+            benchmark = argv[i+1];
+        }
+        // Size of benchmark to be executed
         else if (std::string(argv[i]) == "-t") {
             size = argv[i+1];
         }
+        // Size of data types (size of chunks to divide the cache line into)
+        else if (std::string(argv[i]) == "-d") {
+            data_type = atoi(argv[i+1]);
+        }
+        // Bytes to be ignored at the end of every data block
+        else if (std::string(argv[i]) == "-i") {
+            bytes_ignored = atoi(argv[i+1]);
+        }
+        // Whether to update the precompressed data on a cache write hit
         else if (std::string(argv[i]) == "-u") {
             hit_update = argv[i+1];
         }
+        // Generate minimized traces or actual precompression
         else if (std::string(argv[i]) == "-o") {
             option = argv[i+1];
         }
+        // Trace window for benchmark execution
         else if (std::string(argv[i]) == "-l") {
             trace_accesses_start = atoi(argv[i+1]);
             trace_accesses_end = atoi(argv[i+2]);
         }
     }
+
+    cout << "Precompression method: " << precomp_method << "\n";
+    cout << "Precompression table update method: " << precomp_update_method << "\n";
 
     if (option != "pre" && option != "trace"){
         option = "pre";
@@ -210,14 +255,27 @@ int main(int argc, char* argv[])
         hit_update = "n";
     }
 
+    if (ignore_i_bytes != "n" && ignore_i_bytes != "y"){
+        ignore_i_bytes = "n";
+    }
+
     if (trace_accesses_end <= trace_accesses_start) {
         cout << "Simulation Window:\n";
         trace_accesses_end = std::numeric_limits<unsigned long long>::max();
     }
 
-    if (method != "xor" && method != "add") {
-        method = "xor";
+    if (precomp_method != "xor" && precomp_method != "add") {
+        precomp_method = "xor";
     }
+
+    if (precomp_update_method != "kmeans" && precomp_update_method != "frequency") {
+        precomp_update_method = "frequency";
+    }
+
+    if (comp_method != "bdi") {
+        comp_method = "bdi";
+    }
+
     if (!(entries && !(entries & (entries - 1)))) {
         int old_entries = entries;
         entries--;
@@ -229,11 +287,17 @@ int main(int argc, char* argv[])
         entries++;
         cout << "The number of precompression table entries (" << old_entries << ") is not a power of two. It has been increased to " << entries << ".\n";
     }
+
+    if (precomp_update_method == "frequency" && hit_update == "n") {
+        cout << "!!! Precompression table filled with most frequent cache lines (frequency) is highly recommended to be used with updates on datax (precompressed data) in the case of a cache write hit.\n";
+    }
     
 
     cout << "\nInput Stats\n_________________\n\n";
-    cout << "Precompression method: " << method << "\nSuite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBits ignored: " << bits_ignored << "\nEntries: " << entries << "\nFrequency: " << frequency \
-        << "\nOption: " << option << "\nUpdate on write hit: " << hit_update << "\n" << "___________________________________________________" << "\n\n";
+    cout << "Precompression method: " << precomp_method << "\nPrecompression table update method: " << precomp_update_method << "\nCompression method: " << comp_method << \
+         "\nCompute ignored bytes: " << ignore_i_bytes << "\nSuite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBytes ignored: " << bytes_ignored << \
+         "\nEntries: " << entries << "\nFrequency: " << frequency << "\nOption: " << option << "\nUpdate on write hit: " << hit_update << \
+         "\n" << "___________________________________________________" << "\n\n";
 
 
     // tid_map is used to inform the simulator how
@@ -253,7 +317,7 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 16384, 4, NULL, false, false);
+    SingleCacheSystem sys(64, 2, 1, NULL, false, false);
     // MultiCacheSystem sys(tid_map, 64, 2, 2, std::move(prefetch), false, false, 2);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
@@ -280,6 +344,13 @@ int main(int argc, char* argv[])
 
     // trace_info = (set, way, tag, access type, data)
     std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> trace_info;
+
+    // Compression stats of cache(s) (computed after every cache access)
+    std::vector<std::tuple<int, int>> compressionStats;
+    // Compression stats of cache(s) (saving stats for the entire trace)
+    std::vector<std::vector<std::tuple<int, int>>> fullCompressionStats;
+
+    int access_num = 0; // debug
 
     while(getline(infile,line))
     {
@@ -311,11 +382,16 @@ int main(int argc, char* argv[])
             if(address != 0) {
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
-                trace_info = sys.memAccess(address, accessType, lineData, lines%2, method, hit_update);
+                trace_info = sys.memAccess(address, accessType, lineData, lines%2, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored);
                 // Precompression code
                 if (option == "pre") {
+                    // Call compression calculation algorithm
+                    std::cout << "\nAccess #" << std::dec << access_num << " vs Write #" << writes << "\n";  // debug
+                    compressionStats = sys.compressStats(comp_method);
+                    access_num++;   // debug
+                    fullCompressionStats.push_back(compressionStats);
                     if ((writes % frequency) == 0 && writes != 0) {
-                        sys.precompress(method, entries);
+                        sys.precompress(entries, precomp_method, precomp_update_method, ignore_i_bytes, data_type, bytes_ignored);
                         if (debug && snapshot) {
                             cout << "\n";
                             sys.snapshot();
@@ -339,6 +415,49 @@ int main(int argc, char* argv[])
         }
 
         ++lines;
+    }
+
+    // Print compression stats
+    int beforeSum = 0;
+    int afterSum = 0;
+    // for (std::vector<std::vector<std::tuple<int, int>>>::const_iterator it = fullCompressionStats.begin(); it != fullCompressionStats.end(); ++it) {
+    //     beforeSum = beforeSum + get<0>(it);
+    //     afterSum = afterSum + get<1>(it);
+    // }
+
+    for (uint i=0; i<fullCompressionStats.size(); i++) {
+        std::cout << "Access #" << std::dec << i << "\n";   // debug
+        for (uint j=0; j<fullCompressionStats[i].size(); j++) {
+            std::cout << "Cache #" << std::dec << j << "\n";    // debug
+            beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
+            afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
+            std::cout << "          Before Sum: " << beforeSum << "\n";   // debug
+            std::cout << "          After Sum: " << afterSum << "\n"; // debug
+        }
+    }
+
+    std::cout << "Before Compressed Byte Size: " << std::dec << beforeSum << "\n";
+    std::cout << "After Compressed Byte Size: " << std::dec << afterSum << "\n\n";
+
+    if (machine == "cluster") {
+
+        // Generating filepath for printing compression stats
+        std::string compression_outfile = outfile_generation(precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, data_type, bytes_ignored);
+        std::ofstream compression_stream(compression_outfile.c_str());
+
+        for (uint i=0; i<fullCompressionStats.size(); i++) {
+            for (uint j=0; j<fullCompressionStats[i].size(); j++) {
+                if (fullCompressionStats[i].size() == 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]);
+                }
+                else if (fullCompressionStats[i].size() > 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " ";
+                }
+                beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
+                afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
+            }
+            compression_stream << "\n";
+        }
     }
 
     cout << "Accesses: " << lines << endl;
