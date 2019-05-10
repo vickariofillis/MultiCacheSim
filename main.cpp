@@ -41,7 +41,7 @@ using namespace std;
 // Flags for debug printouts;
 bool debug = true;
 bool trace_accesses = false;
-bool snapshot = true;
+bool snapshot = false;
 
 /* Cluster */
 std::string machine = "cluster";
@@ -139,9 +139,10 @@ std::string tracefile_generation(const std::string option, const std::string sui
     }
     else if (machine == "local") {
         if (option == "pre"){
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
+            // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace.out.gz";
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line.out.gz";
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_one_line_old.out.gz";
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trisolv/trace.out.gz";
         }
         else if (option == "trace") {
             // file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trace_min.out";
@@ -154,13 +155,20 @@ std::string tracefile_generation(const std::string option, const std::string sui
 }
 
 // File generation for printing compression stats
-std::string outfile_generation(const std::string precomp_method, const std::string precomp_update_method, const std::string comp_method, const int entries, \
+std::string outfile_generation(const std::string machine, const std::string precomp_method, const std::string precomp_update_method, const std::string comp_method, const int entries, \
     const std::string suite, const std::string benchmark, const std::string size, const std::string hit_update, const std::string ignore_i_bytes, const int data_type, const int bytes_ignored)
 {
     std::string file_path;
 
-    file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + comp_method + "/" + precomp_update_method + "_" + \
-        std::to_string(entries) + "_" + std::to_string(data_type) + "_" + std::to_string(bytes_ignored) + ".out";
+    if (machine == "cluster") {
+        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + comp_method + "/" + precomp_update_method + "_" + \
+            std::to_string(entries) + "_" + std::to_string(data_type) + "_" + std::to_string(bytes_ignored) + ".out";
+    }
+    else if (machine == "local") {
+        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/trisolv/" + suite + "_" + benchmark + "_" + size + "_" + comp_method + "_" + precomp_update_method + "_" + \
+            std::to_string(entries) + "_" + std::to_string(data_type) + "_" + std::to_string(bytes_ignored) + ".out";
+    }
+    
 
     return file_path;
 }
@@ -317,7 +325,7 @@ int main(int argc, char* argv[])
     // whether to do virtual to physical translation,
     // and number of caches/domains
     // WARNING: counting compulsory misses doubles execution time
-    SingleCacheSystem sys(64, 2, 1, NULL, false, false);
+    SingleCacheSystem sys(64, 16384, 4, NULL, false, false);
     // MultiCacheSystem sys(tid_map, 64, 2, 2, std::move(prefetch), false, false, 2);
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
     /* 
@@ -386,7 +394,7 @@ int main(int argc, char* argv[])
                 // Precompression code
                 if (option == "pre") {
                     // Call compression calculation algorithm
-                    std::cout << "\nAccess #" << std::dec << access_num << " vs Write #" << writes << "\n";  // debug
+                    // std::cout << "\nAccess #" << std::dec << access_num << " vs Write #" << writes << "\n";  // debug
                     compressionStats = sys.compressStats(comp_method);
                     access_num++;   // debug
                     fullCompressionStats.push_back(compressionStats);
@@ -426,13 +434,13 @@ int main(int argc, char* argv[])
     // }
 
     for (uint i=0; i<fullCompressionStats.size(); i++) {
-        std::cout << "Access #" << std::dec << i << "\n";   // debug
+        // std::cout << "Access #" << std::dec << i << "\n";   // debug
         for (uint j=0; j<fullCompressionStats[i].size(); j++) {
-            std::cout << "Cache #" << std::dec << j << "\n";    // debug
+            // std::cout << "Cache #" << std::dec << j << "\n";    // debug
             beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
             afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
-            std::cout << "          Before Sum: " << beforeSum << "\n";   // debug
-            std::cout << "          After Sum: " << afterSum << "\n"; // debug
+            // std::cout << "          Before Sum: " << beforeSum << "\n";   // debug
+            // std::cout << "          After Sum: " << afterSum << "\n"; // debug
         }
     }
 
@@ -442,7 +450,26 @@ int main(int argc, char* argv[])
     if (machine == "cluster") {
 
         // Generating filepath for printing compression stats
-        std::string compression_outfile = outfile_generation(precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, data_type, bytes_ignored);
+        std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, data_type, bytes_ignored);
+        std::ofstream compression_stream(compression_outfile.c_str());
+
+        for (uint i=0; i<fullCompressionStats.size(); i++) {
+            for (uint j=0; j<fullCompressionStats[i].size(); j++) {
+                if (fullCompressionStats[i].size() == 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]);
+                }
+                else if (fullCompressionStats[i].size() > 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " ";
+                }
+                beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
+                afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
+            }
+            compression_stream << "\n";
+        }
+    }
+    else if (machine == "local") {
+        // Generating filepath for printing compression stats
+        std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, data_type, bytes_ignored);
         std::ofstream compression_stream(compression_outfile.c_str());
 
         for (uint i=0; i<fullCompressionStats.size(); i++) {
