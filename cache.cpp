@@ -121,7 +121,7 @@ bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const
 // Insert a new cache line by popping the least recently used line if necessary
 // and pushing the new line to the back (most recently used)
 void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    std::string ignore_i_bytes, int data_type, int bytes_ignored)
+    std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     if (sets[set].size() == maxSetSize) {
       sets[set].pop_front();
@@ -142,10 +142,10 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
         // std::cout << "findPrecompressionEntry <- insertLine\n";
 
         // Check if a precompression table entry is similar to the inserted data
-        int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored);
+        int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored, sim_threshold);
         // std::cout << "similarEntry = " << similarEntry << "\n"; // debug
 
-        if (similarEntry != -1) {
+        if (similarEntry > -1) {
             //call precompressDatax
             sets[set].emplace_back(tag, state, similarEntry, data, data);
             // debug
@@ -163,20 +163,19 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 
 // Updating cache data in case of a hit
 void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, std::string hit_update, \
-    std::string ignore_i_bytes, int data_type, int bytes_ignored)
+    std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
         if (it->tag == tag) {
             if (hit_update == "n") {
-                    it->mapping = -1;
-                    for (int j=0; j<64; j++) {
-                        it->data[j] = data[j];
-                        it->datax[j] = data[j];
-                    }
+                it->mapping = -1;
+                for (int j=0; j<64; j++) {
+                    it->data[j] = data[j];
+                    it->datax[j] = data[j];
                 }
+            }
             if (precomp_update_method == "kmeans") {
                 if (hit_update == "y") {
-                    // it->mapping = -1;    // FIXME: doesn't make sense (think some more about it)
                     for (int j=0; j<64; j++) {
                         // FIXME: Add other precompression methods
                         if (precomp_method == "xor") {
@@ -203,10 +202,10 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
                     // std::cout << "findPrecompressionEntry <- updateData\n";
 
                     // Check if a precompression table entry is similar to the updated data
-                    int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored);
+                    int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored, sim_threshold);
                     // std::cout << "similarEntry = " << std::dec << similarEntry << "\n"; // debug
 
-                    if (similarEntry != -1) {
+                    if (similarEntry > -1) {
                         // debug
                         // std::cout << "precompressDatax <- updateData\n";
                         precompressDatax(precomp_update_method, set, tag, data_type, bytes_ignored, ignore_i_bytes);
@@ -216,6 +215,8 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
                         for (int j=0; j<64; j++) {
                             it->datax[j] = data[j];
                         }
+                        // If there is no similar entry, update the mapping indicator to reflect that
+                        it->mapping = -1;
                     }
                 }
             }    
@@ -286,7 +287,7 @@ void Cache::updateFrequencyTable(std::array<int,64> data)
 }
 
 // Updating precompression table
-void Cache::updatePrecompressTable(int entries, std::string precomp_method, std::string precomp_update_method, std::string ignore_i_bytes, int data_type, int bytes_ignored)
+void Cache::updatePrecompressTable(int entries, std::string precomp_method, std::string precomp_update_method, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     int cacheLines = 0;
     std::vector<std::array<int,64>> inputData;
@@ -388,7 +389,7 @@ void Cache::updatePrecompressTable(int entries, std::string precomp_method, std:
                 }
                 // debug
                 // std::cout << "findPrecompressionEntry <- updatePrecompressTable\n"; // debug
-                it->mapping = findPrecompressionEntry(tempData, precomp_update_method, data_type, bytes_ignored);
+                it->mapping = findPrecompressionEntry(tempData, precomp_update_method, data_type, bytes_ignored, sim_threshold);
                 // std::cout << "it->mapping = " << it->mapping << "\n";   // debug
             }
         }
@@ -446,10 +447,12 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                 if (ignore_i_bytes == "y" && (ignore_flag > bytes_ignored)) {
                     // FIXME: Add other precompression methods
                     if (precomp_method == "xor") {
-                        it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
                         // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
                         << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
+                            std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
+                                << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }
@@ -462,10 +465,12 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                 }
                 else if (ignore_i_bytes == "n") {
                     if (precomp_method == "xor") {
-                        it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
                         // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
                         << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
+                            std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
+                                << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }
@@ -492,7 +497,7 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
 // }
 
 // Finding a similar Precompression Entry (for mapping)
-int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_update_method, int data_type, int bytes_ignored)
+int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_update_method, int data_type, int bytes_ignored, int sim_threshold)
 {
     // FIXME: precomp_update_method is not used for now
     // Finding the most similar precompression entry is only used for "frequency"
@@ -550,8 +555,6 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
         // debug
         // std::cout << "similarity[0] = " << std::dec << sum_weight[0] << "\n";
 
-        // FIXME: Similarity should be checked (it doesn't mean that there will always be a similar entry)
-        // What is the cutoff point for declaring there is no similarity? Should it be a variable that we sweep for?
         for (uint i=1; i<clusterData.size(); i++) {
             // debug
             // std::cout << "similarity[" << i << "] = " << std::dec << sum_weight[i] << "\n";
@@ -561,8 +564,8 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
             }
         }
 
-        // Cutoff point equivalent (return -1 if there is no similarity)
-        if (max == 0) {
+        // Cutoff point (return -1 if there is no similarity or it's lower than the threshold)
+        if (max == 0 || max < sim_threshold) {
             similarEntry = -1;
         }
     }
@@ -571,10 +574,18 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
     return similarEntry;
 }
 
-std::tuple<int, int> Cache::compressionStats(int cache_num, std::string comp_method)
+std::tuple<int, int, double, double> Cache::compressionStats(int cache_line_num, int assoc, int cache_num, std::string comp_method)
 {
     std::vector<int> beforeCompressedSpace;
     std::vector<int> afterCompressedSpace;
+
+    // Stats for cache utilization
+    float cacheUtil;
+    float wayUtil;
+    int actual_cache_lines = 0;
+    // Stats for way utilization
+    int actual_way_cnt = 0;
+    int max_way_cnt = 0;
 
     // std::cout << "\nCompression Stats\n\nCache: " << cache_num << "\n\n";   // debug
 
@@ -593,6 +604,10 @@ std::tuple<int, int> Cache::compressionStats(int cache_num, std::string comp_met
                 }
                 beforeCompressedSpace.push_back(bdi(tempData));
                 afterCompressedSpace.push_back(bdi(tempDatax));
+                if (sets[i].size() >= 1) {
+                    actual_way_cnt = actual_way_cnt + sets[i].size();
+                    max_way_cnt = max_way_cnt + assoc;
+                }
                 // debug
                 // for (int j=0; j<64; j++) {
                 //     if (j == 0) {
@@ -624,14 +639,19 @@ std::tuple<int, int> Cache::compressionStats(int cache_num, std::string comp_met
                 // std::cout << std::dec << "Before: -" << bdi(tempData) << "- vs After: -" << bdi(tempDatax) << "-\n";
 
                 way_count++;
+                actual_cache_lines++;
             }
         }
     }
     // Sum up the vectors containing the compression stats for every cache line
     int beforeSum = std::accumulate(beforeCompressedSpace.begin(), beforeCompressedSpace.end(), 0);
     int afterSum = std::accumulate(afterCompressedSpace.begin(), afterCompressedSpace.end(), 0);
+    //Computing cache utilization
+    cacheUtil = float(actual_cache_lines) / float(cache_line_num);
+    // Computing way utilization
+    wayUtil = float(actual_way_cnt) / float(max_way_cnt);
     // std::cout << "\n";   // debug
-    std::tuple<int, int> compressionStats = std::make_tuple(beforeSum, afterSum);
+    std::tuple<int, int, double, double> compressionStats = std::make_tuple(beforeSum, afterSum, cacheUtil, wayUtil);
 
     // debug
     // std::cout << "\n(One Access Cache Total) Before Sum: -" << std::dec << beforeSum << "- vs After Sum: -" << afterSum << "-\n";
@@ -644,7 +664,7 @@ void Cache::snapshot(int cache_num)
     std::cout << "Cache: " << cache_num << "\n\n";
     for (uint i=0; i<sets.size(); i++) {
         int way_count = 0;
-        std::cout << "Cache Line #" << std::dec << i << " \n";
+        std::cout << "Cache Row #" << std::dec << i << " \n";
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
             std::cout << "Way #" << std::dec << way_count << ", Tag: " << std::hex << it->tag << ", Mapping: " << std::dec << it->mapping << "\nData: (";
             for (int j=0; j<64; j++) {
