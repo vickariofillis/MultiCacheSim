@@ -96,7 +96,7 @@ void Cache::updateLRU(uint64_t set, uint64_t tag)
          temp = *it;
          break;
       }
-   } 
+   }
 
    sets[set].erase(it);
    sets[set].push_back(temp);
@@ -120,8 +120,8 @@ bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const
 
 // Insert a new cache line by popping the least recently used line if necessary
 // and pushing the new line to the back (most recently used)
-void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \
+    std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     if (sets[set].size() == maxSetSize) {
       sets[set].pop_front();
@@ -136,7 +136,7 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
     else if (precomp_update_method == "frequency") {
 
         // Update frequency table
-        updateFrequencyTable(data);
+        updateFrequencyTable(data, entries, infinite_freq, data_type, bytes_ignored);
 
         // debug
         // std::cout << "findPrecompressionEntry <- insertLine\n";
@@ -162,8 +162,8 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 }
 
 // Updating cache data in case of a hit
-void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, std::string hit_update, \
-    std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \
+    std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
         if (it->tag == tag) {
@@ -189,7 +189,7 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
             else if (precomp_update_method == "frequency") {
 
                 // Update frequency table
-                updateFrequencyTable(data);
+                updateFrequencyTable(data, entries, infinite_freq, data_type, bytes_ignored);
 
                 if (hit_update == "y") {
                     // Update data
@@ -239,71 +239,162 @@ uint Cache::getWay(uint64_t set, uint64_t tag) const
     }
 }
 
-void Cache::updateFrequencyTable(std::array<int,64> data) 
+void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int data_type, int bytes_ignored)
 {
     // Update frequency table
-    // Frequency table is empty
-    if (frequentLines.size() == 0) {
-        frequentLines.emplace_back(std::make_tuple(data, 1));
+
+    // Infinite frequency table
+    if (infinite_freq == "y") {
+        // Frequency table is empty
+        if (infiniteFrequentLines.size() == 0) {
+            infiniteFrequentLines.emplace_back(std::make_tuple(data, 1));
+        }
+        // Frequency table is not empty
+        else {
+            // If the new line exists in the frequency table
+            // exists: whether the new line exists in the frequency table
+            bool exists = false;
+            for (uint i=0; i<infiniteFrequentLines.size(); i++) {
+                // similar: whether the new line is the same as the current one we are comparing it with (in the frequency table)
+                bool similar = true;
+                for (int j=0; j<64; j++) {
+                    if (std::get<0>(infiniteFrequentLines[i])[j] != data[j]) {
+                        similar = false;
+                    }
+                }
+                if (similar) {
+                    std::get<1>(infiniteFrequentLines[i])++;
+                    exists = true;
+                }
+            }
+            // If the new line does not exist in the frequency table
+            if (!exists) {
+                infiniteFrequentLines.emplace_back(std::make_tuple(data, 1));
+            }
+        }
     }
-    // Frequency table is not empty
-    else {
-        // If the new line exists in the frequency table
-        // exists: whether the new line exists in the frequency table
-        bool exists = false;
+    else if (infinite_freq == "n") {
+
+        // Flag for ignoring LSBytes when checking for similarity
+        int ignore_flag = data_type;
+
+        // debug
+        // int frequency_entry = 1; 
+        // std::cout << "\nBefore\n\nFrequency Table with size of: " << std::dec << frequentLines.size() << "\n";
+        // for (uint i=0; i<frequentLines.size(); i++) {
+        //     std::cout << "Entry = " << frequency_entry << "\n";
+        //     std::cout << "Data: (";
+        //     for (int j=0; j<64; j++) {
+        //         if (j != 63) {
+        //             std::cout << std::hex << frequentLines[i][j] << " ";
+        //         }
+        //         else {
+        //             std::cout << std::hex << frequentLines[i][j] << ")";
+        //         }
+        //     }
+        //     // std::cout << " - Similar = " << similar << "\n";
+        //     std::cout << "\n";
+        //     frequency_entry++;
+        // }
+        // std::cout << "\n";
+        // debug
+
+        // Checking if the entry already exists
+        // found: whether the line was found in the frequency table
+        bool found = false;
+        
         for (uint i=0; i<frequentLines.size(); i++) {
-            // similar: whether the new line is the same as the current one we are comparing it with (in the frequency table)
             bool similar = true;
             for (int j=0; j<64; j++) {
-                if (std::get<0>(frequentLines[i])[j] != data[j]) {
-                    similar = false;
+                // Takes data_type and bytes_ignored into account when checking for similarity
+                if (ignore_flag > bytes_ignored){
+                    if (frequentLines[i][j] != data[j]) {
+                        similar = false;
+                    }
+                }
+                ignore_flag--;
+                if (ignore_flag == 0) {
+                    ignore_flag = data_type;
                 }
             }
             if (similar) {
-                std::get<1>(frequentLines[i])++;
-                exists = true;
+                frequentLines.erase(frequentLines.begin() + i);
+                frequentLines.push_back(data);
+                found = true;
             }
         }
-        // If the new line does not exist in the frequency table
-        if (!exists) {
-            frequentLines.emplace_back(std::make_tuple(data, 1));
+        
+        // Entry does not already exist
+        if (!found) {
+            // Frequency table is smaller than the precompression table
+            if (frequentLines.size() >= entries) {
+                frequentLines.pop_front();
+            }
+            frequentLines.push_back(data);
         }
+
+        // debug
+        // std::cout << "\n\nFound = " << found << "\n";
+        // frequency_entry = 1; 
+        // std::cout << "\nAfter\n\nFrequency Table with size of: " << std::dec << frequentLines.size() << "\n";
+        // for (uint i=0; i<frequentLines.size(); i++) {
+        //     std::cout << "Entry = " << frequency_entry << "\n";
+        //     std::cout << "Data: (";
+        //     for (int j=0; j<64; j++) {
+        //         if (j != 63) {
+        //             std::cout << std::hex << frequentLines[i][j] << " ";
+        //         }
+        //         else {
+        //             std::cout << std::hex << frequentLines[i][j] << ")";
+        //         }
+        //     }
+        //     // std::cout << " - Similar = " << similar << "\n";
+        //     std::cout << "\n";
+        //     frequency_entry++;
+        // }
+        // std::cout << "\n";
+        // std::cout << "------------------------------------------------------------------------------------------------\n";
+        // debug
+        
     }
+    
 
     // debug
-    // std::cout << "\nFrequency Table with size of: " << std::dec << frequentLines.size() << "\n";
-    // for (uint i=0; i<frequentLines.size(); i++) {
+    // std::cout << "\nFrequency Table with size of: " << std::dec << infiniteFrequentLines.size() << "\n";
+    // for (uint i=0; i<infiniteFrequentLines.size(); i++) {
     //     for (int j=0; j<64; j++) {
     //         if (j != 63) {
-    //             std::cout << std::hex << std::get<0>(frequentLines[i])[j] << " ";
+    //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << " ";
     //         }
     //         else {
-    //             std::cout << std::hex << std::get<0>(frequentLines[i])[j] << ")";
+    //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << ")";
     //         }
     //     }
-    //     std::cout << " / freq = " << std::dec << std::get<1>(frequentLines[i]) << "\n"; // debug
+    //     std::cout << " / freq = " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n"; // debug
     // }
     // std::cout << "\n";
 }
 
 // Updating precompression table
-void Cache::updatePrecompressTable(int entries, std::string precomp_method, std::string precomp_update_method, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+void Cache::updatePrecompressTable(int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, std::string ignore_i_bytes, int data_type, \
+    int bytes_ignored, int sim_threshold)
 {
-    int cacheLines = 0;
-    std::vector<std::array<int,64>> inputData;
-
-    //Iterate over the cache and keep the cache data as input
-    for (uint i=0; i<sets.size(); i++) {
-        for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
-            inputData.push_back(it->data);
-            cacheLines++;
-        }
-    }
 
     // Different ways for filling the precompression table
 
     // K-means
     if (precomp_update_method == "kmeans") {
+
+        int cacheLines = 0;
+        std::vector<std::array<int,64>> inputData;
+
+        //Iterate over the cache and keep the cache data as input
+        for (uint i=0; i<sets.size(); i++) {
+            for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
+                inputData.push_back(it->data);
+                cacheLines++;
+            }
+        }
 
         std::tuple<std::vector<std::array<int, 64>>, std::vector<uint32_t>> dkmData;
         if (cacheLines < entries) {
@@ -352,32 +443,49 @@ void Cache::updatePrecompressTable(int entries, std::string precomp_method, std:
     // Precompression table is a frequency table
     else if (precomp_update_method == "frequency") {
 
-        // Find the n = entries most frequent cache lines
-        // Sort frequency table
-        sort(frequentLines.begin(),frequentLines.end(),[](std::tuple<std::array<int,64>,int> &a, std::tuple<std::array<int,64>,int>& b) { return std::get<1>(a) > std::get<1>(b); });
+        if (infinite_freq == "y") {
+            // Find the n = entries most frequent cache lines
+            // Sort frequency table
+            sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int> &a, std::tuple<std::array<int,64>,int>& b) { return std::get<1>(a) > std::get<1>(b); });
 
-        // debug
-        // std::cout << "frequentLines size = " << frequentLines.size() << "\n";
-        // std::cout << "clusterData size = " << clusterData.size() << "\n";
-        // std::cout << "entries = " << entries << "\n";
+            // debug
+            // std::cout << "infiniteFrequentLines size = " << infiniteFrequentLines.size() << "\n";
+            // std::cout << "clusterData size = " << clusterData.size() << "\n";
+            // std::cout << "entries = " << entries << "\n";
 
-        // Delete centroids vector contents before updating it
-        clusterData.clear();
+            // Delete centroids vector contents before updating it
+            clusterData.clear();
 
-        // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
-        int end_point = entries;
+            // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
+            int end_point = entries;
 
-        if (frequentLines.size() < entries) {
-            end_point = frequentLines.size();
-        }
-
-        // Fill Precompression table with the most frequent cache lines
-        for (int i=0; i<end_point; i++) {
-            std::array<int,64> tempCentroid;
-            for (int j=0; j<64; j++) {
-                tempCentroid[j] = std::get<0>(frequentLines[i])[j];
+            if (infiniteFrequentLines.size() < entries) {
+                end_point = infiniteFrequentLines.size();
             }
-            clusterData.push_back(tempCentroid);
+
+            // Fill Precompression table with the most frequent cache lines
+            for (int i=0; i<end_point; i++) {
+                std::array<int,64> tempCentroid;
+                for (int j=0; j<64; j++) {
+                    tempCentroid[j] = std::get<0>(infiniteFrequentLines[i])[j];
+                }
+                clusterData.push_back(tempCentroid);
+            }
+        }
+        else if (infinite_freq == "n") {
+            // Frequency table doubles as the precompression table
+
+            // Delete centroids vector contents before updating it
+            clusterData.clear();
+
+            // Fill Precompression table with the most frequent cache lines
+            for (int i=0; i<entries; i++) {
+                std::array<int,64> tempCentroid;
+                for (int j=0; j<64; j++) {
+                    tempCentroid[j] = frequentLines[i][j];
+                }
+                clusterData.push_back(tempCentroid);
+            }
         }
 
         // Updating mappings
@@ -451,8 +559,8 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                         // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
                         << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
-                            std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                                << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
+                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }
@@ -469,8 +577,8 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                         // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
                         << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
-                            std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                                << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
+                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }

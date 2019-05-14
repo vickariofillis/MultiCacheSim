@@ -185,6 +185,7 @@ void help(){
     std::cout << "-cm:  Compression method    (i.e., bdi)\n";
     std::cout << "-f:   Frequency of updating precompression table\n";
     std::cout << "-x:   Entries of precompression table\n";
+    std::cout << "-if:  Infinite frequency table    (y or n)\n";
     std::cout << "-u:   Precompress data on a write hit    (y or n)\n";
     std::cout << "-c:   Compute or not parts of line that are ignored during finding similarity    (y or n)\n";
     std::cout << "-d:   Data type size    (i.e., 32 bytes or 16 bytes etc.)\n";
@@ -208,6 +209,7 @@ int main(int argc, char* argv[])
     int frequency = 1;
     int entries = 8;
 
+    std::string infinite_freq = "n";
     std::string hit_update = "n";
     std::string ignore_i_bytes;
     
@@ -268,6 +270,10 @@ int main(int argc, char* argv[])
         else if (std::string(argv[i]) == "-i") {
             bytes_ignored = atoi(argv[i+1]);
         }
+        // Whether to have an infinite frequency table
+        else if (std::string(argv[i]) == "-if") {
+            infinite_freq = argv[i+1];
+        }
         // Whether to update the precompressed data on a cache write hit
         else if (std::string(argv[i]) == "-u") {
             hit_update = argv[i+1];
@@ -317,6 +323,10 @@ int main(int argc, char* argv[])
         comp_method = "bdi";
     }
 
+    if (infinite_freq != "n" && infinite_freq != "y"){
+        ignore_i_bytes = "n";
+    }
+
     if (64 % data_type != 0) {
         std::cout << "Data type needs to be a divisor of 64 (cache line size in bytes).\n";
         data_type = 32;
@@ -356,10 +366,11 @@ int main(int argc, char* argv[])
     
     // Printing configuration variables
     cout << "\nInput Stats\n___________________________________________________\n\n";
-    cout << "Precompression method: " << precomp_method << "\nPrecompression table update method: " << precomp_update_method << "\nCompression method: " << comp_method << \
-         "\nCompute ignored bytes: " << ignore_i_bytes << "\nSuite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nBytes ignored: " << bytes_ignored << \
-         "\nEntries: " << entries << "\nFrequency: " << frequency << "\nOption: " << option << "\nUpdate on write hit: " << hit_update << \
-         "\n" << "___________________________________________________" << "\n\n";
+    std::cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nSimulator functionality: " << option << "\nPrecompression method: " << precomp_method << \
+        "\nPrecompression table update method: " << precomp_update_method << "\nCompression method: " << comp_method << "\nFrequency: " << frequency << "\nEntries: " << entries << \
+        "\nPrecompress on write hit: " << hit_update << "Infinite Frequency table: " << infinite_freq << "\nCompute ignored bytes: " << ignore_i_bytes << "\nData type size: " << data_type << \
+        "\nBytes ignored: " << bytes_ignored << "\nSimilarity threshold: " << sim_threshold << \
+        "\n" << "___________________________________________________" << "\n\n";
 
     // Number of cache lines (instantiated here for ease-of-use for cache utilization)
     /* Quick stats for LLC (assuming 64 byte sized lines)*/
@@ -447,7 +458,8 @@ int main(int argc, char* argv[])
             if(address != 0) {
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
-                trace_info = sys.memAccess(address, accessType, lineData, lines%2, precomp_method, precomp_update_method, comp_method, hit_update, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+                trace_info = sys.memAccess(address, accessType, lineData, lines%2, precomp_method, precomp_update_method, comp_method, entries, infinite_freq, hit_update, ignore_i_bytes, data_type, \
+                    bytes_ignored, sim_threshold);
                 // Precompression code
                 if (option == "pre") {
                     // Call compression calculation algorithm
@@ -469,7 +481,7 @@ int main(int argc, char* argv[])
                     // debug
 
                     if ((writes % frequency) == 0 && writes != 0) {
-                        sys.precompress(entries, precomp_method, precomp_update_method, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+                        sys.precompress(entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
                         if (debug && snapshot) {
                             cout << "\n";
                             sys.snapshot();
@@ -505,7 +517,8 @@ int main(int argc, char* argv[])
     double waySum = 0.0;
 
     // Generating filepath for printing compression stats
-    std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, data_type, bytes_ignored);
+    std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, \
+        data_type, bytes_ignored);
     std::ofstream compression_stream(compression_outfile.c_str());
 
     // Print compression stats
