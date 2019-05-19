@@ -325,11 +325,11 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
 
 }
 
-void MultiCacheSystem::precompress(int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, std::string ignore_i_bytes, int data_type, \
-    int bytes_ignored, int sim_threshold)
+void MultiCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+    std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     for (uint i=0; i<caches.size(); i++) {
-        caches[i]->updatePrecompressTable(entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+        caches[i]->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
     }
 }
 
@@ -468,10 +468,10 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
     return trace_info;
 }
 
-void SingleCacheSystem::precompress(int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, std::string ignore_i_bytes, int data_type, \
-    int bytes_ignored, int sim_threshold)
+void SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, \
+    std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
-    cache->updatePrecompressTable(entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+    cache->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
 }
 
 std::vector<std::tuple<int, int, double, double>> SingleCacheSystem::compressStats(int cache_line_num, int assoc, std::string comp_method)

@@ -161,7 +161,7 @@ std::string outfile_generation(const std::string machine, const std::string prec
     std::string file_path;
 
     if (machine == "cluster") {
-        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + precomp_update_method + "/" + comp_method + "_" + \
+        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/" + precomp_update_method + "_" + comp_method + "_" + \
             std::to_string(entries) + "_" + hit_update + "_" + ignore_i_bytes + "_" + std::to_string(data_type) + "_" + std::to_string(bytes_ignored) + ".out";
     }
     else if (machine == "local") {
@@ -368,7 +368,7 @@ int main(int argc, char* argv[])
     cout << "\nInput Stats\n___________________________________________________\n\n";
     std::cout << "Suite: " << suite << "\nBenchmark: " << benchmark << "\nSize: " << size << "\nSimulator functionality: " << option << "\nPrecompression method: " << precomp_method << \
         "\nPrecompression table update method: " << precomp_update_method << "\nCompression method: " << comp_method << "\nFrequency: " << frequency << "\nEntries: " << entries << \
-        "\nPrecompress on write hit: " << hit_update << "Infinite Frequency table: " << infinite_freq << "\nCompute ignored bytes: " << ignore_i_bytes << "\nData type size: " << data_type << \
+        "\nPrecompress on write hit: " << hit_update << "\nInfinite Frequency table: " << infinite_freq << "\nCompute ignored bytes: " << ignore_i_bytes << "\nData type size: " << data_type << \
         "\nBytes ignored: " << bytes_ignored << "\nSimilarity threshold: " << sim_threshold << \
         "\n" << "___________________________________________________" << "\n\n";
 
@@ -481,7 +481,7 @@ int main(int argc, char* argv[])
                     // debug
 
                     if ((writes % frequency) == 0 && writes != 0) {
-                        sys.precompress(entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+                        sys.precompress(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
                         if (debug && snapshot) {
                             cout << "\n";
                             sys.snapshot();

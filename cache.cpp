@@ -39,6 +39,23 @@ freely, subject to the following restrictions:
 /* Local */
 // #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 
+// File generation for printing most frequent entries
+std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int data_type, \
+    const int bytes_ignored)
+{
+    std::string file_path;
+
+    if (machine == "cluster") {
+        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/frequent_entries_" + std::to_string(entries) + ".out";
+    }
+    else if (machine == "local") {
+        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + size + "_frequent_entries_" + std::to_string(entries) + ".out";
+    }
+    
+
+    return file_path;
+}
+
 Cache::Cache(unsigned int num_lines, unsigned int assoc) : maxSetSize(assoc)
 {
    assert(num_lines % assoc == 0);
@@ -376,8 +393,8 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
 }
 
 // Updating precompression table
-void Cache::updatePrecompressTable(int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, std::string ignore_i_bytes, int data_type, \
-    int bytes_ignored, int sim_threshold)
+void Cache::updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+    std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
 
     // Different ways for filling the precompression table
@@ -463,14 +480,28 @@ void Cache::updatePrecompressTable(int entries, std::string precomp_method, std:
                 end_point = infiniteFrequentLines.size();
             }
 
+            // Generating filepath for printing most frequent entries
+            std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, data_type, bytes_ignored);
+            std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
+            // std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str());
+
             // Fill Precompression table with the most frequent cache lines
             for (int i=0; i<end_point; i++) {
                 std::array<int,64> tempCentroid;
+                frequent_entries_stream << std::dec << i << " ";
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = std::get<0>(infiniteFrequentLines[i])[j];
+                    if (j != 63) {
+                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+                    }
+                    else {
+                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
+                    }   
                 }
                 clusterData.push_back(tempCentroid);
             }
+
+
         }
         else if (infinite_freq == "n") {
             // Frequency table doubles as the precompression table
