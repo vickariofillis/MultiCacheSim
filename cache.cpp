@@ -46,7 +46,7 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
     std::string file_path;
 
     if (machine == "cluster") {
-        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/frequent_entries_" + std::to_string(entries) + ".out";
+        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
     }
     else if (machine == "local") {
         file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + size + "_frequent_entries_" + std::to_string(entries) + ".out";
@@ -483,7 +483,6 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // Generating filepath for printing most frequent entries
             std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, data_type, bytes_ignored);
             std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
-            // std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str());
 
             // Fill Precompression table with the most frequent cache lines
             for (int i=0; i<end_point; i++) {
@@ -496,7 +495,7 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                     }
                     else {
                         frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
-                    }   
+                    }
                 }
                 clusterData.push_back(tempCentroid);
             }
@@ -509,11 +508,21 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // Delete centroids vector contents before updating it
             clusterData.clear();
 
+            // Generating filepath for printing most frequent entries
+            std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, data_type, bytes_ignored);
+            std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
+
             // Fill Precompression table with the most frequent cache lines
             for (int i=0; i<entries; i++) {
                 std::array<int,64> tempCentroid;
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = frequentLines[i][j];
+                    if (j != 63) {
+                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+                    }
+                    else {
+                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
+                    }
                 }
                 clusterData.push_back(tempCentroid);
             }
