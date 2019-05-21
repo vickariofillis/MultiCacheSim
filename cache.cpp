@@ -155,18 +155,13 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
         // Update frequency table
         updateFrequencyTable(data, entries, infinite_freq, data_type, bytes_ignored);
 
-        // debug
-        // std::cout << "findPrecompressionEntry <- insertLine\n";
 
         // Check if a precompression table entry is similar to the inserted data
         int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored, sim_threshold);
-        // std::cout << "similarEntry = " << similarEntry << "\n"; // debug
 
         if (similarEntry > -1) {
             //call precompressDatax
             sets[set].emplace_back(tag, state, similarEntry, data, data);
-            // debug
-            // std::cout << "precompressDatax <- insertLine\n";
             precompressDatax(precomp_method, set, tag, data_type, bytes_ignored, ignore_i_bytes);
         }
         else {
@@ -215,16 +210,10 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
                     }
                     /* Update datax */
 
-                    // debug
-                    // std::cout << "findPrecompressionEntry <- updateData\n";
-
                     // Check if a precompression table entry is similar to the updated data
                     int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored, sim_threshold);
-                    // std::cout << "similarEntry = " << std::dec << similarEntry << "\n"; // debug
 
                     if (similarEntry > -1) {
-                        // debug
-                        // std::cout << "precompressDatax <- updateData\n";
                         precompressDatax(precomp_update_method, set, tag, data_type, bytes_ignored, ignore_i_bytes);
                     }
                     else {
@@ -290,31 +279,11 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
             }
         }
     }
+    // FIXME: Change LRU
     else if (infinite_freq == "n") {
 
         // Flag for ignoring LSBytes when checking for similarity
         int ignore_flag = data_type;
-
-        // debug
-        // int frequency_entry = 1; 
-        // std::cout << "\nBefore\n\nFrequency Table with size of: " << std::dec << frequentLines.size() << "\n";
-        // for (uint i=0; i<frequentLines.size(); i++) {
-        //     std::cout << "Entry = " << frequency_entry << "\n";
-        //     std::cout << "Data: (";
-        //     for (int j=0; j<64; j++) {
-        //         if (j != 63) {
-        //             std::cout << std::hex << frequentLines[i][j] << " ";
-        //         }
-        //         else {
-        //             std::cout << std::hex << frequentLines[i][j] << ")";
-        //         }
-        //     }
-        //     // std::cout << " - Similar = " << similar << "\n";
-        //     std::cout << "\n";
-        //     frequency_entry++;
-        // }
-        // std::cout << "\n";
-        // debug
 
         // Checking if the entry already exists
         // found: whether the line was found in the frequency table
@@ -349,47 +318,8 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
             }
             frequentLines.push_back(data);
         }
-
-        // debug
-        // std::cout << "\n\nFound = " << found << "\n";
-        // frequency_entry = 1; 
-        // std::cout << "\nAfter\n\nFrequency Table with size of: " << std::dec << frequentLines.size() << "\n";
-        // for (uint i=0; i<frequentLines.size(); i++) {
-        //     std::cout << "Entry = " << frequency_entry << "\n";
-        //     std::cout << "Data: (";
-        //     for (int j=0; j<64; j++) {
-        //         if (j != 63) {
-        //             std::cout << std::hex << frequentLines[i][j] << " ";
-        //         }
-        //         else {
-        //             std::cout << std::hex << frequentLines[i][j] << ")";
-        //         }
-        //     }
-        //     // std::cout << " - Similar = " << similar << "\n";
-        //     std::cout << "\n";
-        //     frequency_entry++;
-        // }
-        // std::cout << "\n";
-        // std::cout << "------------------------------------------------------------------------------------------------\n";
-        // debug
         
     }
-    
-
-    // debug
-    // std::cout << "\nFrequency Table with size of: " << std::dec << infiniteFrequentLines.size() << "\n";
-    // for (uint i=0; i<infiniteFrequentLines.size(); i++) {
-    //     for (int j=0; j<64; j++) {
-    //         if (j != 63) {
-    //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << " ";
-    //         }
-    //         else {
-    //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << ")";
-    //         }
-    //     }
-    //     std::cout << " / freq = " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n"; // debug
-    // }
-    // std::cout << "\n";
 }
 
 // Updating precompression table
@@ -450,8 +380,6 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             }
         }
 
-        // debug
-        // std::cout << "precompressCache <- updatePrecompressTable\n";    // debug
         // Compute precompressed data (datax) for entire cache
         precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
 
@@ -461,14 +389,9 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
     else if (precomp_update_method == "frequency") {
 
         if (infinite_freq == "y") {
-            // Find the n = entries most frequent cache lines
+            // Find the n (= entries) most frequent cache lines
             // Sort frequency table
             sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int> &a, std::tuple<std::array<int,64>,int>& b) { return std::get<1>(a) > std::get<1>(b); });
-
-            // debug
-            // std::cout << "infiniteFrequentLines size = " << infiniteFrequentLines.size() << "\n";
-            // std::cout << "clusterData size = " << clusterData.size() << "\n";
-            // std::cout << "entries = " << entries << "\n";
 
             // Delete centroids vector contents before updating it
             clusterData.clear();
@@ -515,6 +438,7 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // Fill Precompression table with the most frequent cache lines
             for (int i=0; i<entries; i++) {
                 std::array<int,64> tempCentroid;
+                frequent_entries_stream << std::dec << i << " ";
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = frequentLines[i][j];
                     if (j != 63) {
@@ -535,15 +459,10 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 for (int j=0; j<64; j++) {
                     tempData[j] = it->data[j];
                 }
-                // debug
-                // std::cout << "findPrecompressionEntry <- updatePrecompressTable\n"; // debug
                 it->mapping = findPrecompressionEntry(tempData, precomp_update_method, data_type, bytes_ignored, sim_threshold);
-                // std::cout << "it->mapping = " << it->mapping << "\n";   // debug
             }
         }
 
-        // debug
-        // std::cout << "precompressCache <- updatePrecompressTable\n";    // debug
         // Compute precompressed data (datax) for entire cache
         precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
 
@@ -587,7 +506,6 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
     // Flag for ignoring bytes in case ignore_i_bytes is true
     int ignore_flag = data_type;
 
-    // std::cout << "precompressCache - precomp_method = " << precomp_method << "\n";  // debug
     // Update datax on the entire cache
     for (uint i=0; i<sets.size(); i++) {
         for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
@@ -653,33 +571,13 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
 
     int weight = data_type;
     int sum_weight[clusterData.size()];
-    // bool data_printed = false;  // debug
-
-    // debug
-    // std::cout << "Data = (";   // debug
-    // for (int j=0; j<64; j++) {
-    //     if (!data_printed) {
-    //         if (j != 63) {
-    //             std::cout << std::hex << data[j] << " ";
-    //         }
-    //         else {
-    //             std::cout << std::hex << data[j] << ")\n";
-    //         }
-    //     }
-    // }
-
-    // std::cout << "bytes_ignored = " << bytes_ignored << "\n";   // debug
 
     for (uint i=0; i<clusterData.size(); i++) {
         sum_weight[i] = 0;
         weight = data_type;
         for (int j=0; j<64; j++) {
-            // std::cout << "clusterData[" << std::dec << i << "][" << j << "] = " << std::hex << clusterData[i][j] << "  -  data[" << std::dec << j << "] = " << std::hex << data[j] << "\n";  // debug
             if (clusterData[i][j] == data[j]) {
-                // std::cout << "weight (" << std::dec << weight << ") vs bytes_ignored (" << std::dec << bytes_ignored << ")" << "\n";    // debug
                 if (weight > bytes_ignored) {
-                    // std::cout << "before sum_weight[" << std::dec << i << "] = " << sum_weight[i] << "\n";  // debug
-                    // std::cout << "sum_weight[" << std::dec << i << "] = " << sum_weight[i] << " + " << weight << "\n";  // debug
                     sum_weight[i] = sum_weight[i] + weight;
                 }
             }
@@ -700,12 +598,7 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
         similarEntry = 0;
         int max = sum_weight[0];
 
-        // debug
-        // std::cout << "similarity[0] = " << std::dec << sum_weight[0] << "\n";
-
         for (uint i=1; i<clusterData.size(); i++) {
-            // debug
-            // std::cout << "similarity[" << i << "] = " << std::dec << sum_weight[i] << "\n";
             if (sum_weight[i] > max) {
                 max = sum_weight[i];
                 similarEntry = i;
@@ -718,7 +611,6 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
         }
     }
 
-    // std::cout << "returns similarEntry = " << std::dec << similarEntry << "\n"; // debug
     return similarEntry;
 }
 
@@ -735,15 +627,12 @@ std::tuple<int, int, double, double> Cache::compressionStats(int cache_line_num,
     int actual_way_cnt = 0;
     int max_way_cnt = 0;
 
-    // std::cout << "\nCompression Stats\n\nCache: " << cache_num << "\n\n";   // debug
 
     if (comp_method == "bdi") {
         // Iterate over cache
         for (uint i=0; i<sets.size(); i++) {
             int way_count = 0;
-            // std::cout << "Cache Line #" << std::dec << i << " \n";  // debug
             for (auto it = sets[i].begin(); it != sets[i].end(); ++it) {
-                // std::cout << "Way #" << std::dec << way_count << "\n";  // debug
                 std::array<int,64> tempData;
                 std::array<int,64> tempDatax;
                 for (int j=0; j<64; j++) {
@@ -756,35 +645,6 @@ std::tuple<int, int, double, double> Cache::compressionStats(int cache_line_num,
                     actual_way_cnt = actual_way_cnt + sets[i].size();
                     max_way_cnt = max_way_cnt + assoc;
                 }
-                // debug
-                // for (int j=0; j<64; j++) {
-                //     if (j == 0) {
-                //         std::cout << "Data: (" << std::hex << tempData[j] << " ";
-                //     }
-                //     else if (j == 63) {
-                //         std::cout << std::hex << tempData[j] << ")\n";
-                //     }
-                //     else {
-                //         std::cout << std::hex << tempData[j] << " ";
-                //     }
-                // }
-                // for (int j=0; j<64; j++) {
-                //     if (j == 0) {
-                //         std::cout << "Datax: (" << std::hex << tempDatax[j];
-                //     }
-                //     else if (j == 63) {
-                //         std::cout << std::hex << tempDatax[j] << ")\n";
-                //     }
-                //     else {
-                //         std::cout << std::hex << tempDatax[j] << " ";
-                //     }
-                // }
-                // Save stats for each cache line
-                // beforeCompressedSpace.push_back(bdi(tempData));
-                // afterCompressedSpace.push_back(bdi(tempDatax));
-
-                // Print stats (maybe add file output)
-                // std::cout << std::dec << "Before: -" << bdi(tempData) << "- vs After: -" << bdi(tempDatax) << "-\n";
 
                 way_count++;
                 actual_cache_lines++;
@@ -798,11 +658,7 @@ std::tuple<int, int, double, double> Cache::compressionStats(int cache_line_num,
     cacheUtil = float(actual_cache_lines) / float(cache_line_num);
     // Computing way utilization
     wayUtil = float(actual_way_cnt) / float(max_way_cnt);
-    // std::cout << "\n";   // debug
     std::tuple<int, int, double, double> compressionStats = std::make_tuple(beforeSum, afterSum, cacheUtil, wayUtil);
-
-    // debug
-    // std::cout << "\n(One Access Cache Total) Before Sum: -" << std::dec << beforeSum << "- vs After Sum: -" << afterSum << "-\n";
 
     return compressionStats;
 }
