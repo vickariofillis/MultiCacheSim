@@ -518,10 +518,10 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = frequentLines[i][j];
                     if (j != 63) {
-                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+                        frequent_entries_stream << std::dec << std::get<0>(frequentLines[i])[j] << " ";
                     }
                     else {
-                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
+                        frequent_entries_stream << std::dec << std::get<0>(frequentLines[i])[j] << " " << std::dec << std::get<1>(frequentLines[i]) << "\n";
                     }
                 }
                 clusterData.push_back(tempCentroid);
