@@ -28,11 +28,11 @@ freely, subject to the following restrictions:
 #include <sstream>
 #include <string>
 /* Cluster */
-#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
-#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
+// #include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
+// #include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 /* Local */
-// #include "/home/vic/zstr/src/zstr.hpp"
-// #include "/home/vic/zstr/src/strict_fstream.hpp"
+#include "/home/vic/zstr/src/zstr.hpp"
+#include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
@@ -43,10 +43,13 @@ bool debug = true;
 bool trace_accesses = false;
 bool snapshot = false;
 
+// Flags for output files generation
+bool compression_stats_flag = false;
+
 /* Cluster */
-std::string machine = "cluster";
+// std::string machine = "cluster";
 /* Local */
-// std::string machine = "local";
+std::string machine = "local";
 
 std::string tracefile_generation(const std::string option, const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
 {
@@ -490,16 +493,18 @@ int main(int argc, char* argv[])
                 }
                 if (option == "trace") {
                     std::stringstream output_value;
-                    output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " " << get<3>(trace_info) << " ";
-                    for (uint i=0; i<64; i++) {
-                        if (i!=63) {
-                            output_value << get<4>(trace_info)[i] << " ";
+                    if (get<3>(trace_info) != "I") {
+                        output_value << get<0>(trace_info) << " " << get<1>(trace_info) << " " << get<2>(trace_info) << " " << get<3>(trace_info) << " ";
+                        for (uint i=0; i<64; i++) {
+                            if (i!=63) {
+                                output_value << get<4>(trace_info)[i] << " ";
+                            }
+                            else {
+                                output_value << get<4>(trace_info)[i];
+                            }
                         }
-                        else {
-                            output_value << get<4>(trace_info)[i];
-                        }
+                        trace_outfile << output_value.str() << "\n";
                     }
-                    trace_outfile << output_value.str() << "\n";
                 }
             }
         }
@@ -516,33 +521,50 @@ int main(int argc, char* argv[])
     // Print way utilization stats
     double waySum = 0.0;
 
-    // Generating filepath for printing compression stats
-    std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, \
-        data_type, bytes_ignored);
-    std::ofstream compression_stream(compression_outfile.c_str());
+    /* Compression Stats */
+    /*
+    The format of the compression stats is: Before compressed size, After Compressed size, Cache Utilization, Way Utilization
+    Every line in the file represents the stats after every access to the cache
+    */
+    if (compression_stats_flag) {
+        // Generating filepath for printing compression stats
+        std::string compression_outfile = outfile_generation(machine, precomp_method, precomp_update_method, comp_method, entries, suite, benchmark, size, hit_update, ignore_i_bytes, \
+            data_type, bytes_ignored);
+        std::ofstream compression_stream(compression_outfile.c_str());
 
-    // Print compression stats
-    for (uint i=0; i<fullCompressionStats.size(); i++) {
-        // std::cout << "Access #" << std::dec << i << "\n";   // debug
-        for (uint j=0; j<fullCompressionStats[i].size(); j++) {
-            // std::cout << "Cache #" << std::dec << j << "\n";    // debug
-            if (fullCompressionStats[i].size() == 1) {
-                compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " " << get<2>(fullCompressionStats[i][j]) \
-                    << " " << get<3>(fullCompressionStats[i][j]);
-            }
-            else if (fullCompressionStats[i].size() > 1) {
-                compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " " << get<2>(fullCompressionStats[i][j]) \
-                    << " " << get<3>(fullCompressionStats[i][j]) << " ";
-            }
-            beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
-            afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
-            statsNum++;
-            utilSum = utilSum + get<2>(fullCompressionStats[i][j]);
-            waySum = waySum + get<3>(fullCompressionStats[i][j]);
+        // Print compression stats
+        for (uint i=0; i<fullCompressionStats.size(); i++) {
+            for (uint j=0; j<fullCompressionStats[i].size(); j++) {
+                if (fullCompressionStats[i].size() == 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " " << get<2>(fullCompressionStats[i][j]) \
+                        << " " << get<3>(fullCompressionStats[i][j]);
+                }
+                else if (fullCompressionStats[i].size() > 1) {
+                    compression_stream << get<0>(fullCompressionStats[i][j]) << " " << get<1>(fullCompressionStats[i][j]) << " " << get<2>(fullCompressionStats[i][j]) \
+                        << " " << get<3>(fullCompressionStats[i][j]) << " ";
+                }
+                beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
+                afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
+                statsNum++;
+                utilSum = utilSum + get<2>(fullCompressionStats[i][j]);
+                waySum = waySum + get<3>(fullCompressionStats[i][j]);
 
+            }
+            compression_stream << "\n";
         }
-        compression_stream << "\n";
     }
+    else  {
+        for (uint i=0; i<fullCompressionStats.size(); i++) {
+            for (uint j=0; j<fullCompressionStats[i].size(); j++) {
+                beforeSum = beforeSum + get<0>(fullCompressionStats[i][j]);
+                afterSum = afterSum + get<1>(fullCompressionStats[i][j]);
+                statsNum++;
+                utilSum = utilSum + get<2>(fullCompressionStats[i][j]);
+                waySum = waySum + get<3>(fullCompressionStats[i][j]);
+            }
+        }
+    }
+
 
     std::cout << "Before Compressed Byte Size: " << std::dec << beforeSum << "\n";
     std::cout << "After Compressed Byte Size: " << std::dec << afterSum << "\n";

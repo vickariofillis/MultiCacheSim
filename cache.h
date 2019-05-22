@@ -31,8 +31,8 @@ freely, subject to the following restrictions:
 #include "misc.h"
 
 // File generation for printing most frequent entries
-std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int data_type, \
-    const int bytes_ignored);
+std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, 
+    const std::string infinite_freq, const int data_type, const int bytes_ignored);
 
 // Represents a single cache
 class Cache {
@@ -76,7 +76,7 @@ public:
 private:
     std::vector<std::deque<CacheLine>> sets;
     unsigned int maxSetSize;
-    std::vector<std::array<int,64>> clusterData;
+    std::vector<std::array<int,64>> precompressionTable;
     std::vector<std::tuple<std::array<int,64>,int>> infiniteFrequentLines;
     std::deque<std::array<int,64>> frequentLines;
 };

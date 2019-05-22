@@ -35,21 +35,34 @@ freely, subject to the following restrictions:
 
 // Kmeans
 /* Cluster */
-#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
+// #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 /* Local */
-// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+#include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+
+// Flags for output files generation
+bool frequent_entries_flag = true;
 
 // File generation for printing most frequent entries
-std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int data_type, \
-    const int bytes_ignored)
+std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, \
+    const std::string infinite_freq, const int data_type, const int bytes_ignored)
 {
     std::string file_path;
 
     if (machine == "cluster") {
-        file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
+        if (infinite_freq == "y") {
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(entries) + ".out";
+        }
+        else if (infinite_freq == "n") {
+            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
+        }
     }
     else if (machine == "local") {
-        file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + size + "_frequent_entries_" + std::to_string(entries) + ".out";
+        if (infinite_freq == "y") {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(entries) + ".out";
+        }
+        else if (infinite_freq == "n") {
+            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(entries) + ".out";
+        }
     }
     
 
@@ -168,9 +181,6 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
             sets[set].emplace_back(tag, state, -1, data, data);
         }
     }
-
-    // FIXME: Call function responsible for getting bdi stats (input is cache line data) - ONLY IF I CARE ABOUT THE NEWLY INSERTED LINE
-
 }
 
 // Updating cache data in case of a hit
@@ -192,7 +202,7 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
                         // FIXME: Add other precompression methods
                         if (precomp_method == "xor") {
                             it->data[j] = data[j];
-                            it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+                            it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
                             // xorData(set);    //FIXME
                         }
                     }
@@ -228,9 +238,6 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
             }    
         }
     }
-
-    // FIXME: Call function responsible for getting bdi stats (input is cache line data) - ONLY IF I CARE ABOUT UPDATED DATA
-    // Need to save the correct cache line data, before giving it as input
 }
 
 // Returns the way number of the specified cache line
@@ -352,15 +359,15 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
         }
 
         // Delete centroids vector contents before updating it
-        clusterData.clear();
+        precompressionTable.clear();
 
-        // Updating clusterData (centroids)
+        // Updating precompressionTable (centroids)
         std::array<int,64> tempCentroid = {0};
         for (const auto& mean : std::get<0>(dkmData)) {
             for (int i=0; i<64; i++) {
                 tempCentroid[i] = mean[i];
             }
-            clusterData.push_back(tempCentroid);
+            precompressionTable.push_back(tempCentroid);
         }
 
         // Updating mappings
@@ -394,7 +401,7 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int> &a, std::tuple<std::array<int,64>,int>& b) { return std::get<1>(a) > std::get<1>(b); });
 
             // Delete centroids vector contents before updating it
-            clusterData.clear();
+            precompressionTable.clear();
 
             // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
             int end_point = entries;
@@ -403,53 +410,82 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 end_point = infiniteFrequentLines.size();
             }
 
-            // Generating filepath for printing most frequent entries
-            std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, data_type, bytes_ignored);
-            std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
-
             // Fill Precompression table with the most frequent cache lines
             for (int i=0; i<end_point; i++) {
                 std::array<int,64> tempCentroid;
-                frequent_entries_stream << std::dec << i << " ";
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = std::get<0>(infiniteFrequentLines[i])[j];
-                    if (j != 63) {
-                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " ";
-                    }
-                    else {
-                        frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
-                    }
                 }
-                clusterData.push_back(tempCentroid);
+                precompressionTable.push_back(tempCentroid);
             }
 
+            // Printing most frequent entries
+            if (frequent_entries_flag) {
+                // Generating filepath for printing most frequent entries
+                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, data_type, bytes_ignored);
+                std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
+
+                for (int i=0; i<end_point; i++) {
+                    frequent_entries_stream << std::dec << i << " ";
+                    for (int j=0; j<64; j++) {
+                        if (j != 63) {
+                            frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+                        }
+                        else {
+                            frequent_entries_stream << std::dec << std::get<0>(infiniteFrequentLines[i])[j] << " " << std::dec << std::get<1>(infiniteFrequentLines[i]) << "\n";
+                        }
+                    }
+                }
+            }
+
+            // Reset frequency table
+            infiniteFrequentLines.clear();
 
         }
         else if (infinite_freq == "n") {
             // Frequency table doubles as the precompression table
 
             // Delete centroids vector contents before updating it
-            clusterData.clear();
+            precompressionTable.clear();
 
-            // Generating filepath for printing most frequent entries
-            std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, data_type, bytes_ignored);
-            std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
+            // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
+            int end_point = entries;
+
+            if (frequentLines.size() < entries) {
+                end_point = frequentLines.size();
+            }
 
             // Fill Precompression table with the most frequent cache lines
-            for (int i=0; i<entries; i++) {
+            for (int i=0; i<end_point; i++) {
                 std::array<int,64> tempCentroid;
-                frequent_entries_stream << std::dec << i << " ";
                 for (int j=0; j<64; j++) {
                     tempCentroid[j] = frequentLines[i][j];
-                    if (j != 63) {
-                        frequent_entries_stream << std::dec << frequentLines[i][j] << " ";
-                    }
-                    else {
-                        frequent_entries_stream << std::dec << frequentLines[i][j] << "\n";
+                }
+                precompressionTable.push_back(tempCentroid);
+            }
+
+            // Printing most frequent entries
+            if (frequent_entries_flag) {
+                // Generating filepath for printing most frequent entries
+                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, data_type, bytes_ignored);
+                std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
+
+                for (int i=0; i<end_point; i++) {
+                    frequent_entries_stream << std::dec << i << " ";
+                    for (int j=0; j<64; j++) {
+                        if (j != 63) {
+                            if (frequent_entries_flag) frequent_entries_stream << std::dec << frequentLines[i][j] << " ";
+                        }
+                        else {
+                            if (frequent_entries_flag) frequent_entries_stream << std::dec << frequentLines[i][j] << "\n";
+                        }
                     }
                 }
-                clusterData.push_back(tempCentroid);
             }
+
+            // Reset frequency table
+            frequentLines.clear();
+
         }
 
         // Updating mappings
@@ -481,7 +517,7 @@ void Cache::precompressDatax(std::string precomp_method, uint64_t set, uint64_t 
             for (int j=0; j<64; j++) {
                 if (ignore_i_bytes == "y" && (ignore_flag > bytes_ignored)) {
                     if (precomp_method == "xor") {
-                        it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+                        it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
                         // xorData(set);    //FIXME
                     }
                 }
@@ -491,7 +527,7 @@ void Cache::precompressDatax(std::string precomp_method, uint64_t set, uint64_t 
                 }
                 else if (ignore_i_bytes == "n") {
                     if (precomp_method == "xor") {
-                        it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+                        it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
                         // xorData(set);    //FIXME
                     }
                 }
@@ -513,12 +549,12 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                 if (ignore_i_bytes == "y" && (ignore_flag > bytes_ignored)) {
                     // FIXME: Add other precompression methods
                     if (precomp_method == "xor") {
-                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
-                        // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                        << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
+                        // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ precompressionTable[" \
+                        << std::dec << it->mapping << "][" << j << "] (" << std::hex << precompressionTable[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
-                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ precompressionTable[" \
+                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << precompressionTable[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }
@@ -531,12 +567,12 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
                 }
                 else if (ignore_i_bytes == "n") {
                     if (precomp_method == "xor") {
-                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
-                        // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                        << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                        if (it->mapping > -1) it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
+                        // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ precompressionTable[" \
+                        << std::dec << it->mapping << "][" << j << "] (" << std::hex << precompressionTable[it->mapping][j] << ")\n";   // debug
                         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
-                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ clusterData[" \
-                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << clusterData[it->mapping][j] << ")\n";   // debug
+                            // std::cout << "it->datax[" << std::dec << j << "] (" << std::hex << it->datax[j] << ") = it->data[" << std::dec << j << "] (" << std::hex << it->data[j] << ") ^ precompressionTable[" \
+                            //     << std::dec << it->mapping << "][" << j << "] (" << std::hex << precompressionTable[it->mapping][j] << ")\n";   // debug
                             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
                             abort();
                         }
@@ -554,7 +590,7 @@ void Cache::precompressCache(std::string precomp_method, int data_type, int byte
 //     // Update datax for current line
 //     auto it = sets[set];
 //     for (int j=0; j<64; j++) {
-//         it->datax[j] = it->data[j] ^ clusterData[it->mapping][j];
+//         it->datax[j] = it->data[j] ^ precompressionTable[it->mapping][j];
 //         if ((it->datax[j]) > 255 || (it->datax[j]) < -255) {
 //             std::cout << "\n! The value of the modified cache data is outside of bounds (-255 - 255)! with a value of:" << it->datax[j] << "\n";
 //             abort();
@@ -570,13 +606,13 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
     // If other techniques use it, then an if statement will need to be added
 
     int weight = data_type;
-    int sum_weight[clusterData.size()];
+    int sum_weight[precompressionTable.size()];
 
-    for (uint i=0; i<clusterData.size(); i++) {
+    for (uint i=0; i<precompressionTable.size(); i++) {
         sum_weight[i] = 0;
         weight = data_type;
         for (int j=0; j<64; j++) {
-            if (clusterData[i][j] == data[j]) {
+            if (precompressionTable[i][j] == data[j]) {
                 if (weight > bytes_ignored) {
                     sum_weight[i] = sum_weight[i] + weight;
                 }
@@ -590,7 +626,7 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
 
     int similarEntry;
 
-    if (clusterData.size() < 1) {
+    if (precompressionTable.size() < 1) {
         similarEntry = -1;
     }
     else {
@@ -598,7 +634,7 @@ int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_
         similarEntry = 0;
         int max = sum_weight[0];
 
-        for (uint i=1; i<clusterData.size(); i++) {
+        for (uint i=1; i<precompressionTable.size(); i++) {
             if (sum_weight[i] > max) {
                 max = sum_weight[i];
                 similarEntry = i;
@@ -694,15 +730,15 @@ void Cache::snapshot(int cache_num)
     }
 
     std::cout << "\nPrecompression Table Entries\n\n";
-    for (uint i=0; i<clusterData.size(); i++) {
+    for (uint i=0; i<precompressionTable.size(); i++) {
         std::cout << "Entry #" << std::dec << i << "\n";
         std::cout << "(";
         for (int j=0; j<64; j++) {
             if (j != 63) {
-                std::cout << std::hex << clusterData[i][j] << " ";
+                std::cout << std::hex << precompressionTable[i][j] << " ";
             }
             else {
-                std::cout << std::hex << clusterData[i][j] << ")";
+                std::cout << std::hex << precompressionTable[i][j] << ")";
             }
         }
         std::cout << "\n";

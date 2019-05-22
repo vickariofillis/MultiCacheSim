@@ -320,7 +320,13 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
     }
 
     // In the minimized trace, we want all accesses except Read Hits
-    if (!(accessType == AccessType::Read && hit)) trace_info = std::make_tuple(set, way, tag, type, data);
+    if (!(accessType == AccessType::Read && hit)) {
+        trace_info = std::make_tuple(set, way, tag, type, data);
+    }
+    else {
+        type = 'I';
+        trace_info = std::make_tuple(set, way, tag, type, data);
+    }
     return trace_info;
 
 }
@@ -429,7 +435,13 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
 
         // In the minimized trace, we want all accesses except Read Hits
         // In this case we ignore Read Hits
-        if (accessType == AccessType::Write) trace_info = std::make_tuple(set, way, tag, type, data);
+        if (accessType == AccessType::Write) {
+            trace_info = std::make_tuple(set, way, tag, type, data);
+        }
+        else {
+            type = 'I';
+            trace_info = std::make_tuple(set, way, tag, type, data);
+        }
         return trace_info;
     }
 

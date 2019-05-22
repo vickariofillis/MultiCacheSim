@@ -35,11 +35,11 @@ changeState	cache.cpp	/^void Cache::changeState(uint64_t set, uint64_t tag, Cach
 checkCompulsory	system.cpp	/^void System::checkCompulsory(uint64_t line)$/;"	f	class:System
 checkRemoteStates	system.cpp	/^unsigned int MultiCacheSystem::checkRemoteStates(uint64_t set, $/;"	f	class:MultiCacheSystem
 checkWriteback	cache.cpp	/^bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const$/;"	f	class:Cache
-clusterData	cache.h	/^    std::vector<std::array<int,64>> clusterData;$/;"	m	class:Cache
 compressStats	system.cpp	/^std::vector<std::tuple<int, int, double, double>> MultiCacheSystem::compressStats(int cache_line_num, int assoc, std::string comp_method)$/;"	f	class:MultiCacheSystem
 compressStats	system.cpp	/^std::vector<std::tuple<int, int, double, double>> SingleCacheSystem::compressStats(int cache_line_num, int assoc, std::string comp_method)$/;"	f	class:SingleCacheSystem
 compressionStats	cache.cpp	/^std::tuple<int, int, double, double> Cache::compressionStats(int cache_line_num, int assoc, int cache_num, std::string comp_method)$/;"	f	class:Cache
 compression_debug	compression.cpp	/^bool compression_debug = false;$/;"	v
+compression_stats_flag	main.cpp	/^bool compression_stats_flag = false;$/;"	v
 countCompulsory	system.h	/^   bool countCompulsory;$/;"	m	class:System
 data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine
 datax	misc.h	/^   std::array<int,64> datax;$/;"	m	struct:CacheLine
@@ -48,7 +48,8 @@ evictTraffic	system.cpp	/^void MultiCacheSystem::evictTraffic(uint64_t set, $/;"
 findPrecompressionEntry	cache.cpp	/^int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_update_method, int data_type, int bytes_ignored, int sim_threshold)$/;"	f	class:Cache
 findTag	cache.cpp	/^CacheState Cache::findTag(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 frequentLines	cache.h	/^    std::deque<std::array<int,64>> frequentLines;$/;"	m	class:Cache
-frequent_entries_outfile_generation	cache.cpp	/^std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, const int data_type, \\$/;"	f
+frequent_entries_flag	cache.cpp	/^bool frequent_entries_flag = false;$/;"	v
+frequent_entries_outfile_generation	cache.cpp	/^std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, \\$/;"	f
 getWay	cache.cpp	/^uint Cache::getWay(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 help	main.cpp	/^void help(){$/;"	f
 infiniteFrequentLines	cache.h	/^    std::vector<std::tuple<std::array<int,64>,int>> infiniteFrequentLines;$/;"	m	class:Cache
@@ -82,6 +83,7 @@ precompress	system.cpp	/^void MultiCacheSystem::precompress(std::string machine,
 precompress	system.cpp	/^void SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, \\$/;"	f	class:SingleCacheSystem
 precompressCache	cache.cpp	/^void Cache::precompressCache(std::string precomp_method, int data_type, int bytes_ignored, std::string ignore_i_bytes)$/;"	f	class:Cache
 precompressDatax	cache.cpp	/^void Cache::precompressDatax(std::string precomp_method, uint64_t set, uint64_t tag, int data_type, int bytes_ignored, std::string ignore_i_bytes)$/;"	f	class:Cache
+precompressionTable	cache.h	/^    std::vector<std::array<int,64>> precompressionTable;$/;"	m	class:Cache
 prefetchHit	prefetch.cpp	/^int AdjPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \\$/;"	f	class:AdjPrefetch
 prefetchHit	prefetch.cpp	/^int SeqPrefetch::prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \\$/;"	f	class:SeqPrefetch
 prefetchMiss	prefetch.cpp	/^int AdjPrefetch::prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \\$/;"	f	class:AdjPrefetch
