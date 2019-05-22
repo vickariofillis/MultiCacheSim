@@ -35,9 +35,9 @@ freely, subject to the following restrictions:
 
 // Kmeans
 /* Cluster */
-// #include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
+#include "/aenao-99/karyofyl/dkm-master/include/dkm_parallel.hpp"
 /* Local */
-#include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
+// #include "/home/vic/Documents/dkm-master/include/dkm_parallel.hpp"
 
 // Flags for output files generation
 bool frequent_entries_flag = true;

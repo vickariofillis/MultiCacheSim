@@ -28,11 +28,11 @@ freely, subject to the following restrictions:
 #include <sstream>
 #include <string>
 /* Cluster */
-// #include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
-// #include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
+#include "/aenao-99/karyofyl/zstr/src/zstr.hpp"
+#include "/aenao-99/karyofyl/zstr/src/strict_fstream.hpp"
 /* Local */
-#include "/home/vic/zstr/src/zstr.hpp"
-#include "/home/vic/zstr/src/strict_fstream.hpp"
+// #include "/home/vic/zstr/src/zstr.hpp"
+// #include "/home/vic/zstr/src/strict_fstream.hpp"
 
 #include "system.h"
 
@@ -47,9 +47,9 @@ bool snapshot = false;
 bool compression_stats_flag = false;
 
 /* Cluster */
-// std::string machine = "cluster";
+std::string machine = "cluster";
 /* Local */
-std::string machine = "local";
+// std::string machine = "local";
 
 std::string tracefile_generation(const std::string option, const std::string suite, const std::string benchmark, const std::string size, const std::string machine)
 {
