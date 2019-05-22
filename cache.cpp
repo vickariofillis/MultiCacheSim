@@ -50,18 +50,38 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
 
     if (machine == "cluster") {
         if (infinite_freq == "y") {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(entries) + ".out";
+            if (frequent_entries_flag) {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(entries) + ".out";
+            }
         }
         else if (infinite_freq == "n") {
-            file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
+            if (frequent_entries_flag) {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
+            }
         }
     }
     else if (machine == "local") {
         if (infinite_freq == "y") {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(entries) + ".out";
+            if (frequent_entries_flag) {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(entries) + ".out";
+            }
         }
         else if (infinite_freq == "n") {
-            file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(entries) + ".out";
+            if (frequent_entries_flag) {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(entries) + ".out";
+            }
         }
     }
     
