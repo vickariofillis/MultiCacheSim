@@ -31,9 +31,9 @@ class System;
 class Prefetch {
 public:
    virtual int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) = 0;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) = 0;
    virtual int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) = 0;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) = 0;
 };
 
 // Modeling AMD's L1 prefetcher, a sequential
@@ -42,9 +42,9 @@ public:
 class SeqPrefetch : public Prefetch {
 public:
    int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
    int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
 private:
    uint64_t lastMiss{0};
    uint64_t lastPrefetch{0};
@@ -55,7 +55,7 @@ private:
 class AdjPrefetch : public Prefetch {
 public:
    int prefetchMiss(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
    int prefetchHit(uint64_t address, unsigned int tid, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, \
-    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
+    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;
 };

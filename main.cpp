@@ -189,6 +189,7 @@ void help(){
     std::cout << "-f:   Frequency of updating precompression table\n";
     std::cout << "-x:   Entries of precompression table\n";
     std::cout << "-if:  Infinite frequency table    (y or n)\n";
+    std::cout << "-ft:  Frequent entry stall threshold\n";
     std::cout << "-u:   Precompress data on a write hit    (y or n)\n";
     std::cout << "-c:   Compute or not parts of line that are ignored during finding similarity    (y or n)\n";
     std::cout << "-d:   Data type size    (i.e., 32 bytes or 16 bytes etc.)\n";
@@ -213,6 +214,8 @@ int main(int argc, char* argv[])
     int entries = 8;
 
     std::string infinite_freq = "n";
+    int frequency_threshold = std::numeric_limits<int>::max();
+
     std::string hit_update = "n";
     std::string ignore_i_bytes;
     
@@ -276,6 +279,10 @@ int main(int argc, char* argv[])
         // Whether to have an infinite frequency table
         else if (std::string(argv[i]) == "-if") {
             infinite_freq = argv[i+1];
+        }
+        // # of precompression table updates after which we remove an entry that has remained at a certain frequency
+        else if (std::string(argv[i]) == "-ft") {
+            frequency_threshold = atoi(argv[i+1]);
         }
         // Whether to update the precompressed data on a cache write hit
         else if (std::string(argv[i]) == "-u") {
@@ -349,6 +356,10 @@ int main(int argc, char* argv[])
     if (sim_threshold > max_threshold) {
         std::cout << "Similarity threshold is greater than the maximum allowed (" << max_threshold << ") with the chosen data type (" << data_type << " bytes).\n";
         exit(0);
+    }
+
+    if (frequency_threshold < 0) {
+        std::cout << "Frequency threshold has been set to maximum (no reset).\n";
     }
 
     if (!(entries && !(entries & (entries - 1)))) {
@@ -461,8 +472,8 @@ int main(int argc, char* argv[])
             if(address != 0) {
                 // By default the pinatrace tool doesn't record the tid,
                 // so we make up a tid to stress the MultiCache functionality
-                trace_info = sys.memAccess(address, accessType, lineData, lines%2, precomp_method, precomp_update_method, comp_method, entries, infinite_freq, hit_update, ignore_i_bytes, data_type, \
-                    bytes_ignored, sim_threshold);
+                trace_info = sys.memAccess(address, accessType, lineData, lines%2, precomp_method, precomp_update_method, comp_method, entries, infinite_freq, frequency_threshold, \
+                    hit_update, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
                 // Precompression code
                 if (option == "pre") {
                     // Call compression calculation algorithm
@@ -484,7 +495,8 @@ int main(int argc, char* argv[])
                     // debug
 
                     if ((writes % frequency) == 0 && writes != 0) {
-                        sys.precompress(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, ignore_i_bytes, data_type, bytes_ignored, sim_threshold);
+                        sys.precompress(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
+                            bytes_ignored, sim_threshold);
                         if (debug && snapshot) {
                             cout << "\n";
                             sys.snapshot();

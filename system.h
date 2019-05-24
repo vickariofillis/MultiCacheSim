@@ -79,10 +79,10 @@ public:
           std::unique_ptr<Prefetch> prefetcher, bool count_compulsory=false, 
           bool do_addr_trans=false);
    virtual std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, \
-        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, \
-        int data_type, int bytes_ignored, int sim_threshold) = 0;
+        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, \
+        std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) = 0;
    virtual void precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
-        std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) = 0;
+        std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) = 0;
    virtual std::vector<std::tuple<int, int, double, double>> compressStats(int cache_line_num, int assoc, std::string comp_method) = 0;
    virtual void snapshot() = 0;
    SystemStats stats;
@@ -114,10 +114,10 @@ public:
             bool do_addr_trans=false, unsigned int num_domains=1);
 
    std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, \
-        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, \
-        int data_type, int bytes_ignored, int sim_threshold) override;
+        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, \
+        std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
    void precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
-        std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
+        std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
    std::vector<std::tuple<int, int, double, double>> compressStats(int cache_line_num, int assoc, std::string comp_method) override;
    void snapshot() override;
 };
@@ -131,10 +131,10 @@ public:
                bool do_addr_trans=false);
 
    std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> memAccess(uint64_t address, AccessType type, std::array<int,64> data, unsigned int tid, \
-        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, \
-        int data_type, int bytes_ignored, int sim_threshold) override;
+        std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, \
+        std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
    void precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
-        std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
+        std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;
    std::vector<std::tuple<int, int, double, double>> compressStats(int cache_line_num, int assoc, std::string comp_method) override;
    void snapshot() override;
 private:

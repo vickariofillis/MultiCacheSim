@@ -28,6 +28,8 @@ freely, subject to the following restrictions:
 #include <iterator>
 #include <numeric>
 #include <typeinfo>
+#include <stdio.h>
+#include <sys/stat.h>
 
 #include "misc.h"
 #include "cache.h"
@@ -41,46 +43,64 @@ freely, subject to the following restrictions:
 
 // Flags for output files generation
 bool frequent_entries_flag = true;
+// Flag for checking if frequent entries files already existed
+bool frequent_file_check = false;
+
+// int precomp_updates = 1; // debug
+
+bool fileExists(const std::string& filename)
+{
+    struct stat buf;
+    if (stat(filename.c_str(), &buf) != -1)
+    {
+        return true;
+    }
+    return false;
+}
 
 // File generation for printing most frequent entries
 std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, \
-    const std::string infinite_freq, const int data_type, const int bytes_ignored)
+    const std::string infinite_freq, const int frequency_threshold, const int data_type, const int bytes_ignored)
 {
     std::string file_path;
 
     if (machine == "cluster") {
         if (infinite_freq == "y") {
-            if (frequent_entries_flag) {
+            if (frequency_threshold == 0) {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
             else {
-                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(entries) + ".out";
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(frequency_threshold) \
+                    + "_" + std::to_string(entries) + ".out";
             }
         }
         else if (infinite_freq == "n") {
-            if (frequent_entries_flag) {
+            if (frequency_threshold == 0) {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
             else {
-                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(entries) + ".out";
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(frequency_threshold) \
+                    + "_" + std::to_string(entries) + ".out";
             }
         }
     }
     else if (machine == "local") {
         if (infinite_freq == "y") {
-            if (frequent_entries_flag) {
+            if (frequency_threshold == 0) {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
             else {
-                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(entries) + ".out";
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(frequency_threshold) \
+                    + "_" + std::to_string(entries) + ".out";
             }
         }
         else if (infinite_freq == "n") {
-            if (frequent_entries_flag) {
+            if (frequency_threshold == 0) {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
             else {
-                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(entries) + ".out";
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(frequency_threshold) \
+                    + "_" + std::to_string(entries) + ".out";
             }
         }
     }
@@ -171,7 +191,7 @@ bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const
 // Insert a new cache line by popping the least recently used line if necessary
 // and pushing the new line to the back (most recently used)
 void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \
-    std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+    std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     if (sets[set].size() == maxSetSize) {
       sets[set].pop_front();
@@ -186,7 +206,7 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
     else if (precomp_update_method == "frequency") {
 
         // Update frequency table
-        updateFrequencyTable(data, entries, infinite_freq, data_type, bytes_ignored);
+        updateFrequencyTable(data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
 
         // Check if a precompression table entry is similar to the inserted data
@@ -205,7 +225,7 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 
 // Updating cache data in case of a hit
 void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \
-    std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+    std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
     for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
         if (it->tag == tag) {
@@ -231,7 +251,7 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
             else if (precomp_update_method == "frequency") {
 
                 // Update frequency table
-                updateFrequencyTable(data, entries, infinite_freq, data_type, bytes_ignored);
+                updateFrequencyTable(data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
                 if (hit_update == "y") {
                     // Update data
@@ -272,7 +292,7 @@ uint Cache::getWay(uint64_t set, uint64_t tag) const
     }
 }
 
-void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int data_type, int bytes_ignored)
+void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored)
 {
     // Update frequency table
 
@@ -280,7 +300,7 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
     if (infinite_freq == "y") {
         // Frequency table is empty
         if (infiniteFrequentLines.size() == 0) {
-            infiniteFrequentLines.emplace_back(std::make_tuple(data, 1));
+            infiniteFrequentLines.emplace_back(std::make_tuple(data, 1, 0, 0));
         }
         // Frequency table is not empty
         else {
@@ -302,7 +322,7 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
             }
             // If the new line does not exist in the frequency table
             if (!exists) {
-                infiniteFrequentLines.emplace_back(std::make_tuple(data, 1));
+                infiniteFrequentLines.emplace_back(std::make_tuple(data, 1, 0, 0));
             }
         }
     }
@@ -351,7 +371,7 @@ void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::stri
 
 // Updating precompression table
 void Cache::updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
-    std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
+    std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
 
     // Different ways for filling the precompression table
@@ -407,18 +427,109 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             }
         }
 
-        // Compute precompressed data (datax) for entire cache
-        precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
-
     }
 
     // Precompression table is a frequency table
     else if (precomp_update_method == "frequency") {
 
         if (infinite_freq == "y") {
+
+            // Sorting frequency table based on freq of entries
+            sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int,int,int> &a, std::tuple<std::array<int,64>,int,int,int>& b) \
+                { return std::get<1>(a) > std::get<1>(b); });
+
+            // debug
+            // std::cout << "\nUPDATE = " << precomp_updates << "\n\n";
+            // std::cout << "\nBefore\n\nFrequency Table with size of: " << std::dec << infiniteFrequentLines.size() << "\n";
+            // for (uint i=0; i<entries; i++) {
+            //     std::cout << "Entry = " << i+1 << "\n";
+            //     std::cout << "Data: (";
+            //     for (int j=0; j<64; j++) {
+            //         if (j != 63) {
+            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+            //         }
+            //         else {
+            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << ")";
+            //         }
+            //     }
+            //     std::cout << " / Freq = " << std::dec << std::get<1>(infiniteFrequentLines[i]) << " / Freq_comp = " << std::get<2>(infiniteFrequentLines[i]) << " / Same_counter = " << \
+            //         std::get<3>(infiniteFrequentLines[i]);
+            //     std::cout << "\n";
+            // }
+            // std::cout << "\n";
+            // debug
+
+            // Filter through the most frequent cache lines (infinite) table
+            // for (uint i=0; i<infiniteFrequentLines.size(); i++) {
+            for (uint i=infiniteFrequentLines.size(); i-- > 0;) {
+
+                // Freq has remained the same
+                if (std::get<1>(infiniteFrequentLines[i]) == std::get<2>(infiniteFrequentLines[i])) {
+
+                    // if (i<32) std::cout << "Entry #" << i+1 << ": freq = " << std::get<1>(infiniteFrequentLines[i]) << " EQUAL freq_comp = " << std::get<2>(infiniteFrequentLines[i]) << "\n";   // debug
+                    // Counter for keeping track of # of updates that freq is stagnant (same_counter) is increased
+                    std::get<3>(infiniteFrequentLines[i])++;
+                    // if (i<32) std:: cout << "same_counter = " << std::get<3>(infiniteFrequentLines[i]) << "\n";   // debug
+
+                    // Delete entries that their stagnant period has exceeded the allowed one
+                    if (std::get<3>(infiniteFrequentLines[i]) > frequency_threshold) {
+                        //Checking size of frequency table before removing entries
+                        if (infiniteFrequentLines.size() > entries) {
+                            // if (i<32) std::cout << "Deleting entry #" << i+1 << "\n"; // debug
+                            // if (i<32) {
+                            //     std::cout << "with Data: (";
+                            //     for (int j=0; j<64; j++) {
+                            //         if (j != 63) {
+                            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+                            //         }
+                            //         else {
+                            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << ")";
+                            //         }
+                            //     }
+                            // } // debug
+                            // Deleting entry
+                            infiniteFrequentLines.erase(infiniteFrequentLines.begin() + i);
+                        }
+                    }
+                }
+                // Freq has changed
+                else {
+                    // if (i<32) std::cout << "Entry #" << i+1 << ": freq = " << std::get<1>(infiniteFrequentLines[i]) << " VS freq_comp (old) = " << std::get<2>(infiniteFrequentLines[i]);   // debug
+                    // freq_comp = freq
+                    std::get<2>(infiniteFrequentLines[i]) = std::get<1>(infiniteFrequentLines[i]);
+                    // if (i<32) std::cout << " / freq_comp (new) = " << std::get<2>(infiniteFrequentLines[i]) << "\n";   // debug
+                    // same_counter reset to 0
+                    std::get<3>(infiniteFrequentLines[i]) = 0;
+                }
+            }
+
+            // debug
+            // std::cout << "\nAfter\n\nFrequency Table with size of: " << std::dec << infiniteFrequentLines.size() << "\n";
+            // for (uint i=0; i<entries; i++) {
+            //     std::cout << "Entry = " << i+1 << "\n";
+            //     std::cout << "Data: (";
+            //     for (int j=0; j<64; j++) {
+            //         if (j != 63) {
+            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << " ";
+            //         }
+            //         else {
+            //             std::cout << std::hex << std::get<0>(infiniteFrequentLines[i])[j] << ")";
+            //         }
+            //     }
+            //     std::cout << " / Freq = " << std::dec << std::get<1>(infiniteFrequentLines[i]) << " / Freq_comp = " << std::get<2>(infiniteFrequentLines[i]) << " / Same_counter = " << \
+            //         std::get<3>(infiniteFrequentLines[i]);
+            //     std::cout << "\n";
+            // }
+            // std::cout << "\n";
+            // std::cout << "_________________________________________________________________________________\n";
+            // debug
+
+            // precomp_updates++; // debug
+
             // Find the n (= entries) most frequent cache lines
             // Sort frequency table
-            sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int> &a, std::tuple<std::array<int,64>,int>& b) { return std::get<1>(a) > std::get<1>(b); });
+            // sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int,int,int> &a, std::tuple<std::array<int,64>,int,int,int>& b) \
+            //     { return std::get<1>(a) > std::get<1>(b); });   // FIXME
 
             // Delete centroids vector contents before updating it
             precompressionTable.clear();
@@ -442,7 +553,12 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // Printing most frequent entries
             if (frequent_entries_flag) {
                 // Generating filepath for printing most frequent entries
-                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, data_type, bytes_ignored);
+                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+                if (!frequent_file_check) {
+                    bool file_exists = fileExists(frequent_entries_outfile);
+                    if (file_exists) std::remove(frequent_entries_outfile.c_str());
+                    frequent_file_check = true;
+                }
                 std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
 
                 for (int i=0; i<end_point; i++) {
@@ -459,7 +575,7 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             }
 
             // Reset frequency table
-            infiniteFrequentLines.clear();
+            // infiniteFrequentLines.clear();
 
         }
         else if (infinite_freq == "n") {
@@ -487,24 +603,29 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // Printing most frequent entries
             if (frequent_entries_flag) {
                 // Generating filepath for printing most frequent entries
-                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, data_type, bytes_ignored);
+                std::string frequent_entries_outfile = frequent_entries_outfile_generation(machine, suite, benchmark, size, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+                if (!frequent_file_check) {
+                    bool file_exists = fileExists(frequent_entries_outfile);
+                    if (file_exists) std::remove(frequent_entries_outfile.c_str());
+                    frequent_file_check = true;
+                }
                 std::ofstream frequent_entries_stream(frequent_entries_outfile.c_str(), std::ofstream::out | std::ofstream::app);
 
                 for (int i=0; i<end_point; i++) {
                     frequent_entries_stream << std::dec << i << " ";
                     for (int j=0; j<64; j++) {
                         if (j != 63) {
-                            if (frequent_entries_flag) frequent_entries_stream << std::dec << frequentLines[i][j] << " ";
+                            frequent_entries_stream << std::dec << frequentLines[i][j] << " ";
                         }
                         else {
-                            if (frequent_entries_flag) frequent_entries_stream << std::dec << frequentLines[i][j] << "\n";
+                            frequent_entries_stream << std::dec << frequentLines[i][j] << "\n";
                         }
                     }
                 }
             }
 
             // Reset frequency table
-            frequentLines.clear();
+            // frequentLines.clear();
 
         }
 
@@ -518,11 +639,11 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 it->mapping = findPrecompressionEntry(tempData, precomp_update_method, data_type, bytes_ignored, sim_threshold);
             }
         }
-
-        // Compute precompressed data (datax) for entire cache
-        precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
-
     }
+
+    // Compute precompressed data (datax) for entire cache
+    precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
+
 }
 
 // Computing datax for a cache line
