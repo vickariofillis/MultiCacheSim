@@ -45,14 +45,16 @@ data	misc.h	/^   std::array<int,64> data;$/;"	m	struct:CacheLine
 datax	misc.h	/^   std::array<int,64> datax;$/;"	m	struct:CacheLine
 doAddrTrans	system.h	/^   bool doAddrTrans;$/;"	m	class:System
 evictTraffic	system.cpp	/^void MultiCacheSystem::evictTraffic(uint64_t set, $/;"	f	class:MultiCacheSystem
+fileExists	cache.cpp	/^bool fileExists(const std::string& filename)$/;"	f
 findPrecompressionEntry	cache.cpp	/^int Cache::findPrecompressionEntry(std::array<int,64> data, std::string precomp_update_method, int data_type, int bytes_ignored, int sim_threshold)$/;"	f	class:Cache
 findTag	cache.cpp	/^CacheState Cache::findTag(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 frequentLines	cache.h	/^    std::deque<std::array<int,64>> frequentLines;$/;"	m	class:Cache
-frequent_entries_flag	cache.cpp	/^bool frequent_entries_flag = false;$/;"	v
+frequent_entries_flag	cache.cpp	/^bool frequent_entries_flag = true;$/;"	v
 frequent_entries_outfile_generation	cache.cpp	/^std::string frequent_entries_outfile_generation(const std::string machine, const std::string suite, const std::string benchmark, const std::string size, const int entries, \\$/;"	f
+frequent_file_check	cache.cpp	/^bool frequent_file_check = false;$/;"	v
 getWay	cache.cpp	/^uint Cache::getWay(uint64_t set, uint64_t tag) const$/;"	f	class:Cache
 help	main.cpp	/^void help(){$/;"	f
-infiniteFrequentLines	cache.h	/^    std::vector<std::tuple<std::array<int,64>,int>> infiniteFrequentLines;$/;"	m	class:Cache
+infiniteFrequentLines	cache.h	/^    std::vector<std::tuple<std::array<int,64>,int,int,int>> infiniteFrequentLines;$/;"	m	class:Cache
 insertLine	cache.cpp	/^void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \\$/;"	f	class:Cache
 isLocal	system.cpp	/^bool MultiCacheSystem::isLocal(uint64_t address, unsigned int local)$/;"	f	class:MultiCacheSystem
 lineMask	system.h	/^   uint64_t lineMask;$/;"	m	class:System
@@ -64,12 +66,12 @@ memAccess	system.cpp	/^std::tuple<uint64_t, uint, uint64_t, std::string, std::ar
 operator <	misc.h	/^   bool operator<(const CacheLine& rhs) const$/;"	f	struct:CacheLine
 operator ==	misc.h	/^   bool operator==(const CacheLine& rhs) const$/;"	f	struct:CacheLine
 outfile_generation	main.cpp	/^std::string outfile_generation(const std::string machine, const std::string precomp_method, const std::string precomp_update_method, const std::string comp_method, const int entries, \\$/;"	f
-override	prefetch.h	/^    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;$/;"	m	class:AdjPrefetch
-override	prefetch.h	/^    int entries, std::string infinite_freq, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;$/;"	m	class:SeqPrefetch
-override	system.h	/^        int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:MultiCacheSystem
-override	system.h	/^        int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:SingleCacheSystem
-override	system.h	/^        std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:MultiCacheSystem
-override	system.h	/^        std::string infinite_freq, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:SingleCacheSystem
+override	prefetch.h	/^    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;$/;"	m	class:AdjPrefetch
+override	prefetch.h	/^    int entries, std::string infinite_freq, int frequency_threshold, std::string hit_update, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold, System& sys) override;$/;"	m	class:SeqPrefetch
+override	system.h	/^        std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:MultiCacheSystem
+override	system.h	/^        std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:SingleCacheSystem
+override	system.h	/^        std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:MultiCacheSystem
+override	system.h	/^        std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold) override;$/;"	m	class:SingleCacheSystem
 override	system.h	/^   std::vector<std::tuple<int, int, double, double>> compressStats(int cache_line_num, int assoc, std::string comp_method) override;$/;"	m	class:MultiCacheSystem
 override	system.h	/^   std::vector<std::tuple<int, int, double, double>> compressStats(int cache_line_num, int assoc, std::string comp_method) override;$/;"	m	class:SingleCacheSystem
 override	system.h	/^   void snapshot() override;$/;"	m	class:MultiCacheSystem
@@ -80,7 +82,7 @@ pageShift	misc.h	/^constexpr uint32_t pageShift = 12;$/;"	v
 pageShift	misc.h	/^constexpr uint32_t pageShift = 21;$/;"	v
 pageToDomain	system.h	/^   std::unordered_map<uint64_t, unsigned int> pageToDomain;$/;"	m	class:MultiCacheSystem
 precompress	system.cpp	/^void MultiCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \\$/;"	f	class:MultiCacheSystem
-precompress	system.cpp	/^void SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, std::string infinite_freq, \\$/;"	f	class:SingleCacheSystem
+precompress	system.cpp	/^void SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \\$/;"	f	class:SingleCacheSystem
 precompressCache	cache.cpp	/^void Cache::precompressCache(std::string precomp_method, int data_type, int bytes_ignored, std::string ignore_i_bytes)$/;"	f	class:Cache
 precompressDatax	cache.cpp	/^void Cache::precompressDatax(std::string precomp_method, uint64_t set, uint64_t tag, int data_type, int bytes_ignored, std::string ignore_i_bytes)$/;"	f	class:Cache
 precompressionTable	cache.h	/^    std::vector<std::array<int,64>> precompressionTable;$/;"	m	class:Cache
@@ -107,7 +109,7 @@ trace_accesses	main.cpp	/^bool trace_accesses = false;$/;"	v
 trace_info	system.h	/^   std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> trace_info;$/;"	m	class:System
 tracefile_generation	main.cpp	/^std::string tracefile_generation(const std::string option, const std::string suite, const std::string benchmark, const std::string size, const std::string machine)$/;"	f
 updateData	cache.cpp	/^void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \\$/;"	f	class:Cache
-updateFrequencyTable	cache.cpp	/^void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int data_type, int bytes_ignored)$/;"	f	class:Cache
+updateFrequencyTable	cache.cpp	/^void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, \\$/;"	f	class:Cache
 updateLRU	cache.cpp	/^void Cache::updateLRU(uint64_t set, uint64_t tag)$/;"	f	class:Cache
 updatePageToDomain	system.cpp	/^void MultiCacheSystem::updatePageToDomain(uint64_t address, $/;"	f	class:MultiCacheSystem
 updatePrecompressTable	cache.cpp	/^void Cache::updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \\$/;"	f	class:Cache

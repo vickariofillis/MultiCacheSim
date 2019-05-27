@@ -57,7 +57,7 @@ public:
     // Returns the way number of the specified cache line
     uint getWay(uint64_t set, uint64_t tag) const;
     // Update frequency table
-    void updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored);
+    void updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored);
     // Updating precompression table
     void updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
         std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold);

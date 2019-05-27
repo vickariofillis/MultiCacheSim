@@ -26,6 +26,7 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <iomanip>
 #include <iterator>
+#include <limits>
 #include <numeric>
 #include <typeinfo>
 #include <stdio.h>
@@ -69,6 +70,9 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
             if (frequency_threshold == 0) {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
+            else if (frequency_threshold == std::numeric_limits<int>::max()) {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_max_" + std::to_string(entries) + ".out";
+            }
             else {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/infinite_frequent_entries_" + std::to_string(frequency_threshold) \
                     + "_" + std::to_string(entries) + ".out";
@@ -77,6 +81,9 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
         else if (infinite_freq == "n") {
             if (frequency_threshold == 0) {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else if (frequency_threshold == std::numeric_limits<int>::max()) {
+                file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_max_" + std::to_string(entries) + ".out";
             }
             else {
                 file_path = "/aenao-99/karyofyl/results/mcs/" + suite + "/" + benchmark + "/" + size + "/compressibility/finite_frequent_entries_" + std::to_string(frequency_threshold) \
@@ -89,6 +96,9 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
             if (frequency_threshold == 0) {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_reset_" + std::to_string(entries) + ".out";
             }
+            else if (frequency_threshold == std::numeric_limits<int>::max()) {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_max_" + std::to_string(entries) + ".out";
+            }
             else {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "infinite_frequent_entries_" + std::to_string(frequency_threshold) \
                     + "_" + std::to_string(entries) + ".out";
@@ -97,6 +107,9 @@ std::string frequent_entries_outfile_generation(const std::string machine, const
         else if (infinite_freq == "n") {
             if (frequency_threshold == 0) {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_reset_" + std::to_string(entries) + ".out";
+            }
+            else if (frequency_threshold == std::numeric_limits<int>::max()) {
+                file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_max_" + std::to_string(entries) + ".out";
             }
             else {
                 file_path = "/home/vic/Documents/MultiCacheSim/tests/traces/" + suite + "/" + benchmark + "/" + "finite_frequent_entries_" + std::to_string(frequency_threshold) \
@@ -193,6 +206,13 @@ bool Cache::checkWriteback(uint64_t set, uint64_t& tag) const
 void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<int,64> data, std::string precomp_method, std::string precomp_update_method, std::string comp_method, int entries, \
     std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
+    std::string action;
+
+    // Increasing the freq counter in the appropriate frequency table entry
+    action = "d";
+    // Update frequency table
+    updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+
     if (sets[set].size() == maxSetSize) {
       sets[set].pop_front();
     }
@@ -205,8 +225,10 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
     }
     else if (precomp_update_method == "frequency") {
 
+        // Increasing the freq counter in the appropriate frequency table entry
+        action = "i";
         // Update frequency table
-        updateFrequencyTable(data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+        updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
 
         // Check if a precompression table entry is similar to the inserted data
@@ -250,8 +272,11 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
             }
             else if (precomp_update_method == "frequency") {
 
+                // Increasing the freq counter in the appropriate frequency table entry
+                std::string action = "i";
+
                 // Update frequency table
-                updateFrequencyTable(data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+                updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
                 if (hit_update == "y") {
                     // Update data
@@ -292,39 +317,84 @@ uint Cache::getWay(uint64_t set, uint64_t tag) const
     }
 }
 
-void Cache::updateFrequencyTable(std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored)
+void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, \
+    int bytes_ignored)
 {
     // Update frequency table
 
     // Infinite frequency table
     if (infinite_freq == "y") {
-        // Frequency table is empty
-        if (infiniteFrequentLines.size() == 0) {
-            infiniteFrequentLines.emplace_back(std::make_tuple(data, 1, 0, 0));
-        }
-        // Frequency table is not empty
-        else {
-            // If the new line exists in the frequency table
-            // exists: whether the new line exists in the frequency table
-            bool exists = false;
-            for (uint i=0; i<infiniteFrequentLines.size(); i++) {
-                // similar: whether the new line is the same as the current one we are comparing it with (in the frequency table)
-                bool similar = true;
-                for (int j=0; j<64; j++) {
-                    if (std::get<0>(infiniteFrequentLines[i])[j] != data[j]) {
-                        similar = false;
-                    }
-                }
-                if (similar) {
-                    std::get<1>(infiniteFrequentLines[i])++;
-                    exists = true;
-                }
-            }
-            // If the new line does not exist in the frequency table
-            if (!exists) {
+
+        // Increasing the freq counter in the appropriate frequency table entry
+        if (action == "i") {
+            // Frequency table is empty
+            if (infiniteFrequentLines.size() == 0) {
                 infiniteFrequentLines.emplace_back(std::make_tuple(data, 1, 0, 0));
             }
+            // Frequency table is not empty
+            else {
+                // If the new line exists in the frequency table
+                // exists: whether the new line exists in the frequency table
+                bool exists = false;
+                for (uint i=0; i<infiniteFrequentLines.size(); i++) {
+                    // similar: whether the new line is the same as the current one we are comparing it with (in the frequency table)
+                    bool similar = true;
+                    for (int j=0; j<64; j++) {
+                        if (std::get<0>(infiniteFrequentLines[i])[j] != data[j]) {
+                            similar = false;
+                        }
+                    }
+                    if (similar) {
+                        std::get<1>(infiniteFrequentLines[i])++;
+                        exists = true;
+                    }
+                }
+                // If the new line does not exist in the frequency table
+                if (!exists) {
+                    infiniteFrequentLines.emplace_back(std::make_tuple(data, 1, 0, 0));
+                }
+            }
         }
+        // Decreasing the freq counter in the appropriate frequency table entry
+        else if (action == "d") {
+            // Iterate on cache
+            for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
+                if (it->tag == tag) {
+                    // Find similarEntry from precompression table
+                    int similarEntry = it->mapping;
+                    // Get similarEntry's data
+                    std::array<int,64> tempSimilarData;
+                    for (uint i=0; i<precompressionTable.size(); i++) {
+                        for (int j=0; j<64; j++) {
+                            tempSimilarData[j] = precompressionTable[i][j];
+                        }
+                    }
+                    // Decrement its counter from frequency table
+                    // exists is used for making sure that the precompression table entry is in the frequency table
+                    bool exists = false;
+                    for (uint i=0; i<infiniteFrequentLines.size(); i++) {
+                        // similar: used here for finding the same precompression table entry in the frequency table
+                        // it MUST be in the frequency table
+                        bool similar = true;
+                        for (int j=0; j<64; j++) {
+                            if (std::get<0>(infiniteFrequentLines[i])[j] != tempSimilarData[j]) {
+                                similar = false;
+                            }
+                        }
+                        if (similar) {
+                            std::get<1>(infiniteFrequentLines[i])--;
+                            std::cout << "\n!!! freq was decreased from " << std::get<1>(infiniteFrequentLines[i])+1 << " to " << std::get<1>(infiniteFrequentLines[i]) << "\n";
+                            exists = true;
+                        }
+                    }
+                    if (!exists) {
+                        std::cout << "ERROR: The entry in the precompression table MUST exists in the frequency table.";
+                        abort();
+                    }
+                }
+            }
+        }
+
     }
     // FIXME: Change LRU
     else if (infinite_freq == "n") {
@@ -574,9 +644,6 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 }
             }
 
-            // Reset frequency table
-            // infiniteFrequentLines.clear();
-
         }
         else if (infinite_freq == "n") {
             // Frequency table doubles as the precompression table
@@ -623,9 +690,6 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                     }
                 }
             }
-
-            // Reset frequency table
-            // frequentLines.clear();
 
         }
 
