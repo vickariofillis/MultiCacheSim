@@ -208,13 +208,15 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
 {
     std::string action;
 
-    // Increasing the freq counter in the appropriate frequency table entry
-    action = "d";
-    // Update frequency table
-    updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
-
     if (sets[set].size() == maxSetSize) {
-      sets[set].pop_front();
+        // Increasing the freq counter in the appropriate frequency table entry
+        action = "d";
+        // Get data of cache line to be removed
+        auto it = sets[set].begin();
+        int mapping = it->mapping;
+        // Update frequency table (decrement freq counter)
+        // updateFrequencyTable(action, set, tag, data, mapping, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+        sets[set].pop_front();
     }
 
     // Generic cache line insertion
@@ -228,14 +230,13 @@ void Cache::insertLine(uint64_t set, uint64_t tag, CacheState state, std::array<
         // Increasing the freq counter in the appropriate frequency table entry
         action = "i";
         // Update frequency table
-        updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+        updateFrequencyTable(action, set, tag, data, -1, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
 
         // Check if a precompression table entry is similar to the inserted data
         int similarEntry = findPrecompressionEntry(data, precomp_update_method, data_type, bytes_ignored, sim_threshold);
 
         if (similarEntry > -1) {
-            //call precompressDatax
             sets[set].emplace_back(tag, state, similarEntry, data, data);
             precompressDatax(precomp_method, set, tag, data_type, bytes_ignored, ignore_i_bytes);
         }
@@ -276,7 +277,7 @@ void Cache::updateData(uint64_t set, uint64_t tag, std::array<int,64> data, std:
                 std::string action = "i";
 
                 // Update frequency table
-                updateFrequencyTable(action, set, tag, data, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
+                updateFrequencyTable(action, set, tag, data, -1, entries, infinite_freq, frequency_threshold, data_type, bytes_ignored);
 
                 if (hit_update == "y") {
                     // Update data
@@ -317,7 +318,7 @@ uint Cache::getWay(uint64_t set, uint64_t tag) const
     }
 }
 
-void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, \
+void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int mapping, int entries, std::string infinite_freq, int frequency_threshold, int data_type, \
     int bytes_ignored)
 {
     // Update frequency table
@@ -357,43 +358,39 @@ void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag,
         }
         // Decreasing the freq counter in the appropriate frequency table entry
         else if (action == "d") {
-            // Iterate on cache
-            for (auto it = sets[set].begin(); it != sets[set].end(); ++it) {
-                if (it->tag == tag) {
-                    // Find similarEntry from precompression table
-                    int similarEntry = it->mapping;
-                    // Get similarEntry's data
-                    std::array<int,64> tempSimilarData;
-                    for (uint i=0; i<precompressionTable.size(); i++) {
-                        for (int j=0; j<64; j++) {
-                            tempSimilarData[j] = precompressionTable[i][j];
+            // Checking to see whether this cache line had been mapped to a precompression table entry
+            if (mapping != -1) {
+                // Get precompression table entry's data
+                std::array<int,64> tempSimilarData;
+                for (int j=0; j<64; j++) {
+                    tempSimilarData[j] = precompressionTable[mapping][j];
+                }
+                // Decrement its counter from frequency table
+                // exists is used for making sure that the precompression table entry is in the frequency table
+                bool exists = false;
+                for (uint i=0; i<infiniteFrequentLines.size(); i++) {
+                    // similar: used here for finding the same precompression table entry in the frequency table
+                    // it MUST be in the frequency table
+                    bool similar = true;
+                    for (int j=0; j<64; j++) {
+                        if (std::get<0>(infiniteFrequentLines[i])[j] != tempSimilarData[j]) {
+                            similar = false;
                         }
                     }
-                    // Decrement its counter from frequency table
-                    // exists is used for making sure that the precompression table entry is in the frequency table
-                    bool exists = false;
-                    for (uint i=0; i<infiniteFrequentLines.size(); i++) {
-                        // similar: used here for finding the same precompression table entry in the frequency table
-                        // it MUST be in the frequency table
-                        bool similar = true;
-                        for (int j=0; j<64; j++) {
-                            if (std::get<0>(infiniteFrequentLines[i])[j] != tempSimilarData[j]) {
-                                similar = false;
-                            }
-                        }
-                        if (similar) {
-                            std::get<1>(infiniteFrequentLines[i])--;
-                            std::cout << "\n!!! freq was decreased from " << std::get<1>(infiniteFrequentLines[i])+1 << " to " << std::get<1>(infiniteFrequentLines[i]) << "\n";
-                            exists = true;
-                        }
+                    if (similar) {
+                        std::get<1>(infiniteFrequentLines[i])--;
+                        // std::cout << "\n!!! freq was decreased from " << std::get<1>(infiniteFrequentLines[i])+1 << " to " << std::get<1>(infiniteFrequentLines[i]) << "\n"; // debug
+                        exists = true;
                     }
-                    if (!exists) {
-                        std::cout << "ERROR: The entry in the precompression table MUST exists in the frequency table.";
-                        abort();
-                    }
+                }
+                if (!exists) {
+                    std::cout << "ERROR: The entry in the precompression table MUST exists in the frequency table.";
+                    abort();
                 }
             }
         }
+
+        // Decrement the frequency of all entries by one
 
     }
     // FIXME: Change LRU
@@ -440,7 +437,7 @@ void Cache::updateFrequencyTable(std::string action, uint64_t set, uint64_t tag,
 }
 
 // Updating precompression table
-void Cache::updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+double Cache::updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
     std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
 
@@ -468,6 +465,16 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             dkmData = dkm::kmeans_lloyd_parallel(inputData,entries);
         }
 
+        // Keeping track of the changes from the current precompression table to the next one
+        std::vector<std::array<int,64>> tempPrecompressionTable;
+        for (uint i=0; i<precompressionTable.size(); i++) {
+            std::array<int,64> tempEntry;
+            for (int j=0; j<64; j++) {
+                tempEntry[j] = precompressionTable[i][j];
+            }
+            tempPrecompressionTable.push_back(tempEntry);
+        }
+
         // Delete centroids vector contents before updating it
         precompressionTable.clear();
 
@@ -479,6 +486,30 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             }
             precompressionTable.push_back(tempCentroid);
         }
+
+        // Checking the percentage of precompression table entries that changed
+        int same_entries = 0;
+        for (uint i=0; i<tempPrecompressionTable.size(); i++) {
+            // Checking if a previous entry is the same with more than one new entries - NOT ALLOWED
+            int same_limit = 0;
+            for (uint k=0; k<precompressionTable.size(); k++) {
+                bool same = true;
+                for (int j=0; j<64; j++) {
+                    if (tempPrecompressionTable[i][j] != precompressionTable[k][j]) {
+                        same = false;
+                    }
+                }
+                if (same) {
+                    same_entries++;
+                    same_limit++;
+                }
+            }
+            if (same_limit > 1) {
+                std::cout << "\n!!! Entry from old precompression table is exactly the same to more than new entries.\n";
+                abort();
+            }
+        }
+        changed_portion = double(entries - same_entries) / double(entries);
 
         // Updating mappings
         std::vector<uint32_t> labels;
@@ -601,7 +632,17 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
             // sort(infiniteFrequentLines.begin(),infiniteFrequentLines.end(),[](std::tuple<std::array<int,64>,int,int,int> &a, std::tuple<std::array<int,64>,int,int,int>& b) \
             //     { return std::get<1>(a) > std::get<1>(b); });   // FIXME
 
-            // Delete centroids vector contents before updating it
+            // Keeping track of the changes from the current precompression table to the next one
+            std::vector<std::array<int,64>> tempPrecompressionTable;
+            for (uint i=0; i<precompressionTable.size(); i++) {
+                std::array<int,64> tempEntry;
+                for (int j=0; j<64; j++) {
+                    tempEntry[j] = precompressionTable[i][j];
+                }
+                tempPrecompressionTable.push_back(tempEntry);
+            }
+
+            // Delete precompression table entries before updating it
             precompressionTable.clear();
 
             // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
@@ -619,6 +660,30 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 }
                 precompressionTable.push_back(tempCentroid);
             }
+
+            // Checking the percentage of precompression table entries that changed
+            int same_entries = 0;
+            for (uint i=0; i<tempPrecompressionTable.size(); i++) {
+                // Checking if a previous entry is the same with more than one new entries - NOT ALLOWED
+                int same_limit = 0;
+                for (uint k=0; k<precompressionTable.size(); k++) {
+                    bool same = true;
+                    for (int j=0; j<64; j++) {
+                        if (tempPrecompressionTable[i][j] != precompressionTable[k][j]) {
+                            same = false;
+                        }
+                    }
+                    if (same) {
+                        same_entries++;
+                        same_limit++;
+                    }
+                }
+                if (same_limit > 1) {
+                    std::cout << "\n!!! Entry from old precompression table is exactly the same to more than new entries.\n";
+                    abort();
+                }
+            }
+            changed_portion = double(entries - same_entries) / double(entries);
 
             // Printing most frequent entries
             if (frequent_entries_flag) {
@@ -648,7 +713,17 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
         else if (infinite_freq == "n") {
             // Frequency table doubles as the precompression table
 
-            // Delete centroids vector contents before updating it
+            // Keeping track of the changes from the current precompression table to the next one
+            std::vector<std::array<int,64>> tempPrecompressionTable;
+            for (uint i=0; i<precompressionTable.size(); i++) {
+                std::array<int,64> tempEntry;
+                for (int j=0; j<64; j++) {
+                    tempEntry[j] = precompressionTable[i][j];
+                }
+                tempPrecompressionTable.push_back(tempEntry);
+            }
+
+            // Delete precompression table entries before updating it
             precompressionTable.clear();
 
             // end_point is used to make sure that the Precompression table is not filled with frequent lines that do not exist
@@ -666,6 +741,30 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
                 }
                 precompressionTable.push_back(tempCentroid);
             }
+
+            // Checking the percentage of precompression table entries that changed
+            int same_entries = 0;
+            for (uint i=0; i<tempPrecompressionTable.size(); i++) {
+                // Checking if a previous entry is the same with more than one new entries - NOT ALLOWED
+                int same_limit = 0;
+                for (uint k=0; k<precompressionTable.size(); k++) {
+                    bool same = true;
+                    for (int j=0; j<64; j++) {
+                        if (tempPrecompressionTable[i][j] != precompressionTable[k][j]) {
+                            same = false;
+                        }
+                    }
+                    if (same) {
+                        same_entries++;
+                        same_limit++;
+                    }
+                }
+                if (same_limit > 1) {
+                    std::cout << "\n!!! Entry from old precompression table is exactly the same to more than new entries.\n";
+                    abort();
+                }
+            }
+            changed_portion = double(entries - same_entries) / double(entries);
 
             // Printing most frequent entries
             if (frequent_entries_flag) {
@@ -707,6 +806,26 @@ void Cache::updatePrecompressTable(std::string machine, std::string suite, std::
 
     // Compute precompressed data (datax) for entire cache
     precompressCache(precomp_method, data_type, bytes_ignored, ignore_i_bytes);
+
+    // debug
+    // std::cout << "\n\nPrecompression Table" << "\n";
+    // for (uint i=0; i<entries; i++) {
+    //     std::cout << "Entry = " << std::dec << i+1 << "\n";
+    //     std::cout << "Data: (";
+    //     for (int j=0; j<64; j++) {
+    //         if (j != 63) {
+    //             std::cout << std::hex << precompressionTable[i][j] << " ";
+    //         }
+    //         else {
+    //             std::cout << std::hex << precompressionTable[i][j] << ")\n";
+    //         }
+    //     }
+    // }
+    // std::cout << "Same Portion of Precompression Table = " << std::dec << (1-changed_portion) << "\n";
+    // std::cout << "_________________________________________________________________________________\n";
+    // debug
+
+    return changed_portion;
 
 }
 

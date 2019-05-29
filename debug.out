@@ -1,0 +1,37 @@
+
+Input Stats
+___________________________________________________
+
+Suite: polybench
+Benchmark: trisolv
+Size: small
+Simulator functionality: pre
+Precompression method: xor
+Precompression table update method: frequency
+Compression method: bdi
+Frequency: 5000
+Entries: 32
+Precompress on write hit: y
+Infinite Frequency table: y
+Compute ignored bytes: n
+Data type size: 8
+Bytes ignored: 2
+Similarity threshold: 0
+___________________________________________________
+
+Before Compressed Byte Size: 22540536
+After Compressed Byte Size: 17093568
+After / Before Ratio: 0.758348
+Average Cache Utilization: 0.998966
+Average Way Utilization: 0.999579
+Average Precompression Table Turnover: 0.0625
+
+___________________________________________________
+Accesses: 22360
+Hits: 20531
+Misses: 1829
+Local reads: 1829
+Local writes: 102
+Remote reads: 0
+Remote writes: 0
+Other-cache reads: 0

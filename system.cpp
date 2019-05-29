@@ -333,13 +333,20 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> MultiCache
 
 }
 
-void MultiCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+double MultiCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
     std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
+    double changed_portion[caches.size()];
+    double total_changed_portion = 0.0 ;
     for (uint i=0; i<caches.size(); i++) {
-        caches[i]->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
+        changed_portion[i] = caches[i]->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
             bytes_ignored, sim_threshold);
     }
+    for (uint i=0; i<caches.size(); i++) {
+        total_changed_portion = total_changed_portion + changed_portion[i];
+    }
+    total_changed_portion = total_changed_portion / caches.size();
+    return total_changed_portion;
 }
 
 std::vector<std::tuple<int, int, double, double>> MultiCacheSystem::compressStats(int cache_line_num, int assoc, std::string comp_method)
@@ -484,11 +491,12 @@ std::tuple<uint64_t, uint, uint64_t, std::string, std::array<int,64>> SingleCach
     return trace_info;
 }
 
-void SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+double SingleCacheSystem::precompress(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
     std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold)
 {
-    cache->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
+    double changed_portion = cache->updatePrecompressTable(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
         bytes_ignored, sim_threshold);
+    return changed_portion;
 }
 
 std::vector<std::tuple<int, int, double, double>> SingleCacheSystem::compressStats(int cache_line_num, int assoc, std::string comp_method)

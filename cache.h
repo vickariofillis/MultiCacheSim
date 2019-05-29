@@ -57,9 +57,9 @@ public:
     // Returns the way number of the specified cache line
     uint getWay(uint64_t set, uint64_t tag) const;
     // Update frequency table
-    void updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored);
+    void updateFrequencyTable(std::string action, uint64_t set, uint64_t tag, std::array<int,64> data, int mapping, int entries, std::string infinite_freq, int frequency_threshold, int data_type, int bytes_ignored);
     // Updating precompression table
-    void updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
+    double updatePrecompressTable(std::string machine, std::string suite, std::string benchmark, std::string size, int entries, std::string precomp_method, std::string precomp_update_method, \
         std::string infinite_freq, int frequency_threshold, std::string ignore_i_bytes, int data_type, int bytes_ignored, int sim_threshold);
     // Computing data after precompression is applied (for a single cache line)
     void precompressDatax(std::string precomp_method, uint64_t set, uint64_t tag, int data_type, int bytes_ignored, std::string ignore_i_bytes);
@@ -80,5 +80,7 @@ private:
     // Data, freq, freq_comp, same_cntr
     std::vector<std::tuple<std::array<int,64>,int,int,int>> infiniteFrequentLines;
     std::deque<std::array<int,64>> frequentLines;
+    // Keeping track of average change of entries in the precompression table
+    double changed_portion = 0.0;
 };
 

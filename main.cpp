@@ -394,9 +394,9 @@ int main(int argc, char* argv[])
     4MB -> 65536 lines
     8MB -> 131072 lines
     */
-    int cache_line_num = 16384;
+    int cache_line_num = 4096;
     // Associativity
-    int assoc = 4;
+    int assoc = 2;
 
     // tid_map is used to inform the simulator how
     // thread ids map to NUMA/cache domains. Using
@@ -441,6 +441,12 @@ int main(int argc, char* argv[])
     std::vector<std::tuple<int, int, double, double>> compressionStats;
     // Compression stats of cache(s) (saving stats for the entire trace)
     std::vector<std::vector<std::tuple<int, int, double, double>>> fullCompressionStats;
+
+    // Keeping track of the portion of entries that change every time precompression table gets updated
+    double changed_portion = 0.0;
+    double same_portion = 0.0;
+    bool first_update = false;
+    int precompression_updates = 0;
 
     while(getline(infile,line))
     {
@@ -495,8 +501,15 @@ int main(int argc, char* argv[])
                     // debug
 
                     if ((writes % frequency) == 0 && writes != 0) {
-                        sys.precompress(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
+                        changed_portion = sys.precompress(machine, suite, benchmark, size, entries, precomp_method, precomp_update_method, infinite_freq, frequency_threshold, ignore_i_bytes, data_type, \
                             bytes_ignored, sim_threshold);
+                        if (!first_update) {
+                            first_update = true;
+                        }
+                        else {
+                            same_portion = same_portion + (1 - changed_portion);
+                            precompression_updates++;
+                        }
                         if (debug && snapshot) {
                             cout << "\n";
                             sys.snapshot();
@@ -580,9 +593,10 @@ int main(int argc, char* argv[])
 
     std::cout << "Before Compressed Byte Size: " << std::dec << beforeSum << "\n";
     std::cout << "After Compressed Byte Size: " << std::dec << afterSum << "\n";
-    std::cout << "Before / After Ratio: " << std::dec << (float(afterSum) / float(beforeSum)) << "\n";
+    std::cout << "After / Before Ratio: " << std::dec << (float(afterSum) / float(beforeSum)) << "\n";
     std::cout << "Average Cache Utilization: " << std::dec << (utilSum / statsNum) << "\n";
-    std::cout << "Average Way Utilization: " << std::dec << (waySum / statsNum) << "\n\n";
+    std::cout << "Average Way Utilization: " << std::dec << (waySum / statsNum) << "\n";
+    std::cout << "Average Precompression Table Turnover: " << std::dec << (1-(same_portion / precompression_updates)) << "\n\n";
 
     std::cout << "___________________________________________________\n";
 
